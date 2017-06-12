@@ -469,38 +469,38 @@
         </dependencies>
     </dependencyManagement>
     <!-- 本机-->
-    <distributionManagement>
-        <repository>
-            <id>maven-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>
-                http://localhost:8081/repository/maven-releases/
-            </url>
-        </repository>
-        <snapshotRepository>
-            <id>maven-snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>
-                http://localhost:8081/repository/maven-snapshots/
-            </url>
-        </snapshotRepository>
-    </distributionManagement>
-    <!--地利-->
     <!--<distributionManagement>-->
         <!--<repository>-->
-            <!--<id>central</id>-->
-            <!--<name>Artifactory Release Repository</name>-->
+            <!--<id>maven-releases</id>-->
+            <!--<name>Nexus Release Repository</name>-->
             <!--<url>-->
-                <!--http://mvn2.diligrp.com/artifactory/libs-release-local-->
+                <!--http://localhost:8081/repository/maven-releases/-->
             <!--</url>-->
         <!--</repository>-->
         <!--<snapshotRepository>-->
-            <!--<id>central</id>-->
-            <!--<name>Artifactory Snapshot Repository</name>-->
+            <!--<id>maven-snapshots</id>-->
+            <!--<name>Nexus Snapshot Repository</name>-->
             <!--<url>-->
-                <!--http://mvn2.diligrp.com/artifactory/libs-snapshot-local-->
+                <!--http://localhost:8081/repository/maven-snapshots/-->
             <!--</url>-->
         <!--</snapshotRepository>-->
     <!--</distributionManagement>-->
+    <!--地利-->
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>Artifactory Release Repository</name>
+            <url>
+                http://mvn2.diligrp.com/artifactory/libs-release-local
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>central</id>
+            <name>Artifactory Snapshot Repository</name>
+            <url>
+                http://mvn2.diligrp.com/artifactory/libs-snapshot-local
+            </url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
