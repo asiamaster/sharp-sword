@@ -1,0 +1,2 @@
+#org.springframework.context.ApplicationContextInitializer=com.dili.utils.boot.retrofitful.RetrofitfulRegistrar
+#package.path.to.your.MyApplicationContextInitializerApplicationContextInitializer

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <properties resource="generator/generator-config1.properties"/>
+
+    <context id="Mysql" targetRuntime="MyBatis3Simple" defaultModelType="flat">
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <!-- Mapper插件 -->
+        <!-- mappers属性为*Mapper.java要继承的接口全名 -->
+        <plugin type="${mapper.plugin}">
+            <property name="mappers" value="com.dili.utils.base.MyMapper"/>
+            <property name="beginningDelimiter" value="`"/>
+            <property name="endingDelimiter" value="`"/>
+        </plugin>
+
+        <!-- Service生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <!--<plugin type="com.dili.utils.mbg.MyServicePlugin">-->
+            <!--<property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"></property>-->
+            <!--<property name="targetPackage" value="com.dili.utils.service"></property>-->
+            <!--&lt;!&ndash; 此配置用于getActualDao方法的返回对象import，需要获取Mapper类的包路径 &ndash;&gt;-->
+            <!--&lt;!&ndash; 如果不配置，则从下面的<javaClientGenerator>标签的targetPackage属性获取 &ndash;&gt;-->
+            <!--&lt;!&ndash; 如果再没有<javaClientGenerator>标签，则根据targetPackage属性减去service加上dao来生成 &ndash;&gt;-->
+            <!--<property name="javaClientTargetPackage" value="com.dili.utils.dao"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
+            <!--<property name="serviceSuperClass" value="com.dili.utils.base.BaseServiceImpl"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
+            <!--<property name="serviceSuperInterface" value="com.dili.utils.base.BaseService"></property>-->
+        <!--</plugin>-->
+
+        <!-- Controller生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <plugin type="com.dili.utils.mbg.MyControllerPlugin">
+            <property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"></property>
+            <property name="targetPackage" value="com.dili.utils.controller"></property>
+            <!-- 如果不配置，则不会在类上继承 -->
+            <!--<property name="controllerSuperClass" value="com.dili.utils.base.BaseControllerImpl"></property>-->
+            <!-- 如果不配置，则不会在接口上继承 -->
+            <!--<property name="controllerSuperInterface" value="com.dili.utils.base.BaseController"></property>-->
+        </plugin>
+
+        <!-- Mybatis配置文件生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <!-- fileName不填默认为mybatis-config.xml -->
+        <!--<plugin type="com.dili.utils.mbg.MyMapperConfigPlugin">-->
+            <!--<property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources/"></property>-->
+            <!--<property name="targetPackage" value="/"></property>-->
+            <!--<property name="fileName" value="mybatis-config.xml" />-->
+        <!--</plugin>-->
+
+        <!-- 根据beetl模板文件生成代码插件 -->
+        <!-- targetDir和templateRootDir必填 -->
+        <!-- overwrite属性默认为false，这里无法获取maven plugin中配置的overwrite属性，需要单独解析 -->
+        <!--<plugin type="com.dili.utils.mbg.beetl.BeetlTemplatesPlugin">-->
+            <!--<property name="targetDir" value="d:/tpl"></property>-->
+            <!--<property name="templateRootDir" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/mbg-templates"></property>-->
+            <!--<property name="basePackage" value="com.dili.utils.dao" />-->
+            <!--<property name="basePackage_dir" value="com/dili/ec/" />-->
+            <!--<property name="overwrite" value="true" />-->
+            <!--<property name="appName" value="ec"/>-->
+            <!--<property name="projectName" value="electronic-clearing"/>-->
+        <!--</plugin>-->
+
+        <commentGenerator type="org.mybatis.generator.internal.DefaultCommentGenerator">
+            <!--**阻止**生成注释，默认为false-->
+            <property name="suppressAllComments" value="false"/>
+            <!--**阻止**生成的注释包含时间戳，默认为false-->
+            <property name="suppressDate" value="false"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/ping_server?createDatabaseIfNotExist=true&amp;autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;allowMultiQueries=true"
+                        userId="root"
+                        password="123456">
+        </jdbcConnection>
+
+        <javaModelGenerator targetPackage="com.dili.utils.domain.mbg" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"/>
+
+        <!--<sqlMapGenerator targetPackage="mapper"  targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources"/>-->
+
+        <!--<javaClientGenerator targetPackage="com.dili.utils.dao" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java" type="XMLMAPPER" />-->
+
+        <!--<table tableName="%" >-->
+            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
+        <!--</table>-->
+        <table domainObjectName="Device" tableName="device">
+            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
+        </table>
+        <!--<table domainObjectName="Person" tableName="person">-->
+            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
+        <!--</table>-->
+    </context>
+</generatorConfiguration>

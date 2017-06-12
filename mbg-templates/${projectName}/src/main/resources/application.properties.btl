@@ -1,0 +1,22 @@
+spring.profiles.active=\${build.profile.id}
+#swagger����
+springfox.documentation.swagger.v2.host=${appName}.brtc.com
+springfox.documentation.swagger.v2.path=/swagger/api-docs
+
+
+#��redis
+#redis.enable=true
+#��beetl
+beetl.enable=true
+quartz.enabled=false
+#��freemarker
+#freemarker.enable=true
+#��swagger,���ʵ�ַ:http://host:port/swagger-ui.html
+swagger.enable=true
+swagger.basePackage=com.dili.${appName}.controller
+#��druid���
+druidFilter.enable=true
+#��mongodb
+#mongodb.enable=true
+#��web���ã�����listener, filter��servlet
+web.enable=true

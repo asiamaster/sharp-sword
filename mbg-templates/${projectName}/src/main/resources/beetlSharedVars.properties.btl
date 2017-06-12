@@ -1,0 +1,10 @@
+#\u7CFB\u7EDF\u540D\u79F0
+project_name=${appName}
+#本地地址
+url_local=http://${appName}.dili.com
+#本地静态资源地址
+url_local_static=
+#静态资源项目地址
+url_static=http://static.1n4j.com
+
+

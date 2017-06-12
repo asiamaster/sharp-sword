@@ -1,0 +1,18 @@
+# 数据库配置
+jdbc.driverClass=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://127.0.0.1:3306/${appName}?createDatabaseIfNotExist=true&amp;autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;allowMultiQueries=true
+jdbc.user=root
+jdbc.password=123456
+
+#c3p0
+jdbc.maxPoolSize=50
+jdbc.minPoolSize=10
+jdbc.maxStatements=100
+jdbc.testConnection=true
+
+# 通用Mapper配置
+mapper.plugin=com.dili.utils.mbg.MyMapperPlugin
+mapper.Mapper=com.dili.utils.base.MyMapper
+myMapperConfig.Plugin=com.dili.utils.mbg.MyMapperConfigPlugin
+myService.Plugin=com.dili.utils.mbg.MyServicePlugin
+myController.Plugin=com.dili.utils.mbg.MyControllerPlugin
