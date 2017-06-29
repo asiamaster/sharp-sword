@@ -1,4 +1,4 @@
-# Êý¾Ý¿âÅäÖÃ
+# ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½
 jdbc.driverClass=com.mysql.jdbc.Driver
 jdbc.url=jdbc:mysql://127.0.0.1:3306/${appName}?createDatabaseIfNotExist=true&amp;autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;allowMultiQueries=true
 jdbc.user=root
@@ -10,9 +10,9 @@ jdbc.minPoolSize=10
 jdbc.maxStatements=100
 jdbc.testConnection=true
 
-# Í¨ÓÃMapperÅäÖÃ
-mapper.plugin=com.dili.utils.mbg.MyMapperPlugin
-mapper.Mapper=com.dili.utils.base.MyMapper
-myMapperConfig.Plugin=com.dili.utils.mbg.MyMapperConfigPlugin
-myService.Plugin=com.dili.utils.mbg.MyServicePlugin
-myController.Plugin=com.dili.utils.mbg.MyControllerPlugin
+# Í¨ï¿½ï¿½Mapperï¿½ï¿½ï¿½ï¿½
+mapper.plugin=com.dili.ss.mbg.MyMapperPlugin
+mapper.Mapper=com.dili.ss.base.MyMapper
+myMapperConfig.Plugin=com.dili.ss.mbg.MyMapperConfigPlugin
+myService.Plugin=com.dili.ss.mbg.MyServicePlugin
+myController.Plugin=com.dili.ss.mbg.MyControllerPlugin

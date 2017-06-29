@@ -38,11 +38,11 @@
                             <td style="padding:5px;">
                                 <%
                                 //初始化数据
-                                var jsonObject = @com.dili.utils.mbg.beetl.BeetlTemplateUtil.getJsonObject(field.remarks);
-                                var fieldName = @com.dili.utils.mbg.beetl.BeetlTemplateUtil.getFieldName(field.remarks);
+                                var jsonObject = @com.dili.ss.mbg.beetl.BeetlTemplateUtil.getJsonObject(field.remarks);
+                                var fieldName = @com.dili.ss.mbg.beetl.BeetlTemplateUtil.getFieldName(field.remarks);
                                 //没有注释则直接使用javaProperty
                                 fieldName = (fieldName == null || fieldName=="") ? field.javaProperty :fieldName;
-                                var comment = @com.dili.utils.mbg.beetl.BeetlTemplateUtil.getComment(field.remarks);
+                                var comment = @com.dili.ss.mbg.beetl.BeetlTemplateUtil.getComment(field.remarks);
                                 //注释中有JSON参数，则处理成下拉框
                                 if( jsonObject!=null){
                                     var data = jsonObject["data"];
@@ -70,6 +70,9 @@
                                 <input class="easyui-datebox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:'" />
                                     <%}else if(field.jdbcTypeName=="INTEGER" || field.jdbcTypeName=="BIGINT"){%>
                                 <input class="easyui-numberbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" />
+                                    <%}else if(field.jdbcTypeName=="BIT"){%>
+                                <input class="easyui-numberbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,1]'" <% if(field.nullable == false){ %>
+                                    required="true" <%}%>/>
                                     <%}else{%>
                                 <input class="easyui-textbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" />
                                     <%}%>
@@ -113,8 +116,8 @@
                               continue;
                           }
                           //初始化数据
-                          var jsonObject = @com.dili.utils.mbg.beetl.BeetlTemplateUtil.getJsonObject(field.remarks);
-                          var fieldName = @com.dili.utils.mbg.beetl.BeetlTemplateUtil.getFieldName(field.remarks);
+                          var jsonObject = @com.dili.ss.mbg.beetl.BeetlTemplateUtil.getJsonObject(field.remarks);
+                          var fieldName = @com.dili.ss.mbg.beetl.BeetlTemplateUtil.getFieldName(field.remarks);
                           //没有注释则直接使用javaProperty
                           fieldName = (fieldName == null || fieldName=="") ? field.javaProperty :fieldName;
                           var provider = null;
@@ -198,11 +201,11 @@
                 <td style="padding:5px;">
                     <%
                     //初始化数据
-                    var jsonObject = @com.dili.utils.mbg.beetl.BeetlTemplateUtil.getJsonObject(field.remarks);
-                    var fieldName = @com.dili.utils.mbg.beetl.BeetlTemplateUtil.getFieldName(field.remarks);
+                    var jsonObject = @com.dili.ss.mbg.beetl.BeetlTemplateUtil.getJsonObject(field.remarks);
+                    var fieldName = @com.dili.ss.mbg.beetl.BeetlTemplateUtil.getFieldName(field.remarks);
                     //没有注释则直接使用javaProperty
                     fieldName = (fieldName == null || fieldName=="") ? field.javaProperty :fieldName;
-                    var comment = @com.dili.utils.mbg.beetl.BeetlTemplateUtil.getComment(field.remarks);
+                    var comment = @com.dili.ss.mbg.beetl.BeetlTemplateUtil.getComment(field.remarks);
                     //注释中有JSON参数，则处理成下拉框
                     if( jsonObject!=null){
                         var data = jsonObject["data"];
@@ -232,6 +235,9 @@
                         required="true" <%}%>/>
                         <%}else if(field.jdbcTypeName=="INTEGER" || field.jdbcTypeName=="BIGINT"){%>
                     <input class="easyui-numberbox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
+                        required="true" <%}%>/>
+                        <%}else if(field.jdbcTypeName=="BIT"){%>
+                    <input class="easyui-numberbox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,1]'" <% if(field.nullable == false){ %>
                         required="true" <%}%>/>
                         <%}else{%>
                     <input class="easyui-textbox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" <% if(field.nullable == false){ %>

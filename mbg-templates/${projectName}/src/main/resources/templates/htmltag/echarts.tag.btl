@@ -1,6 +1,6 @@
 <!-- echarts -->
-<script type="text/javascript" src="\${contextPath}/ec/echarts/echarts.common.min.js"></script>
+<script type="text/javascript" src="\${contextPath}/resources/echarts/echarts.common.min.js"></script>
 <!-- echarts扩展 -->
 <script type="text/javascript" src="\${contextPath}/common/echarts/echarts_extend.js"></script>
 <!-- echarts主题 -->
-<script src="\${contextPath}/ec/echarts/themes/shine.js"></script>
+<script src="\${contextPath}/resources/echarts/themes/shine.js"></script>

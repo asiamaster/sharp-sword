@@ -24,6 +24,8 @@
     var _chartsTitle = '${_title}';
     //副标题参数选填
     var _chartsSubTitle = '${_subTitle!}';
+    //其它图表参数
+    var options = ${_options!"{\}" };
 
     $.ajax({
         type: "POST",
@@ -32,11 +34,11 @@
         dataType: "json",
         success: function(data){
             <% if(_type!=null && _type=="Pie"){ %>
-                var opt = MyECharts.ChartOptionTemplates.Pie(_chartsTitle, _chartsSubTitle, data, _chartsNameField, _chartsValueField);
+                var opt = MyECharts.ChartOptionTemplates.Pie(_chartsTitle, _chartsSubTitle, data, _chartsNameField, _chartsValueField, options);
             <% } else if (_type!=null && _type=="Line"){ %>
-                var opt = MyECharts.ChartOptionTemplates.Line(_chartsTitle, _chartsSubTitle, data, _chartsNameField, _chartsValueField, _chartsGroupField);
+                var opt = MyECharts.ChartOptionTemplates.Line(_chartsTitle, _chartsSubTitle, data, _chartsNameField, _chartsValueField, _chartsGroupField, options);
             <% } else if (_type!=null && _type=="Bar"){ %>
-                var opt = MyECharts.ChartOptionTemplates.Bar(_chartsTitle, _chartsSubTitle, data, _chartsNameField, _chartsValueField, _chartsGroupField);
+                var opt = MyECharts.ChartOptionTemplates.Bar(_chartsTitle, _chartsSubTitle, data, _chartsNameField, _chartsValueField, _chartsGroupField, options);
             <% } else{ %>
                 var opt = {};
             <% } %>

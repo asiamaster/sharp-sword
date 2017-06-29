@@ -1,7 +1,7 @@
 package com.dili;
 
-import com.dili.utils.base.MyMapper;
-import com.dili.utils.quartz.SchedulerConfig;
+import com.dili.ss.base.MyMapper;
+import com.dili.ss.quartz.SchedulerConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableAutoConfiguration(exclude = {ThymeleafAutoConfiguration.class, VelocityAutoConfiguration.class})
 @MapperScan(basePackages = "com.dili.${appName}.dao", markerInterface = MyMapper.class)
 //@ImportResource(locations = "classpath:applicationContext.xml")
-@ComponentScan(basePackages={"com.dili.utils","com.dili.${appName}"})
+@ComponentScan(basePackages={"com.dili.ss","com.dili.${appName}"})
 //@EnableEncryptableProperties
 //@PropertySource(name="EncryptedProperties", value = "classpath:security.properties")
 @EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:security.properties")

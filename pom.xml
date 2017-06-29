@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dili</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <artifactId>sharp-sword</artifactId>
     <description>利刃</description>
     <packaging>jar</packaging>
@@ -16,6 +16,7 @@
         <mapper.version>3.3.9</mapper.version>
         <mysql.version>5.1.40</mysql.version>
         <aspectj.version>1.8.10</aspectj.version>
+        <projectdir>${basedir}</projectdir>
     </properties>
 
 
@@ -99,103 +100,110 @@
                 <!--</dependencies>-->
             <!--</plugin>-->
 
-            <plugin>
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <version>2.0.14</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>proguard</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <attach>true</attach>
-                    <!-- 使用5.3.2版本来混淆 -->
-                    <proguardVersion>5.3.2</proguardVersion>
-                    <obfuscate>true</obfuscate>
-                    <attachArtifactClassifier>pg</attachArtifactClassifier>
-                    <proguardInclude>${basedir}/proguard.conf</proguardInclude>
-                    <addMavenDescriptor>false</addMavenDescriptor>
-                    <!-- attach 的作用是在 install 与 deploy 时将生成的 pg 文件也安装与部署 -->
-                    <options> <!-- 详细配置方式参考 ProGuard 官方文档 -->
-                        <!--<option>-dontobfuscate</option>-->
-                        <!--<option>-ignorewarnings</option> &lt;!&ndash;忽略所有告警&ndash;&gt;-->
-                        <!--<option>-dontshrink</option>   &lt;!&ndash;不做 shrink &ndash;&gt;-->
-                        <!--<option>-dontoptimize</option> &lt;!&ndash;不做 optimize &ndash;&gt;-->
-                        <option>-dontskipnonpubliclibraryclasses</option><!-- 指定不去忽略非公共库的类 -->
-                        <option>-dontskipnonpubliclibraryclassmembers</option><!-- 指定不去忽略非公共库的类 -->
-                        <option>-dontusemixedcaseclassnames</option> <!--混合时不使用大小写混合，混合后的类名为小写-->
-                        <!--<option>-optimizationpasses 5</option> &lt;!&ndash;代码混淆压缩比，在0~7之间，默认为5，一般不做修改&ndash;&gt;-->
-                        <option>-verbose</option><!--这句话能够使我们的项目混淆后产生映射文件,包含有类名->混淆后类名的映射关系-->
-                        <!--<option>-repackageclasses org.noahx.proguard.example.project2.pg</option>-->
-                        <!--平行包结构（重构包层次），所有混淆的类放在 pg 包下-->
+            <!--<plugin>-->
+                <!--<groupId>com.github.wvengen</groupId>-->
+                <!--<artifactId>proguard-maven-plugin</artifactId>-->
+                <!--<version>2.0.14</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>proguard</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<configuration>-->
+                    <!--<attach>true</attach>-->
+                    <!--&lt;!&ndash; 使用5.3.2版本来混淆 &ndash;&gt;-->
+                    <!--<proguardVersion>5.3.2</proguardVersion>-->
+                    <!--<obfuscate>true</obfuscate>-->
+                    <!--<attachArtifactClassifier>pg</attachArtifactClassifier>-->
+                    <!--<proguardInclude>${basedir}/proguard.conf</proguardInclude>-->
+                    <!--<addMavenDescriptor>false</addMavenDescriptor>-->
+                    <!--&lt;!&ndash; attach 的作用是在 install 与 deploy 时将生成的 pg 文件也安装与部署 &ndash;&gt;-->
+                    <!--<options> &lt;!&ndash; 详细配置方式参考 ProGuard 官方文档 &ndash;&gt;-->
+                        <!--&lt;!&ndash;<option>-dontobfuscate</option>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<option>-ignorewarnings</option> &lt;!&ndash;忽略所有告警&ndash;&gt;&ndash;&gt;-->
+                        <!--&lt;!&ndash;<option>-dontshrink</option>   &lt;!&ndash;不做 shrink &ndash;&gt;&ndash;&gt;-->
+                        <!--&lt;!&ndash;<option>-dontoptimize</option> &lt;!&ndash;不做 optimize &ndash;&gt;&ndash;&gt;-->
+                        <!--<option>-dontskipnonpubliclibraryclasses</option>&lt;!&ndash; 指定不去忽略非公共库的类 &ndash;&gt;-->
+                        <!--<option>-dontskipnonpubliclibraryclassmembers</option>&lt;!&ndash; 指定不去忽略非公共库的类 &ndash;&gt;-->
+                        <!--<option>-dontusemixedcaseclassnames</option> &lt;!&ndash;混合时不使用大小写混合，混合后的类名为小写&ndash;&gt;-->
+                        <!--&lt;!&ndash;<option>-optimizationpasses 5</option> &lt;!&ndash;代码混淆压缩比，在0~7之间，默认为5，一般不做修改&ndash;&gt;&ndash;&gt;-->
+                        <!--<option>-verbose</option>&lt;!&ndash;这句话能够使我们的项目混淆后产生映射文件,包含有类名->混淆后类名的映射关系&ndash;&gt;-->
+                        <!--&lt;!&ndash;<option>-repackageclasses org.noahx.proguard.example.project2.pg</option>&ndash;&gt;-->
+                        <!--&lt;!&ndash;平行包结构（重构包层次），所有混淆的类放在 pg 包下&ndash;&gt;-->
 
-                        <!-- 以下为 Keep，哪些内容保持不变，因为有一些内容混淆后（a,b,c）导致反射或按类名字符串相关的操作失效 -->
+                        <!--&lt;!&ndash; 以下为 Keep，哪些内容保持不变，因为有一些内容混淆后（a,b,c）导致反射或按类名字符串相关的操作失效 &ndash;&gt;-->
 
-                        <option>-keep class **.package-info</option>
-                        <!--保持包注解类-->
+                        <!--<option>-keep class **.package-info</option>-->
+                        <!--&lt;!&ndash;保持包注解类&ndash;&gt;-->
 
-                        <!--JAXB NEED，具体原因不明，不加会导致 JAXB 出异常，如果不使用 JAXB 根据需要修改-->
-                        <!-- Jaxb requires generics to be available to perform xml parsing and without this option ProGuard was not retaining that information after obfuscation. That was causing the exception above. -->
+                        <!--&lt;!&ndash;JAXB NEED，具体原因不明，不加会导致 JAXB 出异常，如果不使用 JAXB 根据需要修改&ndash;&gt;-->
+                        <!--&lt;!&ndash; Jaxb requires generics to be available to perform xml parsing and without this option ProGuard was not retaining that information after obfuscation. That was causing the exception above. &ndash;&gt;-->
 
-                        <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod</option>
-                        <!--保持源码名与行号（异常时有明确的栈信息），注解（默认会过滤掉所有注解，会影响框架的注解）-->
+                        <!--<option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod</option>-->
+                        <!--&lt;!&ndash;保持源码名与行号（异常时有明确的栈信息），注解（默认会过滤掉所有注解，会影响框架的注解）&ndash;&gt;-->
 
-                        <option>-keepclassmembers enum com.dili.utils.** { *;}</option>
-                        <!--资源类变量需要保留-->
+                        <!--<option>-keepclassmembers enum com.dili.ss.** { *;}</option>-->
+                        <!--&lt;!&ndash;资源类变量需要保留&ndash;&gt;-->
 
-                        <option>-keepdirectories</option>
-                        <option>-keep class com.dili.utils.domain.** { *;}</option>
-                        <option>-keep class com.dili.utils.consts.** { *;}</option>
-                        <option>-keep class com.dili.utils.base.** { *;}</option>
-                        <option>-keep class com.dili.utils.beetl.** { *;}</option>
-                        <option>-keep class com.dili.utils.boot.** { *;} </option>
-                        <option>-keep class com.dili.utils.mbg.** { *;} </option>
-                        <option>-keep class com.dili.utils.quartz.** { *;} </option>
-                        <!--<option>-keep class com.dili.utils.spring.** { *;} </option>-->
-                        <!-- 排除所有注解类 -->
-                        <option>-keep class * extends java.lang.annotation.Annotation { *; }</option>
-                        <option>-keep interface * extends java.lang.annotation.Annotation { *; }</option>
+                        <!--<option>-keepdirectories</option>-->
+                        <!--<option>-keep class com.dili.ss.domain.** { *;}</option>-->
+                        <!--<option>-keep class com.dili.ss.constant.** { *;}</option>-->
+                        <!--<option>-keep class com.dili.ss.base.** { *;}</option>-->
+                        <!--<option>-keep class com.dili.ss.beetl.** { *;}</option>-->
+                        <!--<option>-keep class com.dili.ss.boot.** { *;}</option>-->
+                        <!--<option>-keep class com.dili.ss.mbg.** { *;}</option>-->
+                        <!--<option>-keep class com.dili.ss.quartz.** { *;}</option>-->
+                        <!--&lt;!&ndash;<option>-keep class com.dili.ssring.** { *;} </option>&ndash;&gt;-->
+                        <!--&lt;!&ndash; 排除所有注解类 &ndash;&gt;-->
+                        <!--<option>-keep class * extends java.lang.annotation.Annotation { *; }</option>-->
+                        <!--<option>-keep interface * extends java.lang.annotation.Annotation { *; }</option>-->
 
-                        <!--保持 Bean 类，（由于很多框架会对 Bean 中的内容做反射处理，请根据自己的业务调整） -->
+                        <!--&lt;!&ndash;保持 Bean 类，（由于很多框架会对 Bean 中的内容做反射处理，请根据自己的业务调整） &ndash;&gt;-->
 
-                        <!--<option>-keep class com.dili.utils.BeanConver { public void init(); public void-->
-                            <!--destroy(); }-->
-                        <!--</option>-->
-                        <option>-keep class com.dili.utils.BeanConver { *; }</option>
-                        <option>-keep class com.dili.utils.MoneyUtils { *; }</option>
-                        <option>-keep class com.dili.utils.RedisUtil { *; }</option>
-                        <option>-keep class com.dili.utils.ReflectionUtils { *; }</option>
-                        <option>-keep class com.dili.utils.SpringUtil { *; }</option>
-                        <option>-keep class com.dili.http.okhttp.OkHttpUtils { *; }</option>
-                        <option>-keep class com.dili.utils.ip.SM { *;} </option>
+                        <!--&lt;!&ndash;<option>-keep class com.dili.ssanConver { public void init(); public void&ndash;&gt;-->
+                            <!--&lt;!&ndash;destroy(); }&ndash;&gt;-->
+                        <!--&lt;!&ndash;</option>&ndash;&gt;-->
+                        <!--<option>-keep class com.dili.ss.util.BeanConver { *; }</option>-->
+                        <!--<option>-keep class com.dili.ss.util.MoneyUtils { *; }</option>-->
+                        <!--<option>-keep class com.dili.ss.util.RedisUtil { *; }</option>-->
+                        <!--<option>-keep class com.dili.ss.util.ReflectionUtils { *; }</option>-->
+                        <!--<option>-keep class com.dili.ss.util.SpringUtil { *; }</option>-->
+                        <!--<option>-keep class com.dili.http.okhttp.OkHttpUtils { *; }</option>-->
+                        <!--<option>-keep class com.dili.ss.ip.SM { *;}</option>-->
 
-                        <!-- okhttp util -->
-                        <option>-dontwarn okio.**</option>
-                        <!-- 保持对外的接口性质类对外的类名与方法名不变 -->
+                        <!--&lt;!&ndash; okhttp util &ndash;&gt;-->
+                        <!--<option>-dontwarn okio.**</option>-->
+                        <!--&lt;!&ndash; 保持对外的接口性质类对外的类名与方法名不变 &ndash;&gt;-->
 
-                    </options>
-                    <injar>${project.build.finalName}.jar</injar>
-                    <outjar>${project.build.finalName}-pg.jar</outjar>
-                    <libs>
-                        <lib>${java.home}/lib/rt.jar</lib>
-                    </libs>
+                    <!--</options>-->
+                    <!--<injar>${project.build.finalName}.jar</injar>-->
+                    <!--<outjar>${project.build.finalName}-pg.jar</outjar>-->
+                    <!--<libs>-->
+                        <!--<lib>${java.home}/lib/rt.jar</lib>-->
+                    <!--</libs>-->
 
-                </configuration>
-            </plugin>
+                <!--</configuration>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/net.sf.proguard/proguard-base -->
-        <dependency>
-            <groupId>net.sf.proguard</groupId>
-            <artifactId>proguard-base</artifactId>
-            <version>5.3.2</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>net.sf.proguard</groupId>-->
+            <!--<artifactId>proguard-base</artifactId>-->
+            <!--<version>5.3.2</version>-->
+        <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.github.wvengen/proguard-maven-plugin -->
+        <!--<dependency>-->
+            <!--<groupId>com.github.wvengen</groupId>-->
+            <!--<artifactId>proguard-maven-plugin</artifactId>-->
+            <!--<version>2.0.14</version>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
@@ -207,12 +215,7 @@
             <artifactId>poi</artifactId>
             <version>3.15</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.github.wvengen/proguard-maven-plugin -->
-        <dependency>
-            <groupId>com.github.wvengen</groupId>
-            <artifactId>proguard-maven-plugin</artifactId>
-            <version>2.0.14</version>
-        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
         <dependency>
@@ -374,15 +377,14 @@
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
             <scope>provided</scope>
         </dependency>
         <!--mbg-->
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-spring-boot-starter</artifactId>
-            <version>1.1.0</version>
-            <scope>provided</scope>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

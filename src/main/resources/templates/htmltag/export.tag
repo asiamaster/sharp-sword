@@ -32,4 +32,37 @@
             }
         });
     }
+
+    /**
+     * 根据controller url导出
+     * controller方法调用ExportUtils完成导出, 示例:
+     * @RequestMapping("/export")
+     * public @ResponseBody void export( HttpServletRequest request, HttpServletResponse response, @RequestParam("queryParams") String queryParams){...}
+     * @param url
+     * @param params
+     */
+    function exportByUrl(url, params){
+        //没有url就没有查询过，不作导出
+        if(url == null || url == '')
+            return;
+        if($("#_exportByUrlForm").length <= 0) {
+            var formStr = "<div id='_exportByUrlFormDiv'><form id='_exportByUrlForm' class='easyui-form' iframe='false' method='post'>" +
+                "<input type='hidden' id='queryParams' name='queryParams'/>" +
+                "</form></div>";
+            $(formStr).appendTo("body");
+            $.parser.parse("#_exportByUrlFormDiv");
+        }
+        var param = {};
+        param.queryParams = JSON.stringify(params);
+        $('#_exportByUrlForm').form("load", param);
+        $('#_exportByUrlForm').form("submit",{
+            url:url,
+            onSubmit: function(formParam) {
+                //作一些验证
+            },
+            success: function(){
+                $.messager.progress('close');	// 如果提交成功则隐藏进度条
+            }
+        });
+    }
 </script>

@@ -89,8 +89,8 @@ Array.prototype.contains = function (obj) {
 
 var MyECharts = {
     //格式化数据
-    ChartDataFormate: {
-        FormateNOGroupData: function (data, nameField, valueField) {
+    ChartDataFormat: {
+        FormatNOGroupData: function (data, nameField, valueField) {
             nameField = nameField ||"name";
             valueField = valueField ||"value";
             var categories = [];
@@ -127,7 +127,7 @@ var MyECharts = {
                         if (groups[i] == data[j][groupField] && data[j][nameField] == names[k])
                             temp_data.push(data[j][valueField]);
                     }
-                    temp_series = { name: groups[i], type: type, data: temp_data };
+                    temp_series = { name: groups[i], type: type, data: temp_data, smooth:true };
                     series.push(temp_series);
                 }
                 return { legend: groups,category: names, series: series };
@@ -136,8 +136,8 @@ var MyECharts = {
     //生成图形
     ChartOptionTemplates: {
         //柱状图
-        Bar: function (title, subtext, data, nameField, valueField, groupField) {
-            var datas = MyECharts.ChartDataFormate.FormatGroupData(data, 'bar', nameField, valueField, groupField);
+        Bar: function (title, subtext, data, nameField, valueField, groupField, opts) {
+            var datas = MyECharts.ChartDataFormat.FormatGroupData(data, 'bar', nameField, valueField, groupField);
             var option = {
                 title: {
                     text: title || '',
@@ -150,6 +150,46 @@ var MyECharts = {
                 	 trigger: 'axis'
                 },
                 calculable : true,
+                toolbox: {
+                    show : true,
+                    feature : {
+                        mark : {show: true},
+                        dataView : {show: true, readOnly: false},
+                        magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
+                },
+                xAxis: [
+                {
+                    type: 'category',
+                    data: datas.category
+                }
+                ],
+                yAxis: [
+                {
+                    type: 'value'
+                }
+                ],
+                series: datas.series
+            };
+            $.extend(option, opts);
+            return option;
+        },
+        //折线图
+        Line: function (title, subtext, data, nameField, valueField, groupField, opts) {
+            var datas = MyECharts.ChartDataFormat.FormatGroupData(data, 'line', nameField, valueField, groupField);
+            var option = {
+                title: {
+                    text: title || '',
+                    subtext: subtext || ''
+                },
+                legend: {
+                    data:datas.legend
+                },
+                tooltip: {
+                    show: true
+                },
                 toolbox: {
                     show : true,
                     feature : {
@@ -173,40 +213,12 @@ var MyECharts = {
                 ],
                 series: datas.series
             };
-            return option;
-        },
-        //折线图
-        Line: function (title, subtext, data, nameField, valueField, groupField) {
-            var datas = MyECharts.ChartDataFormate.FormatGroupData(data, 'line', nameField, valueField, groupField);
-            var option = {
-                title: {
-                    text: title || '',
-                    subtext: subtext || ''
-                },
-                legend: {
-                    data:datas.legend
-                },
-                tooltip: {
-                    show: true
-                },
-                xAxis: [
-                {
-                    type: 'category',
-                    data: datas.category
-                }
-                ],
-                yAxis: [
-                {
-                    type: 'value'
-                }
-                ],
-                series: datas.series
-            };
+            $.extend(option, opts);
             return option;
         },
         //饼图
-        Pie: function (title, subtext, data, nameField, valueField) {
-            var datas = MyECharts.ChartDataFormate.FormateNOGroupData(data, nameField, valueField);
+        Pie: function (title, subtext, data, nameField, valueField, opts) {
+            var datas = MyECharts.ChartDataFormat.FormatNOGroupData(data, nameField, valueField);
             var option = {
                 title: {
                     text: title || '',
@@ -217,6 +229,16 @@ var MyECharts = {
                     show: true,
                     trigger: 'item',
                     formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                toolbox: {
+                    show : true,
+                    feature : {
+                        mark : {show: true},
+                        dataView : {show: true, readOnly: false},
+                        magicType : {show: true, type: ['pie']},
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
                 },
                 legend: {
                     orient: 'vertical',
@@ -240,10 +262,11 @@ var MyECharts = {
                 }
                 ]
             };
+            $.extend(option, opts);
             return option;
         },
         //散点图
-        Scatter: function (title, subtext, data) {
+        Scatter: function (title, subtext, data, opts) {
             var markLineOpt = {
                 animation: false,
                 label: {
@@ -272,7 +295,8 @@ var MyECharts = {
             };
             var option = {
                 title: {
-                    text: 'Anscombe\'s quartet',
+                    text: title || '',
+                    subtext: subtext || '',
                     x: 'center',
                     y: 0
                 },
@@ -332,6 +356,7 @@ var MyECharts = {
                 }
                 ]
             };
+            $.extend(option, opts);
             return option;
         }
     },

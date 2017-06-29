@@ -32,9 +32,9 @@
             <!--<property name="targetProject" value="\${targetJavaProject}"></property>-->
             <!--<property name="targetPackage" value="\${targetServicePackage}"></property>-->
             <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
-            <!--<property name="serviceSuperClass" value="com.dili.utils.base.BaseServiceImpl"></property>-->
+            <!--<property name="serviceSuperClass" value="com.dili.ss.base.BaseServiceImpl"></property>-->
             <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
-            <!--<property name="serviceSuperInterface" value="com.dili.utils.base.BaseService"></property>-->
+            <!--<property name="serviceSuperInterface" value="com.dili.ss.base.BaseService"></property>-->
         <!--</plugin>-->
 
         <!-- Controller生成插件 -->
@@ -43,16 +43,17 @@
             <!--<property name="targetProject" value="\${targetJavaProject}"></property>-->
             <!--<property name="targetPackage" value="\${targetControllerPackage}"></property>-->
             <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
-            <!--&lt;!&ndash;<property name="controllerSuperClass" value="com.dili.utils.base.BaseControllerImpl"></property>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="controllerSuperClass" value="com.dili.ss.base.BaseControllerImpl"></property>&ndash;&gt;-->
             <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
-            <!--&lt;!&ndash;<property name="controllerSuperInterface" value="com.dili.utils.base.BaseController"></property>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="controllerSuperInterface" value="com.dili.ss.base.BaseController"></property>&ndash;&gt;-->
         <!--</plugin>-->
 
         <!-- beetl模板文件生成插件 -->
-        <!--<plugin type="com.dili.utils.mbg.beetl.BeetlTemplatesPlugin">-->
+        <!--<plugin type="com.dili.ss.mbg.beetl.BeetlTemplatesPlugin">-->
             <!--<property name="targetDir" value="\${targetResourcesProject}"></property>-->
             <!--<property name="templateRootDir" value="\${templateRootDir}"></property>-->
             <!--<property name="basePackage_dir" value="com/dili/utils" />-->
+            <!--<property name="overwrite" value="true" />-->
         <!--</plugin>-->
 
         <commentGenerator type="org.mybatis.generator.internal.DefaultCommentGenerator">

@@ -1,0 +1,59 @@
+package com.dili.ss.quartz.domain;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Created by asiam on 2017/4/18 0018.
+ */
+public class QuartzConstants {
+    //缓存每个调度器的调度次数，key为调度器组名+名称，value为调度次数
+    public static Map<String, Integer> sheduelTimes = new ConcurrentHashMap<>();
+    public static final String jobDataMapScheduleJobKey = "JOB_DATA_MAPSCHEDULE_JOB_KEY";
+
+
+    public static enum JobStatus {
+        NONE(0,"无"),
+        NORMAL(1,"正常"),
+        PAUSED(2,"暂停"),
+        COMPLETE(3,"完成"),
+        ERROR(4,"错误"),
+        BLOCKED(5,"阻塞");
+
+        private Integer code ;
+
+        private String desc;
+
+        JobStatus(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public static JobStatus getJobStatus(Integer code) {
+            for (JobStatus jobStatus : JobStatus.values()) {
+                if (jobStatus.getCode()==code) {
+                    return jobStatus;
+                }
+            }
+            return null;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public void setDesc(String desc) {
+            this.desc = desc;
+        }
+
+    }
+
+}

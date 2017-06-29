@@ -135,14 +135,14 @@
                     <dependency>
                         <groupId>com.dili</groupId>
                         <artifactId>sharp-sword</artifactId>
-                        <version>0.0.1-SNAPSHOT</version>
+                        <version>1.1.0-SNAPSHOT</version>
                         <!--<scope>system</scope>-->
                         <!--<systemPath>\${\project.basedir}/lib/sharp-sword-1.0.0-SNAPSHOT.jar</systemPath>-->
                     </dependency>
                     <dependency>
-                        <groupId>org.beetl</groupId>
-                        <artifactId>beetl-core</artifactId>
-                        <version>2.2.3</version>
+                        <groupId>com.ibeetl</groupId>
+                        <artifactId>beetl</artifactId>
+                        <version>2.7.3</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -155,7 +155,7 @@
 		<dependency>
 			<groupId>com.dili</groupId>
 			<artifactId>sharp-sword</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
         <dependency>
             <groupId>org.mybatis.generator</groupId>
@@ -232,11 +232,6 @@
             <version>2.9.0</version>
         </dependency>
         <!-- beetl -->
-        <dependency>
-            <groupId>org.beetl</groupId>
-            <artifactId>beetl-core</artifactId>
-            <version>2.2.3</version>
-        </dependency>
         <dependency>
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
