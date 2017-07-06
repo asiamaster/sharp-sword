@@ -222,12 +222,7 @@ public class BaseMongoRepository<E>  {
         long count = 0;
         Criteria c = this.createCriteria(gtMap, ltMap, eqMap, gteMap, lteMap,
                 regexMap, inMap, neMap);
-        Query query = null;
-        if (c == null) {
-            query = new Query();
-        } else {
-            query = new Query(c);
-        }
+        Query query = new Query(c);
         count = mongoTemplate.count(query, entityClass);
         return count;
     }

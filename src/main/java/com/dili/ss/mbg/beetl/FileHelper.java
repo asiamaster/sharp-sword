@@ -84,6 +84,9 @@ public class FileHelper {
         collector.add(dir);
         if ((!dir.isHidden() && dir.isDirectory()) && !isIgnoreFile(dir)) {
             File[] subFiles = dir.listFiles();
+            if(subFiles == null){
+                return;
+            }
             for (int i = 0; i < subFiles.length; i++) {
                 searchAllNotIgnoreFile(subFiles[i], collector);
             }

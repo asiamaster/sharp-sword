@@ -20,11 +20,11 @@
         <!-- targetProject和targetPackage必填 -->
         <!--<plugin type="com.dili.ssg.MyServicePlugin">-->
             <!--<property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"></property>-->
-            <!--<property name="targetPackage" value="com.dili.ssrvice"></property>-->
+            <!--<property name="targetPackage" value="com.dili.ss.service"></property>-->
             <!--&lt;!&ndash; 此配置用于getActualDao方法的返回对象import，需要获取Mapper类的包路径 &ndash;&gt;-->
             <!--&lt;!&ndash; 如果不配置，则从下面的<javaClientGenerator>标签的targetPackage属性获取 &ndash;&gt;-->
             <!--&lt;!&ndash; 如果再没有<javaClientGenerator>标签，则根据targetPackage属性减去service加上dao来生成 &ndash;&gt;-->
-            <!--<property name="javaClientTargetPackage" value="com.dili.sso"></property>-->
+            <!--<property name="javaClientTargetPackage" value="com.dili.ss"></property>-->
             <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
             <!--<property name="serviceSuperClass" value="com.dili.ssse.BaseServiceImpl"></property>-->
             <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
@@ -61,7 +61,7 @@
             <property name="basePackage_dir" value="com/dili/${appName}/" />
             <property name="overwrite" value="true" />
             <property name="appName" value="${appName}"/>
-            <property name="projectName" value="${appName}"/>
+            <property name="projectName" value="${projectName}"/>
         </plugin>
 
         <commentGenerator type="org.mybatis.generator.internal.DefaultCommentGenerator">

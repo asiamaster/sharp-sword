@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class QuartzConstants {
     //缓存每个调度器的调度次数，key为调度器组名+名称，value为调度次数
-    public static Map<String, Integer> sheduelTimes = new ConcurrentHashMap<>();
+    public static final Map<String, Integer> sheduelTimes = new ConcurrentHashMap<>();
     public static final String jobDataMapScheduleJobKey = "JOB_DATA_MAPSCHEDULE_JOB_KEY";
 
 
@@ -31,7 +31,7 @@ public class QuartzConstants {
 
         public static JobStatus getJobStatus(Integer code) {
             for (JobStatus jobStatus : JobStatus.values()) {
-                if (jobStatus.getCode()==code) {
+                if (jobStatus.getCode().equals(code)) {
                     return jobStatus;
                 }
             }

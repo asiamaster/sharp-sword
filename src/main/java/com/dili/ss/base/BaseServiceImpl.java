@@ -290,8 +290,9 @@ public abstract class BaseServiceImpl<T extends BaseDomain, KEY extends Serializ
 		if(sb.length()>1) {
 			example.setOrderByClause(sb.substring(1));
 		}
-		Integer page = domain.getPage() == null ? 1 : domain.getPage();
-		Integer rows = domain.getRows() == null ? Integer.MAX_VALUE : domain.getRows();
+		Integer page = domain.getPage();
+		page = (page == null) ? Integer.valueOf(1) : page;
+		Integer rows = domain.getRows() == null ? Integer.valueOf(Integer.MAX_VALUE) : domain.getRows();
 		//为了线程安全,请勿改动下面两行代码的顺序
 		PageHelper.startPage(page, rows);
 		return mapper.selectByExample(example);

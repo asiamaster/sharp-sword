@@ -19,14 +19,15 @@ public class NullTag extends Tag {
     public void render() {
 //        BodyContent content = getBodyContent();
 //        String c = content.getBody();
-        String tagName = (String) this.args[0];
-        Map attrs = (Map) args[1];
-        String value = (String) attrs.get("beanClass");
-        ctx.set("beanClass", value);
-        HttpServletRequest request = (HttpServletRequest)this.ctx.getGlobal("request");
+//        String tagName = (String) this.args[0];
+//        Map attrs = (Map) args[1];
+//        String value = (String) attrs.get("beanClass");
+//        ctx.set("beanClass", value);
+//        HttpServletRequest request = (HttpServletRequest)this.ctx.getGlobal("request");
         try{
-            this.ctx.byteWriter.writeString("<form>form</form>");
+            this.ctx.byteWriter.writeString("");
         }catch (IOException e){
+            e.printStackTrace();
         }
     }
 }

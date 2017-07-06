@@ -20,10 +20,10 @@ public class BaseDomain implements Serializable {
 	private Integer page;	//页码，从1开始
 	@Transient
 	private Integer rows; //每页行数
-	@Transient
-	private String sort;    //排序字段，以逗号分隔
-	@Transient
-	private String order;   //排序类型: asc,desc
+//	@Transient
+//	private String sort;    //排序字段，以逗号分隔
+//	@Transient
+//	private String order;   //排序类型: asc,desc
 	@Transient
 	private Map metadata;
 
@@ -50,21 +50,21 @@ public class BaseDomain implements Serializable {
 		this.rows = rows;
 	}
 
-	public String getSort() {
-		return sort;
-	}
-
-	public void setSort(String sort) {
-		this.sort = sort;
-	}
-
-	public String getOrder() {
-		return order;
-	}
-
-	public void setOrder(String order) {
-		this.order = order;
-	}
+//	public String getSort() {
+//		return sort;
+//	}
+//
+//	public void setSort(String sort) {
+//		this.sort = sort;
+//	}
+//
+//	public String getOrder() {
+//		return order;
+//	}
+//
+//	public void setOrder(String order) {
+//		this.order = order;
+//	}
 
 	public void mset(String key, Object value){
 		if(metadata == null){

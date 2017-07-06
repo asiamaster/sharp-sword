@@ -65,7 +65,7 @@ public class BeetlConfig  {
         ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader("/");
         beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
 
-        InputStream inputStream = BeetlConfig.class.getResourceAsStream("/beetlSharedVars.properties");
+        InputStream inputStream = BeetlConfig.class.getResourceAsStream("/conf/beetlSharedVars.properties");
         Properties p = new Properties();
         try {
             if(inputStream != null) {
@@ -80,7 +80,7 @@ public class BeetlConfig  {
         beetlGroupUtilConfiguration.setVirtualAttributeEvals(virtualAttributeEval);
         beetlGroupUtilConfiguration.setFunctions(functions);
         beetlGroupUtilConfiguration.setTagFactorys(getTagFactoryMaps());
-        beetlGroupUtilConfiguration.setConfigFileResource(patternResolver.getResource("classpath:beetl.properties"));
+        beetlGroupUtilConfiguration.setConfigFileResource(patternResolver.getResource("classpath:conf/beetl.properties"));
         beetlGroupUtilConfiguration.setFormats(formats);
         return beetlGroupUtilConfiguration;
     }

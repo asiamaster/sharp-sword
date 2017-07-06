@@ -140,11 +140,7 @@ public class BasePage<T> extends BaseQuery{
 	 * @param
 	 */
 	public void setPage(Integer page) {
-		if(page ==null){
-			page = 1;
-		}else{
-			this.page = page;
-		}
+		this.page = page;
 	}
 
 	public Integer getTotalPage() {

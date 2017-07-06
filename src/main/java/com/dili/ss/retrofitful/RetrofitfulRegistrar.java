@@ -180,7 +180,7 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
                 JarURLConnection entries = (JarURLConnection) con;
                 ResourceUtils.useCachesIfNecessary(entries);
                 jarFile = entries.getJarFile();
-                String jarFileUrl = entries.getJarFileURL().toExternalForm();
+//                String jarFileUrl = entries.getJarFileURL().toExternalForm();
                 entry = entries.getJarEntry();
                 String rootEntryPath = entry != null ? entry.getName() : "";
                 String classFullPath = rootEntryPath.substring(0, rootEntryPath.length() - ".class".length());
@@ -202,7 +202,9 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
         } finally {
             if (closeJarFile) {
                 try {
-                    jarFile.close();
+                    if(jarFile != null) {
+                        jarFile.close();
+                    }
                 } catch (IOException e) {
                 }
             }

@@ -39,8 +39,6 @@ public class MyServicePlugin extends PluginAdapter {
     }
 
     public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
-        String expandServiceTargetPackage = properties.getProperty("targetPackage");
-        String expandServiceSuperClass = properties.getProperty("serviceSuperClass");
         String serviceSuperClass = properties.getProperty("serviceSuperClass");
         String serviceSuperInterface = properties.getProperty("serviceSuperInterface");
         String serviceTargetDir = properties.getProperty("targetProject");

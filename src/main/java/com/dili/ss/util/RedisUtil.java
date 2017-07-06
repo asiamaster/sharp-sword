@@ -21,6 +21,15 @@ public class RedisUtil {
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
+
+    /**
+     * 集合、列表、Set等对象自行取redisTemplate操作
+     * @return
+     */
+    public RedisTemplate getRedisTemplate() {
+        return redisTemplate;
+    }
+
     /**
      * 批量删除对应的value
      *
@@ -88,6 +97,18 @@ public class RedisUtil {
         }
         return result == null ? null : JSON.parseObject(result.toString(), clazz);
     }
+
+    /**
+     * 根据key自增value
+     * @param key
+     * @param value
+     * @return
+     */
+    public long increment(String key, Long value){
+        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+        return operations.increment(key, value);
+    }
+
     /**
      * 写入缓存
      *
@@ -108,14 +129,15 @@ public class RedisUtil {
     }
 
     /**
-     * 根据key自增value
+     * 写入缓存
+     *
      * @param key
      * @param value
+     * @param expireTime 过期时间，单位秒
      * @return
      */
-    public long increment(String key, Long value){
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-        return operations.increment(key, value);
+    public boolean set(final String key, Object value, Long expireTime) {
+        return set(key, value, expireTime, TimeUnit.SECONDS);
     }
 
     /**
@@ -123,14 +145,16 @@ public class RedisUtil {
      *
      * @param key
      * @param value
+     * @param expireTime
+     * @param timeUnit 过期时间单位枚举
      * @return
      */
-    public boolean set(final String key, Object value, Long expireTime) {
+    public boolean set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
         boolean result = false;
         try {
             ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
             operations.set(key, value);
-            redisTemplate.expire(key, expireTime, TimeUnit.SECONDS);
+            redisTemplate.expire(key, expireTime, timeUnit);
             result = true;
         } catch (Exception e) {
             e.printStackTrace();
