@@ -143,6 +143,7 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
     }
 
     //getFileBeetlGroupTemplate().getTemplate时获取模板文件相对路径
+    @org.jetbrains.annotations.NotNull
     private String getFileRelativePath(String fileName){
         return fileName.substring(fileName.indexOf(templateRootDir.replaceAll("/","\\\\"))+templateRootDir.length());
     }

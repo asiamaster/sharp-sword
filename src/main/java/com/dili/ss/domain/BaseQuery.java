@@ -10,8 +10,8 @@ import java.util.Map;
 //@ApiModel(value = "baseQuery",description = "查询基础类")
 public class BaseQuery implements Serializable {
 
-	private static final String ORDERFIELDTYPE_DESC="DESC";
-	private static final String ORDERFIELDTYPE_ASC="ASC";
+	private static final String DESC ="DESC";
+	private static final String ASC ="ASC";
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,7 +40,7 @@ public class BaseQuery implements Serializable {
 	}
 
 	public String getOrderFieldType() {
-		if(ORDERFIELDTYPE_DESC.equalsIgnoreCase(orderFieldType) ||ORDERFIELDTYPE_ASC.equalsIgnoreCase(orderFieldType)) {
+		if(DESC.equalsIgnoreCase(orderFieldType) || ASC.equalsIgnoreCase(orderFieldType)) {
 			return orderFieldType.toUpperCase();
 		}
 		return null;
@@ -48,10 +48,10 @@ public class BaseQuery implements Serializable {
 
 //	@JSONField(serialize=false)
 	public String getOrderFieldNextType() {
-		if(ORDERFIELDTYPE_DESC.equalsIgnoreCase(orderFieldType)) {
-			return ORDERFIELDTYPE_DESC;
+		if(DESC.equalsIgnoreCase(orderFieldType)) {
+			return DESC;
 		}
-		return ORDERFIELDTYPE_ASC;
+		return ASC;
 	}
 
 	public void setOrderFieldType(String orderFieldType) {

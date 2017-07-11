@@ -97,8 +97,6 @@ function bindMetadata(gridId){
     return params;
 }
 
-bindTreegridMetadata
-
 //树的转换加载
 function convertTree(rows){
     function exists(rows, parentId){

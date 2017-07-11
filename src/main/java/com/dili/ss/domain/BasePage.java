@@ -10,6 +10,7 @@ import java.util.List;
 //@ApiModel(value = "basePage",description = "分页查询对象")
 public class BasePage<T> extends BaseQuery{
 
+	private static final long serialVersionUID = 11234564786156318L;
 	//参照easyui的分页属性
 	public static final String PAGE_SIZE_KEY="rows";
 

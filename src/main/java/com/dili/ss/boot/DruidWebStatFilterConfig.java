@@ -45,7 +45,7 @@ public class DruidWebStatFilterConfig {
     }
 
     @Bean
-    public FilterRegistrationBean DruidWebStatFilter() {
+    public FilterRegistrationBean druidWebStatFilter() {
         FilterRegistrationBean reg = new FilterRegistrationBean();
         reg.setFilter(new WebStatFilter());
         reg.addUrlPatterns("/*");
