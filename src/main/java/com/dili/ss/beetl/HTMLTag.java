@@ -1,9 +1,6 @@
 package com.dili.ss.beetl;
 
-import org.beetl.core.BodyContent;
-import org.beetl.core.ByteWriter;
-import org.beetl.core.Context;
-import org.beetl.core.Template;
+import org.beetl.core.*;
 import org.beetl.core.exception.BeetlException;
 import org.beetl.core.io.ByteWriter_Byte;
 import org.beetl.core.io.ByteWriter_Char;
@@ -171,28 +168,42 @@ public class HTMLTag extends HTMLTagSupportWrapper {
     protected void runTemplateTag() {
         //初始化
         String child = (String) args[0];
-        String path = getHtmlTagResourceId(child);
-        Template t = null;
-        t = gt.getTemplate(path, this.ctx.getResourceId());
-        t.binding(ctx.globalVar);
-        t.dynamic(ctx.objectKeys);
-        t.binding("tag", this);
-        if(this.args.length == 2) {
-            Map bodyContent = (Map)this.args[1];
-            Iterator var4 = bodyContent.entrySet().iterator();
 
-            while(var4.hasNext()) {
-                Map.Entry entry = (Map.Entry)var4.next();
-                t.binding((String)entry.getKey(), entry.getValue());
+        // 首先查找 已经注册的Tag
+        TagFactory tagFactory = null;
+        String functionTagName = child.replace(':', '.');
+        tagFactory = this.gt.getTagFactory(functionTagName);
+        if (tagFactory == null)
+        {
+            String path = getHtmlTagResourceId(child);
+            Template t = null;
+            t = gt.getTemplate(path, this.ctx.getResourceId());
+            t.binding(ctx.globalVar);
+            t.dynamic(ctx.objectKeys);
+            t.binding("tag", this);
+            if(this.args.length == 2) {
+                Map bodyContent = (Map)this.args[1];
+                Iterator var4 = bodyContent.entrySet().iterator();
+
+                while(var4.hasNext()) {
+                    Map.Entry entry = (Map.Entry)var4.next();
+                    t.binding((String)entry.getKey(), entry.getValue());
+                }
+            }
+            try {
+                t.renderTo(ctx.byteWriter);
+            } catch (BeetlException ex) {
+//			ex.pushResource(path);
+                ex.pushToken(ex.token);
+                throw ex;
             }
         }
-        try {
-            t.renderTo(ctx.byteWriter);
-        } catch (BeetlException ex) {
-//			ex.pushResource(path);
-            ex.pushToken(ex.token);
-            throw ex;
+        else
+        {
+            callTag(tagFactory);
         }
+
+
     }
 
     public String toString() {

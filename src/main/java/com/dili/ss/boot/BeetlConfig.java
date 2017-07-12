@@ -79,9 +79,10 @@ public class BeetlConfig  {
         beetlGroupUtilConfiguration.setSharedVars((Map)p);
         beetlGroupUtilConfiguration.setVirtualAttributeEvals(virtualAttributeEval);
         beetlGroupUtilConfiguration.setFunctions(functions);
+        beetlGroupUtilConfiguration.setFormats(formats);
         beetlGroupUtilConfiguration.setTagFactorys(getTagFactoryMaps());
         beetlGroupUtilConfiguration.setConfigFileResource(patternResolver.getResource("classpath:conf/beetl.properties"));
-        beetlGroupUtilConfiguration.setFormats(formats);
+
         return beetlGroupUtilConfiguration;
     }
 
