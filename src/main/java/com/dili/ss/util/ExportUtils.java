@@ -145,6 +145,7 @@ public class ExportUtils {
     private static void buildData(ExportParam exportParam, HSSFWorkbook workbook, HSSFSheet sheet, HttpServletRequest request){
         //渲染数据列
         HSSFCellStyle dataColumnStyle = getDataColumnStyle(workbook);//获取列头样式对象
+        //这里获取到的是nginx转换后的(IP)地址和端口号，如果是跳板机这种，有可能会禁止访问，后续改为从配置读取
         String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
         String json = syncExecute(basePath+exportParam.getUrl(), exportParam.getQueryParams(), "POST");
         JSONArray rowDatas = (JSONArray) JSON.parseObject(json).get("rows");
