@@ -147,11 +147,11 @@ public class MenubuttonTag extends Tag {
 			isMap = true;
 		}
 		for(Object root : rootList){
+			String rootId = getData(root, idField, isMap).toString();
 			//如果根节点下面没有子节点则不生成menu
-			if(!hasChild(list, root, isMap, parentIdField)){
+			if(!hasChild(list, rootId, isMap, parentIdField)){
 				continue;
 			}
-			String rootId = getData(root, idField, isMap).toString();
 			//构建菜单, zIndex:110000是默认值，暂且写死
 			stringBuilder.append("<div id=\"menu_"+rootId+"\" data-options=\"zIndex:'110000' ");
 			//添加所有menu公用属性
