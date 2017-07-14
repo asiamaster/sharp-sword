@@ -108,10 +108,10 @@ public class MenubuttonTag extends Tag {
 				stringBuilder.append(", menuAlign:'" + argsMap.get("menuAlign") + "'");
 			}
 			if (argsMap.containsKey("duration")) {
-				stringBuilder.append(", duration:'" + argsMap.get("duration") + "'");
+				stringBuilder.append(", duration:" + argsMap.get("duration") );
 			}
 			if (argsMap.containsKey("hasDownArrow")) {
-				stringBuilder.append(", hasDownArrow:'" + argsMap.get("hasDownArrow") + "'");
+				stringBuilder.append(", hasDownArrow:" + argsMap.get("hasDownArrow") );
 			}
 			if (argsMap.containsKey("iconCls")) {
 				stringBuilder.append(", iconCls:'" + argsMap.get("iconCls") + "'");
@@ -147,6 +147,10 @@ public class MenubuttonTag extends Tag {
 			isMap = true;
 		}
 		for(Object root : rootList){
+			//如果根节点下面没有子节点则不生成menu
+			if(!hasChild(list, root, isMap, parentIdField)){
+				continue;
+			}
 			String rootId = getData(root, idField, isMap).toString();
 			//构建菜单, zIndex:110000是默认值，暂且写死
 			stringBuilder.append("<div id=\"menu_"+rootId+"\" data-options=\"zIndex:'110000' ");
@@ -155,25 +159,25 @@ public class MenubuttonTag extends Tag {
 				stringBuilder.append(", align:'" + argsMap.get("align") + "'");
 			}
 			if(argsMap.containsKey("minWidth")){
-				stringBuilder.append(", minWidth:'"+argsMap.get("minWidth")+"'");
+				stringBuilder.append(", minWidth:"+argsMap.get("minWidth"));
 			}
 			if(argsMap.containsKey("itemHeight")){
-				stringBuilder.append(", itemHeight:'"+argsMap.get("itemHeight")+"'");
+				stringBuilder.append(", itemHeight:"+argsMap.get("itemHeight"));
 			}
 			if(argsMap.containsKey("duration")){
-				stringBuilder.append(", duration:'"+argsMap.get("duration")+"'");
+				stringBuilder.append(", duration:"+argsMap.get("duration"));
 			}
 			if(argsMap.containsKey("hideOnUnhover")){
-				stringBuilder.append(", hideOnUnhover:'"+argsMap.get("hideOnUnhover")+"'");
+				stringBuilder.append(", hideOnUnhover:"+argsMap.get("hideOnUnhover"));
 			}
 			if(argsMap.containsKey("inline")){
-				stringBuilder.append(", inline:'"+argsMap.get("inline")+"'");
+				stringBuilder.append(", inline:"+argsMap.get("inline"));
 			}
 			if(argsMap.containsKey("fit")){
-				stringBuilder.append(", fit:'"+argsMap.get("fit")+"'");
+				stringBuilder.append(", fit:"+argsMap.get("fit"));
 			}
 			if(argsMap.containsKey("noline")){
-				stringBuilder.append(", noline:'"+argsMap.get("noline")+"'");
+				stringBuilder.append(", noline:"+argsMap.get("noline"));
 			}
 			if(argsMap.containsKey("onclick")){
 				stringBuilder.append(", onClick:"+argsMap.get("onclick"));
