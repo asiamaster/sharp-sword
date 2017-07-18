@@ -63,7 +63,7 @@ public class MenubuttonTag extends Tag {
 			Map<String, String> argsMap = (Map)this.args[1];
 			String service = argsMap.get(SERVICE);
 			String method = argsMap.get(METHOD);
-			String queryParams = argsMap.get(QUERYPARAMS) == null ? null : argsMap.get(QUERYPARAMS).trim();
+			String queryParams = argsMap.get(QUERYPARAMS) == null ? null : argsMap.get(QUERYPARAMS).toString();
 //			service和method参数必填
 			if(StringUtils.isBlank(service) || StringUtils.isBlank(method)) {
 				return;
