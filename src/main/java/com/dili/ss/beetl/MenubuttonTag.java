@@ -60,10 +60,10 @@ public class MenubuttonTag extends Tag {
 	public void render() {
 		try {
 //			BodyContent content = getBodyContent(); // 标签体内容，暂存
-			Map<String, String> argsMap = (Map)this.args[1];
-			String service = argsMap.get(SERVICE);
-			String method = argsMap.get(METHOD);
-			String queryParams = argsMap.get(QUERYPARAMS) == null ? null : argsMap.get(QUERYPARAMS).toString();
+			Map<String, Object> argsMap = (Map)this.args[1];
+			String service = (String) argsMap.get(SERVICE);
+			String method = (String) argsMap.get(METHOD);
+			String queryParams = argsMap.get(QUERYPARAMS) == null ? null : String.valueOf(argsMap.get(QUERYPARAMS));
 //			service和method参数必填
 			if(StringUtils.isBlank(service) || StringUtils.isBlank(method)) {
 				return;
