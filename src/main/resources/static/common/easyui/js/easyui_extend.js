@@ -113,7 +113,9 @@ function convertTree(rows){
         if (!exists(rows, row.parentId)){
             nodes.push({
                 id:row.id,
-                text:row.text
+                text:row.text,
+                state:row["state"],
+                attributes:row["attributes"]
             });
         }
     }
@@ -128,7 +130,12 @@ function convertTree(rows){
         for(var i=0; i<rows.length; i++){
             var row = rows[i];
             if (row.parentId == node.id){
-                var child = {id:row.id,text:row.text};
+                var child = {
+                    id:row.id,
+                    text:row.text,
+                    state:row["state"],
+                    attributes:row["attributes"]
+                };
                 if (node.children){
                     node.children.push(child);
                 } else {

@@ -4,11 +4,13 @@ import org.beetl.core.*;
 import org.beetl.core.exception.BeetlException;
 import org.beetl.core.io.ByteWriter_Byte;
 import org.beetl.core.io.ByteWriter_Char;
+import org.beetl.core.resource.ClasspathResource;
 import org.beetl.core.statement.Statement;
 import org.beetl.ext.tag.HTMLTagSupportWrapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -181,6 +183,25 @@ public class HTMLTag extends HTMLTagSupportWrapper {
             t.binding(ctx.globalVar);
             t.dynamic(ctx.objectKeys);
             t.binding("tag", this);
+
+            //绑定templatePath变量
+            if(ctx.getResource() instanceof ClasspathResource) {
+                try {
+                    if(ctx.getGlobal("templatePath")== null ){
+                        String resourceRoot = ctx.template.cf.getResourceMap().get("root");
+                        Field pathField = ClasspathResource.class.getDeclaredField("path");
+                        pathField.setAccessible(true);
+                        String templatePath = (String) pathField.get((ClasspathResource) ctx.getResource());
+                        resourceRoot = resourceRoot != null && resourceRoot.equals("/") ? "" : resourceRoot;
+                        Integer indexOfLength = 11 + resourceRoot.length();
+                        t.binding("templatePath", templatePath.substring(templatePath.indexOf("/templates/" + resourceRoot) + indexOfLength, templatePath.lastIndexOf(".")));
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                }
+            }
             t.binding("requestUri",ctx.globalVar.get("org.springframework.web.servlet.HandlerMapping.pathWithinHandlerMapping"));
             if(this.args.length == 2) {
                 Map bodyContent = (Map)this.args[1];
