@@ -181,6 +181,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
             t.binding(ctx.globalVar);
             t.dynamic(ctx.objectKeys);
             t.binding("tag", this);
+            t.binding("requestUri",ctx.globalVar.get("org.springframework.web.servlet.HandlerMapping.pathWithinHandlerMapping"));
             if(this.args.length == 2) {
                 Map bodyContent = (Map)this.args[1];
                 Iterator var4 = bodyContent.entrySet().iterator();

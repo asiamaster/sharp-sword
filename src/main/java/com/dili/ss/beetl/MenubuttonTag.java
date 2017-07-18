@@ -20,21 +20,40 @@ import java.util.*;
 public class MenubuttonTag extends Tag {
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 	private final String TAB = "    ";
+
+	//标签自定义属性
+	private final String ID_FIELD = "_idField";
+	private final String TEXT_FIELD = "_textField";
+	private final String PARENT_ID_FIELD = "_parentIdField";
+	private final String ICON_CLS_FIELD = "_iconClsField";
+	private final String DISABLED_FIELD = "_disabledField";
+	private final String SERVICE = "_service";
+	private final String METHOD = "_method";
+	private final String QUERYPARAMS = "_queryParams";
+
 	//标签默认值
 	private final String ID_FIELD_DEFAULT = "id";
 	private final String TEXT_FIELD_DEFAULT = "text";
 	private final String PARENT_ID_FIELD_DEFAULT = "parentId";
+	private final String ICON_CLS_FIELD_DEFAULT = "iconCls";
+	private final String DISABLED_FIELD_DEFAULT = "disabled";
 
-	//标签属性
-	private final String SERVICE = "service";
-	private final String METHOD = "method";
-	private final String QUERYPARAMS = "queryParams";
-	private final String ID_FIELD = "idField";
-	private final String TEXT_FIELD = "textField";
-	private final String PARENT_ID_FIELD = "parentIdField";
+	//easyui menubutton和menu属性，用于在menubutton标签上使用
+	private final String ALIGN = "align";
+	private final String MIN_WIDTH = "minWidth";
+	private final String ITEM_HEIGHT = "itemHeight";
+	private final String DURATION = "duration";
+	private final String HIDE_ON_UNHOVER = "hideOnUnhover";
+	private final String INLINE = "inline";
+	private final String FIT = "fit";
+	private final String NOLINE = "noline";
+	private final String ON_CLICK = "onClick";
+	private final String PLAIN = "plain";
+	private final String MENU_ALIGN = "menuAlign";
+	private final String HAS_DOWN_ARROW = "hasDownArrow";
 
-	//easyui菜单项属性对应，用于在菜单数据列表中获取相应信息
-	private final String ICONCLS = "iconCls";
+	//easyui菜单项属性对应，用于在菜单数据列表中使用
+	private final String ICON_CLS = "iconCls";
 	private final String DISABLED = "disabled";
 
 	@Override
@@ -81,6 +100,9 @@ public class MenubuttonTag extends Tag {
 		String textField = argsMap.get(TEXT_FIELD) == null ? TEXT_FIELD_DEFAULT : argsMap.get(TEXT_FIELD).toString();
 		String idField = argsMap.get(ID_FIELD) == null ? ID_FIELD_DEFAULT : argsMap.get(ID_FIELD).toString();
 		String parentIdField = argsMap.get(PARENT_ID_FIELD) == null ? PARENT_ID_FIELD_DEFAULT : argsMap.get(PARENT_ID_FIELD).toString();
+		String iconClsField = argsMap.get(ICON_CLS_FIELD) == null ? ICON_CLS_FIELD_DEFAULT : argsMap.get(ICON_CLS_FIELD).toString();
+		String disabledField = argsMap.get(DISABLED_FIELD) == null ? DISABLED_FIELD_DEFAULT : argsMap.get(DISABLED_FIELD).toString();
+
 		if(Map.class.isAssignableFrom(list.get(0).getClass())){
 			rootList = getMapRoots(list, parentIdField);
 			isMap = true;
@@ -93,7 +115,9 @@ public class MenubuttonTag extends Tag {
 			if(getData(root, textField, isMap) == null || getData(root, idField, isMap) == null) {
 				continue;
 			}
-			String id = getData(root, idField, isMap).toString();
+			String id = getData(root, idField, isMap);
+			String iconCls = getData(root, iconClsField, isMap);
+			String disabled = getData(root, disabledField, isMap);
 			//没有子的根节点的class为easyui-linkbutton
 			if(!hasChild(list, id, isMap, parentIdField)){
 				stringBuilder.append("<a id=\"menubutton_" + id + "\" href=\"#\" class=\"easyui-linkbutton\" data-options=\"blankKey:''");
@@ -101,20 +125,23 @@ public class MenubuttonTag extends Tag {
 				stringBuilder.append("<a id=\"menubutton_" + id + "\" href=\"#\" class=\"easyui-menubutton\" data-options=\"menu:'#menu_" + id + "'");
 			}
 			//添加menubutton属性
-			if (argsMap.containsKey("plain")) {
-				stringBuilder.append(", plain:" + argsMap.get("plain"));
+			if (argsMap.containsKey(PLAIN)) {
+				stringBuilder.append(", plain:" + argsMap.get(PLAIN));
 			}
-			if (argsMap.containsKey("menuAlign")) {
-				stringBuilder.append(", menuAlign:'" + argsMap.get("menuAlign") + "'");
+			if (argsMap.containsKey(MENU_ALIGN)) {
+				stringBuilder.append(", menuAlign:'" + argsMap.get(MENU_ALIGN) + "'");
 			}
-			if (argsMap.containsKey("duration")) {
-				stringBuilder.append(", duration:" + argsMap.get("duration") );
+			if (argsMap.containsKey(DURATION)) {
+				stringBuilder.append(", duration:" + argsMap.get(DURATION) );
 			}
-			if (argsMap.containsKey("hasDownArrow")) {
-				stringBuilder.append(", hasDownArrow:" + argsMap.get("hasDownArrow") );
+			if (argsMap.containsKey(HAS_DOWN_ARROW)) {
+				stringBuilder.append(", hasDownArrow:" + argsMap.get(HAS_DOWN_ARROW) );
 			}
-			if (argsMap.containsKey("iconCls")) {
-				stringBuilder.append(", iconCls:'" + argsMap.get("iconCls") + "'");
+			if (StringUtils.isNotBlank(iconCls)) {
+				stringBuilder.append(", iconCls:'" + iconCls + "'");
+			}
+			if (StringUtils.isNotBlank(disabled)) {
+				stringBuilder.append(", disabled:" + disabled);
 			}
 			stringBuilder.append("\">" + getData(root, textField, isMap) + "</a>"+ LINE_SEPARATOR);
 		}
@@ -141,6 +168,9 @@ public class MenubuttonTag extends Tag {
 		String textField = argsMap.get(TEXT_FIELD) == null ? TEXT_FIELD_DEFAULT : argsMap.get(TEXT_FIELD).toString();
 		String idField = argsMap.get(ID_FIELD) == null ? ID_FIELD_DEFAULT : argsMap.get(ID_FIELD).toString();
 		String parentIdField = argsMap.get(PARENT_ID_FIELD) == null ? PARENT_ID_FIELD_DEFAULT : argsMap.get(PARENT_ID_FIELD).toString();
+		String iconClsField = argsMap.get(ICON_CLS_FIELD) == null ? ICON_CLS_FIELD_DEFAULT : argsMap.get(ICON_CLS_FIELD).toString();
+		String disabledField = argsMap.get(DISABLED_FIELD) == null ? DISABLED_FIELD_DEFAULT : argsMap.get(DISABLED_FIELD).toString();
+
 		StringBuilder stringBuilder = new StringBuilder();
 		boolean isMap = false;
 		if(Map.class.isAssignableFrom(list.get(0).getClass())){
@@ -155,32 +185,32 @@ public class MenubuttonTag extends Tag {
 			//构建菜单, zIndex:110000是默认值，暂且写死
 			stringBuilder.append("<div id=\"menu_"+rootId+"\" data-options=\"zIndex:'110000' ");
 			//添加所有menu公用属性
-			if(argsMap.containsKey("align")) {
-				stringBuilder.append(", align:'" + argsMap.get("align") + "'");
+			if(argsMap.containsKey(ALIGN)) {
+				stringBuilder.append(", align:'" + argsMap.get(ALIGN) + "'");
 			}
-			if(argsMap.containsKey("minWidth")){
-				stringBuilder.append(", minWidth:"+argsMap.get("minWidth"));
+			if(argsMap.containsKey(MIN_WIDTH)){
+				stringBuilder.append(", minWidth:"+argsMap.get(MIN_WIDTH));
 			}
-			if(argsMap.containsKey("itemHeight")){
-				stringBuilder.append(", itemHeight:"+argsMap.get("itemHeight"));
+			if(argsMap.containsKey(ITEM_HEIGHT)){
+				stringBuilder.append(", itemHeight:"+argsMap.get(ITEM_HEIGHT));
 			}
-			if(argsMap.containsKey("duration")){
-				stringBuilder.append(", duration:"+argsMap.get("duration"));
+			if(argsMap.containsKey(DURATION)){
+				stringBuilder.append(", duration:"+argsMap.get(DURATION));
 			}
-			if(argsMap.containsKey("hideOnUnhover")){
-				stringBuilder.append(", hideOnUnhover:"+argsMap.get("hideOnUnhover"));
+			if(argsMap.containsKey(HIDE_ON_UNHOVER)){
+				stringBuilder.append(", hideOnUnhover:"+argsMap.get(HIDE_ON_UNHOVER));
 			}
-			if(argsMap.containsKey("inline")){
-				stringBuilder.append(", inline:"+argsMap.get("inline"));
+			if(argsMap.containsKey(INLINE)){
+				stringBuilder.append(", inline:"+argsMap.get(INLINE));
 			}
-			if(argsMap.containsKey("fit")){
-				stringBuilder.append(", fit:"+argsMap.get("fit"));
+			if(argsMap.containsKey(FIT)){
+				stringBuilder.append(", fit:"+argsMap.get(FIT));
 			}
-			if(argsMap.containsKey("noline")){
-				stringBuilder.append(", noline:"+argsMap.get("noline"));
+			if(argsMap.containsKey(NOLINE)){
+				stringBuilder.append(", noline:"+argsMap.get(NOLINE));
 			}
-			if(argsMap.containsKey("onclick")){
-				stringBuilder.append(", onClick:"+argsMap.get("onclick"));
+			if(argsMap.containsKey(ON_CLICK)){
+				stringBuilder.append(", onClick:"+argsMap.get(ON_CLICK));
 			}
 			stringBuilder.append("\">"+ LINE_SEPARATOR);
 
@@ -196,7 +226,7 @@ public class MenubuttonTag extends Tag {
 				Object parentId = getData(row, parentIdField, isMap);
 				//parentId有可能为空，所以在右侧
 				if (rootId.equals(parentId)) {
-					appendMenuItem(stringBuilder, list, parentId, isMap, textField, idField, parentIdField, "");
+					appendMenuItem(stringBuilder, list, parentId, isMap, textField, idField, parentIdField, iconClsField, disabledField,  "");
 				}
 
 			}
@@ -216,7 +246,7 @@ public class MenubuttonTag extends Tag {
 	 * @param parentIdField
 	 * @param tab
 	 */
-	public void appendMenuItem(StringBuilder stringBuilder, List list, Object parentId, boolean isMap, String textField, String idField, String parentIdField, String tab){
+	public void appendMenuItem(StringBuilder stringBuilder, List list, Object parentId, boolean isMap, String textField, String idField, String parentIdField, String iconClsField, String disabledField, String tab){
 		Iterator it =list.listIterator();
 		//构建子菜单
 		while(it.hasNext()) {
@@ -227,8 +257,8 @@ public class MenubuttonTag extends Tag {
 			if(id == null){
 				continue;
 			}
-			String iconCls = getData(row, ICONCLS, isMap);
-			String disabled = getData(row, DISABLED, isMap);
+			String iconCls = getData(row, iconClsField, isMap);
+			String disabled = getData(row, disabledField, isMap);
 			//currentParentId有可能为空，所以在右侧
 			if (parentId.equals(currentParentId)) {
 				//选拼接<div>开始标签MenuItem属性和内容
@@ -244,7 +274,7 @@ public class MenubuttonTag extends Tag {
 				//如果有子节点，就拼接子的<div>开始，然后再递归
 				if (hasChild(list, id, isMap, parentIdField)) {
 					stringBuilder.append(tab).append(TAB).append(TAB).append("<div>").append(LINE_SEPARATOR);
-					appendMenuItem(stringBuilder, list, id, isMap, textField, idField, parentIdField, tab + TAB + TAB);
+					appendMenuItem(stringBuilder, list, id, isMap, textField, idField, parentIdField, iconClsField, disabledField, tab + TAB + TAB);
 					//递归子节点完了关闭</div>
 					stringBuilder.append(tab).append(TAB).append(TAB).append("</div>").append(LINE_SEPARATOR);
 					stringBuilder.append(tab).append(TAB).append("</div>").append(LINE_SEPARATOR);
