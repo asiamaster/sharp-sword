@@ -30,6 +30,7 @@ public class MenubuttonTag extends Tag {
 	private final String SERVICE = "_service";
 	private final String METHOD = "_method";
 	private final String QUERYPARAMS = "_queryParams";
+	private final String DIV_ID = "_divId";
 
 	//标签默认值
 	private final String ID_FIELD_DEFAULT = "id";
@@ -37,6 +38,7 @@ public class MenubuttonTag extends Tag {
 	private final String PARENT_ID_FIELD_DEFAULT = "parentId";
 	private final String ICON_CLS_FIELD_DEFAULT = "iconCls";
 	private final String DISABLED_FIELD_DEFAULT = "disabled";
+	private final String DIV_ID_DEFAULT = "_menubuttonDiv";
 
 	//easyui menubutton和menu属性，用于在menubutton标签上使用
 	private final String ALIGN = "align";
@@ -102,6 +104,7 @@ public class MenubuttonTag extends Tag {
 		String parentIdField = argsMap.get(PARENT_ID_FIELD) == null ? PARENT_ID_FIELD_DEFAULT : argsMap.get(PARENT_ID_FIELD).toString();
 		String iconClsField = argsMap.get(ICON_CLS_FIELD) == null ? ICON_CLS_FIELD_DEFAULT : argsMap.get(ICON_CLS_FIELD).toString();
 		String disabledField = argsMap.get(DISABLED_FIELD) == null ? DISABLED_FIELD_DEFAULT : argsMap.get(DISABLED_FIELD).toString();
+		String divId = argsMap.get(DIV_ID) == null ? DIV_ID_DEFAULT : argsMap.get(DIV_ID).toString();
 
 		if(Map.class.isAssignableFrom(list.get(0).getClass())){
 			rootList = getMapRoots(list, parentIdField);
@@ -109,7 +112,7 @@ public class MenubuttonTag extends Tag {
 		}else{
 			rootList = getBeanRoots(list, parentIdField);
 		}
-		StringBuilder stringBuilder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder("<div id=\""+divId+"\" class=\"easyui-panel\" style=\"padding:5px;\">"+ LINE_SEPARATOR);
 		for(Object root : rootList) {
 			//校验text和id必须有
 			if(getData(root, textField, isMap) == null || getData(root, idField, isMap) == null) {
@@ -145,7 +148,7 @@ public class MenubuttonTag extends Tag {
 			}
 			stringBuilder.append("\">" + getData(root, textField, isMap) + "</a>"+ LINE_SEPARATOR);
 		}
-		stringBuilder.append(LINE_SEPARATOR);
+		stringBuilder.append("</div>"+ LINE_SEPARATOR);
 		try {
 			ctx.byteWriter.writeString(stringBuilder.toString() );
 		} catch (IOException e) {
