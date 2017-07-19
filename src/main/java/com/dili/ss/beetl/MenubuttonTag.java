@@ -267,7 +267,8 @@ public class MenubuttonTag extends Tag {
 			//currentParentId有可能为空，所以在右侧
 			if (parentId.equals(currentParentId)) {
 				//选拼接<div>开始标签MenuItem属性和内容
-				stringBuilder.append(tab).append(TAB).append("<div data-options=\"blankKey:''");
+				stringBuilder.append(tab).append(TAB).append("<div parentId=\""+parentId+"\" id=\""+id+"\" data-options=\"blankKey:''");
+
 				if (iconCls != null) {
 					stringBuilder.append(", iconCls:'" + iconCls + "'");
 				}
