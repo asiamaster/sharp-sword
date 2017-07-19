@@ -109,7 +109,7 @@ public class MenubuttonTag extends Tag {
 		}else{
 			rootList = getBeanRoots(list, parentIdField);
 		}
-		StringBuilder stringBuilder = new StringBuilder("<div class=\"easyui-panel\" style=\"padding:5px;\">"+ LINE_SEPARATOR);
+		StringBuilder stringBuilder = new StringBuilder();
 		for(Object root : rootList) {
 			//校验text和id必须有
 			if(getData(root, textField, isMap) == null || getData(root, idField, isMap) == null) {
@@ -145,7 +145,7 @@ public class MenubuttonTag extends Tag {
 			}
 			stringBuilder.append("\">" + getData(root, textField, isMap) + "</a>"+ LINE_SEPARATOR);
 		}
-		stringBuilder.append("</div>"+ LINE_SEPARATOR);
+		stringBuilder.append(LINE_SEPARATOR);
 		try {
 			ctx.byteWriter.writeString(stringBuilder.toString() );
 		} catch (IOException e) {
@@ -163,6 +163,8 @@ public class MenubuttonTag extends Tag {
 	 * @throws IOException
 	 */
 	private void writeMenu(List list, List rootList) throws IOException {
+		//排除只有根节点没有子节点的情况
+		if(list.isEmpty()) return;
 		Map<String, String> argsMap = (Map)this.args[1];
 		//获取对应字段名称，默认为常量值
 		String textField = argsMap.get(TEXT_FIELD) == null ? TEXT_FIELD_DEFAULT : argsMap.get(TEXT_FIELD).toString();
