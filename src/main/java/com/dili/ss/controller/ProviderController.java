@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,8 @@ public class ProviderController {
 
     @RequestMapping("/getLookupList")
     public @ResponseBody
-    List<ValuePair<?>> getLookupList(HttpServletRequest request, HttpServletResponse response, @RequestBody String queryParams){
+    List<ValuePair<?>> getLookupList(HttpServletRequest request, HttpServletResponse response, @RequestBody String queryParams) throws UnsupportedEncodingException {
+        queryParams=java.net.URLDecoder.decode(queryParams,"UTF-8");
         Map<String, Object> queryMap = parseQuery(queryParams);
         String provider = queryMap.get(PROVIDER_KEY).toString();
         queryMap.remove(PROVIDER_KEY);

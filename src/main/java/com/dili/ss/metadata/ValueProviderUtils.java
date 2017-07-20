@@ -1,13 +1,16 @@
 package com.dili.ss.metadata;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.SpringUtil;
-import com.dili.ss.domain.BaseDomain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 值提供者工具类
@@ -31,13 +34,26 @@ public class ValueProviderUtils {
     }
 
     /**
-     * 取显示的文本值
+     * 根据providerId取显示的文本值
      *
      * @return
      */
     public String getDisplayText(String providerId, Object obj, Map<String, Object> paramMap) {
         ValueProvider providerObj = valueProviderMap.get(providerId);
-        return providerObj == null ? "" : providerObj.getDisplayText(obj, paramMap);
+        return providerObj == null ? "" : providerObj.getDisplayText(obj, paramMap, null);
+    }
+
+    /**
+     * 根据FieldMeta取显示的文本值
+     * @param fieldMeta
+     * @param theVal
+     * @param paramMap
+     * @return
+     */
+    public static String getDisplayText(FieldMeta fieldMeta,Object theVal, Map<String, Object> paramMap) {
+        assert (fieldMeta.getProvider() != null);
+        ValueProvider providerObj = ValueProviderFactory.getProviderObj(fieldMeta.getProvider());
+        return providerObj == null ? "" : providerObj.getDisplayText(theVal, paramMap, fieldMeta);
     }
 
     /**
@@ -57,18 +73,38 @@ public class ValueProviderUtils {
     }
 
     /**
-     * 取下拉项
-     *
+     * 根据providerId取下拉项
+     */
+    public List<ValuePair<?>> getLookupList( String providerId, Object val, Map<String, Object> paramMap) {
+        ValueProvider providerObj = valueProviderMap.get(providerId);
+        return providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(val, paramMap, null);
+    }
+
+    /**
+     * 根据FieldMeta取下拉项
+     * @param fieldMeta
+     * @param theVal
+     * @param paramMap
      * @return
      */
-    public List<ValuePair<?>> getLookupList( String providerId, Object obj, Map<String, Object> paramMap) {
-        ValueProvider providerObj = valueProviderMap.get(providerId);
-        return providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(obj, paramMap);
+    @SuppressWarnings("unchecked")
+    public static List<ValuePair<?>> getLookupList(FieldMeta fieldMeta, Object theVal, Map<String, Object> paramMap) {
+        assert (fieldMeta.getProvider() != null);
+        ValueProvider providerObj = ValueProviderFactory.getProviderObj(fieldMeta.getProvider());
+        return providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(theVal, paramMap, fieldMeta);
     }
 
     //原始值保留前缀
     public static final String ORIGINAL_KEY_PREFIX = "$_";
 
+    /**
+     * 根据Provider构造表格显示数据，保留原始值，前缀为ORIGINAL_KEY_PREFIX
+     * @param domain
+     * @param list
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
     public static <T extends BaseDomain> List buildDataByProvider(T domain, List<T> list) throws Exception {
         if(domain.getMetadata() == null || domain.getMetadata().isEmpty()) return list;
         List<Map> results = new ArrayList<>(list.size());
@@ -94,11 +130,38 @@ public class ValueProviderUtils {
                 if(!(dataMap.get(key) instanceof Date)) {
                     dataMap.put(ORIGINAL_KEY_PREFIX + key, dataMap.get(key));
                 }
-                dataMap.put(key, valueProvider.getDisplayText(dataMap.get(key), jsonValue));
+                dataMap.put(key, valueProvider.getDisplayText(dataMap.get(key), jsonValue, null));
             });
             results.add(dataMap);
         }
         return results;
+    }
+
+    /**
+     * 值提供者的工厂类
+     */
+    private static class ValueProviderFactory {
+        protected static final Logger log = LoggerFactory.getLogger(ValueProviderFactory.class);
+        // 缓冲对象
+        private static final Map<Class<? extends ValueProvider>, ValueProvider> buffers = new ConcurrentHashMap<Class<? extends ValueProvider>, ValueProvider>();
+
+        /**
+         * 根据类型取提供者对象
+         *
+         * @return
+         */
+        public static ValueProvider getProviderObj(Class<? extends ValueProvider> providerClazz) {
+            ValueProvider retval = buffers.get(providerClazz);
+            if (retval == null) {
+                try {
+                    retval = providerClazz.newInstance();
+                    buffers.put(providerClazz, retval);
+                } catch (Exception e) {
+                    log.warn(e.getMessage());
+                }
+            }
+            return retval;
+        }
     }
 
 

@@ -13,19 +13,19 @@ public interface ValueProvider {
 
     /**
      * 取下拉列表的选项
-     * @param obj 值对象
+     * @param val 值对象
      * @param metaMap   meta信息
      * @return
      */
-    List<ValuePair<?>> getLookupList(Object obj, Map metaMap);
+    List<ValuePair<?>> getLookupList(Object val, Map metaMap, FieldMeta fieldMeta);
 
     /**
      * 取显示文本的值
-     * @param obj 值对象
+     * @param val 值对象
      * @param metaMap   meta信息
      * @return
      */
-    String getDisplayText(Object obj, Map metaMap);
+    String getDisplayText(Object val, Map metaMap, FieldMeta fieldMeta);
 
 
 }

@@ -2,6 +2,7 @@ package com.dili.ss.metadata.provider;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.ValuePair;
 import com.dili.ss.metadata.ValueProvider;
 import org.springframework.stereotype.Component;
@@ -17,12 +18,12 @@ import java.util.Map;
 public class SimpleDataProvider implements ValueProvider {
 
     @Override
-    public List<ValuePair<?>> getLookupList(Object obj, Map metaMap) {
+    public List<ValuePair<?>> getLookupList(Object obj, Map metaMap, FieldMeta fieldMeta) {
         return null;
     }
 
     @Override
-    public String getDisplayText(Object obj, Map metaMap) {
+    public String getDisplayText(Object obj, Map metaMap, FieldMeta fieldMeta) {
         if(obj == null || obj.equals("")) return "";
         JSONArray ja = (JSONArray)metaMap.get("data");
         if(ja == null || ja.isEmpty()) return "";

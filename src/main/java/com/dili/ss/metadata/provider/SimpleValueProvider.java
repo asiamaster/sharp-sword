@@ -1,10 +1,12 @@
 package com.dili.ss.metadata.provider;
 
-import com.dili.ss.util.SpringUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.dao.CommonMapper;
+import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.ValuePair;
 import com.dili.ss.metadata.ValuePairImpl;
 import com.dili.ss.metadata.ValueProvider;
+import com.dili.ss.util.SpringUtil;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -57,11 +59,11 @@ public class SimpleValueProvider implements ValueProvider {
         queryParams.clear();
         Object queryParams = paramMap.get("queryParams");
         if(queryParams != null) {
-            setQueryParams((Map)queryParams);
+            setQueryParams(JSONObject.parseObject(queryParams.toString()));
         }
     }
 
-    public List<ValuePair<?>> getLookupList(Object obj, Map paramMap){
+    public List<ValuePair<?>> getLookupList(Object obj, Map paramMap, FieldMeta fieldMeta){
         buildParam(paramMap);
         Map map = Maps.newHashMap();
         map.put("sql", buildSql());
@@ -93,7 +95,7 @@ public class SimpleValueProvider implements ValueProvider {
      *
      * @return
      */
-    public String getDisplayText(Object obj, Map paramMap){
+    public String getDisplayText(Object obj, Map paramMap, FieldMeta fieldMeta){
         if(obj == null || obj.equals("")){
             return "";
         }

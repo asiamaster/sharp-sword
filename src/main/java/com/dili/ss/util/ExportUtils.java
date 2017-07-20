@@ -107,7 +107,7 @@ public class ExportUtils {
                         valueProvider = SpringUtil.getBean(providerBeanId, ValueProvider.class);
                         providerBuffer.put(providerBeanId, valueProvider);
                     }
-                    cell.setCellValue(valueProvider.getDisplayText(value, null));
+                    cell.setCellValue(valueProvider.getDisplayText(value, null, null));
                 }else {
                     cell.setCellValue(value == null ? null : value.toString());
                 }

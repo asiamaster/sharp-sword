@@ -6,7 +6,8 @@
         ,textField:'${_textField!"text"}'
     })
     <% }else{ %>
-    var _comboProviderParamObj = ${_queryParams!"{\}" };
+    var _comboProviderParamObj = {};
+    _comboProviderParamObj.queryParams = '${_queryParams!"{\}" }';
     _comboProviderParamObj.valueField = '${_valueField!"value"}';
     _comboProviderParamObj.textField = '${_textField!"text"}';
     _comboProviderParamObj.table = '${_table}';

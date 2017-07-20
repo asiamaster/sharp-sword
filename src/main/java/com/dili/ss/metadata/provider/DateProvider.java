@@ -1,5 +1,6 @@
 package com.dili.ss.metadata.provider;
 
+import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.ValuePair;
 import com.dili.ss.metadata.ValuePairImpl;
 import com.dili.ss.metadata.ValueProvider;
@@ -7,8 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,12 +27,12 @@ public class DateProvider implements ValueProvider {
     }
 
     @Override
-    public List<ValuePair<?>> getLookupList(Object obj, Map metaMap) {
+    public List<ValuePair<?>> getLookupList(Object obj, Map metaMap, FieldMeta fieldMeta) {
         return buffer;
     }
 
     @Override
-    public String getDisplayText(Object obj, Map metaMap) {
+    public String getDisplayText(Object obj, Map metaMap, FieldMeta fieldMeta) {
         if(obj == null || obj.equals("")) return "";
         if(obj instanceof LocalDate){
             //输出yyyy-MM-dd格式字符串
