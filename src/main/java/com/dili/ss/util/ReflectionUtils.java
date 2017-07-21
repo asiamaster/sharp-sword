@@ -90,7 +90,18 @@ public class ReflectionUtils {
     public static Field getAccessibleField(final Object obj, final String fieldName) {
         Assert.notNull(obj, "object不能为空");
         Assert.hasText(fieldName, "fieldName");
-        for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
+        return getAccessibleField(obj.getClass(), fieldName);
+    }
+
+    /**
+     * 循环向上转型, 获取对象的DeclaredField,   并强制设置为可访问.
+     *
+     * 如向上转型到Object仍无法找到, 返回null.
+     */
+    public static Field getAccessibleField(final Class clazz, final String fieldName) {
+        Assert.notNull(clazz, "clazz不能为空");
+        Assert.hasText(fieldName, "fieldName");
+        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
             try {
                 Field field = superClass.getDeclaredField(fieldName);
                 field.setAccessible(true);
@@ -129,15 +140,23 @@ public class ReflectionUtils {
     public static Method getAccessibleMethod(final Object obj, final String methodName,
                                              final Class<?>... parameterTypes) {
         Assert.notNull(obj, "object不能为空");
+        return getAccessibleMethod(obj.getClass(), methodName, parameterTypes);
+    }
 
-        for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
+    /**
+     * 循环向上转型, 获取对象的DeclaredMethod,并强制设置为可访问.
+     * 如向上转型到Object仍无法找到, 返回null.
+     *
+     * 用于方法需要被多次调用的情况. 先使用本函数先取得Method,然后调用Method.invoke(Object obj, Object... args)
+     */
+    public static Method getAccessibleMethod(final Class clazz, final String methodName,
+                                             final Class<?>... parameterTypes) {
+        Assert.notNull(clazz, "clazz不能为空");
+        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
             try {
                 Method method = superClass.getDeclaredMethod(methodName, parameterTypes);
-
                 method.setAccessible(true);
-
                 return method;
-
             } catch (NoSuchMethodException e) {//NOSONAR
                 // Method不在当前类定义,继续向上转型
             }

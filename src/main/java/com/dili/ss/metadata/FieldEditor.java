@@ -10,31 +10,33 @@ package com.dili.ss.metadata;
  * @create 2010-6-2
  */
 public enum FieldEditor {
-	Label,
+	Label("label"),
 	//按钮
-	Button,
+	Button("linkbutton"),
 	// 普通文本
-	Text,
+	Text("textbox"),
+	//密码框
+	Password("passwordbox"),
+	// 数字
+	Number("numberbox"),
 	// 普通下拉
-	Combo,
-	//下拉树
-	TreeComboBox,
+	Combo("combobox"),
 	// 多选框
-	CheckBox,
+	CheckBox("check"),
 	// 日期编辑
-	DateText,
-	// 备注
-	Notes,
-	// 带多选框的对话框
-	TextCheckBoxDialog,
-	//图片控件
-	Picturebox,
-
-	TextWithButton,
-	//多选下拉框
-	MultiSelectField,
-
-	SelectDialogField,
+	Date(""),
+	// 时间编辑
+	Datetime(""),
 	//多行本文
-	TextArea;
+	TextArea("");
+
+	private String editor;
+
+	FieldEditor(String editor){
+		this.editor = editor;
+	}
+
+	public String getEditor() {
+		return editor;
+	}
 }

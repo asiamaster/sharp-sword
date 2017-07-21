@@ -6,18 +6,18 @@
         ,textField:'${_textField!"text"}'
     })
     <% }else{ %>
-    var _comboProviderParamObj = {};
-    _comboProviderParamObj.queryParams = '${_queryParams!"{\}" }';
-    _comboProviderParamObj.valueField = '${_valueField!"value"}';
-    _comboProviderParamObj.textField = '${_textField!"text"}';
-    _comboProviderParamObj.table = '${_table}';
-    _comboProviderParamObj.provider = '${_provider!"simpleValueProvider"}';
+    var _comboProviderParamObj_${_id} = {};
+    _comboProviderParamObj_${_id}.queryParams = '${_queryParams!"{\}" }';
+    _comboProviderParamObj_${_id}.valueField = '${_valueField!"value"}';
+    _comboProviderParamObj_${_id}.textField = '${_textField!"text"}';
+    _comboProviderParamObj_${_id}.table = '${_table!""}';
+    _comboProviderParamObj_${_id}.provider = '${_provider!"simpleValueProvider"}';
     $("#${_id}").combobox({
         url:"${contextPath}/provider/getLookupList"
         ,method:"POST"
         ,valueField:"value"
         ,textField:"text"
-        ,queryParams:_comboProviderParamObj
+        ,queryParams:_comboProviderParamObj_${_id}
     })
     <% } %>
 </script>

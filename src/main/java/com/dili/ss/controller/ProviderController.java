@@ -22,7 +22,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/provider")
 public class ProviderController {
-    public static final String PROVIDER_KEY = "provider";
+    private static final String PROVIDER_KEY = "provider";
 
     @RequestMapping("/getLookupList")
     public @ResponseBody
@@ -31,6 +31,7 @@ public class ProviderController {
         Map<String, Object> queryMap = parseQuery(queryParams);
         String provider = queryMap.get(PROVIDER_KEY).toString();
         queryMap.remove(PROVIDER_KEY);
+        //这里查下拉不需要提供当前字段的值
         return SpringUtil.getBean(ValueProviderUtils.class).getLookupList(provider, null, queryMap);
     }
 

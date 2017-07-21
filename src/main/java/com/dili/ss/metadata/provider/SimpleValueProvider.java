@@ -21,23 +21,25 @@ import java.util.Map;
 @Component
 public class SimpleValueProvider implements ValueProvider {
     //    字段所在的表
-    protected String table;
+    private String table;
     //    基础数据值名称绑定到该下拉列表框。
-    protected String valueField;
+    private String valueField;
     //    基础数据字段名称绑定到该下拉列表框。
-    protected String textField;
+    private String textField;
     // 值
-    protected Object value;
+    private Object value;
     // 排序子句
-    protected String orderByClause;
+    private String orderByClause;
     //    查询参数
-    protected Map<String, Object> queryParams = new HashedMap();
+    private Map<String, Object> queryParams = new HashedMap();
 
-    public static final String TABLE_KEY = "table";
-    public static final String VALUEFIELD_KEY = "valueField";
-    public static final String TEXTFIELD_KEY = "textField";
-    public static final String VALUE_KEY = "value";
-    public static final String ORDER_BY_CLAUSE_KEY = "orderByClause";
+    private static final String TABLE_KEY = "table";
+    private static final String VALUEFIELD_KEY = "valueField";
+    private static final String TEXTFIELD_KEY = "textField";
+    private static final String VALUE_KEY = "value";
+    private static final String ORDER_BY_CLAUSE_KEY = "orderByClause";
+    private static final String QUERY_PARAMS_KEY = "queryParams";
+
 
     public SimpleValueProvider(){}
 
@@ -57,13 +59,20 @@ public class SimpleValueProvider implements ValueProvider {
         }
         //清空缓存
         queryParams.clear();
-        Object queryParams = paramMap.get("queryParams");
+        Object queryParams = paramMap.get(QUERY_PARAMS_KEY);
         if(queryParams != null) {
             setQueryParams(JSONObject.parseObject(queryParams.toString()));
         }
     }
 
-    public List<ValuePair<?>> getLookupList(Object obj, Map paramMap, FieldMeta fieldMeta){
+    /**
+     * 取列表的值
+     * @param value 当前字段的值
+     * @param paramMap 参数
+     * @param fieldMeta
+     * @return
+     */
+    public List<ValuePair<?>> getLookupList(Object value, Map paramMap, FieldMeta fieldMeta){
         buildParam(paramMap);
         Map map = Maps.newHashMap();
         map.put("sql", buildSql());
@@ -92,14 +101,16 @@ public class SimpleValueProvider implements ValueProvider {
 
     /**
      * 取显示文本的值
-     *
+     * @param value 当前字段的值
+     * @param paramMap  参数
+     * @param fieldMeta
      * @return
      */
-    public String getDisplayText(Object obj, Map paramMap, FieldMeta fieldMeta){
-        if(obj == null || obj.equals("")){
+    public String getDisplayText(Object value, Map paramMap, FieldMeta fieldMeta){
+        if(value == null || value.equals("")){
             return "";
         }
-        paramMap.put(VALUE_KEY, obj);
+        paramMap.put(VALUE_KEY, value);
         buildParam(paramMap);
         Map map = Maps.newHashMap();
         map.put("sql", buildSql());
