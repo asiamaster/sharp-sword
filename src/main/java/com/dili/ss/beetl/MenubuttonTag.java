@@ -10,6 +10,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -268,7 +274,7 @@ public class MenubuttonTag extends Tag {
 			if (parentId.equals(currentParentId)) {
 				//选拼接<div>开始标签MenuItem属性和内容
 				stringBuilder.append(tab).append(TAB).append("<div parentId=\""+parentId+"\" id=\""+id+"\" data-options=\"blankKey:''");
-
+				stringBuilder.append("," + getDataOptions(row, isMap));
 				if (iconCls != null) {
 					stringBuilder.append(", iconCls:'" + iconCls + "'");
 				}
@@ -335,6 +341,66 @@ public class MenubuttonTag extends Tag {
 	private String getData(Object row, String key, Boolean isMap){
 		Object data = isMap ? ((Map)row).get(key) : POJOUtils.getProperty(row, key);
 		return data == null ? null : data.toString();
+	}
+
+	/**
+	 * 根据对象获取data-options串
+	 * @param row
+	 * @param isMap
+	 * @return
+	 */
+	private String getDataOptions(Object row, Boolean isMap){
+		StringBuilder stringBuilder = new StringBuilder();
+		if(isMap){
+			Map map = (Map) row;
+			map.forEach((key, value) ->{
+				if(value != null) {
+					stringBuilder.append(", "+key+":'"+value.toString()+"'");
+				}
+			});
+			return stringBuilder.substring(1, stringBuilder.length());
+		}else{
+			Method[] methods = row.getClass().getMethods();
+			for(Method method : methods){
+				//get方法，且不能有参数
+				if(POJOUtils.isGetMethod(method) && method.getParameters().length == 0){
+					String fieldName = POJOUtils.getBeanField(method);
+					try {
+						Object value = getObjectStringValue(method.invoke(row));
+						if(value != null){
+							stringBuilder.append(", "+fieldName+":'"+value+"'");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			return stringBuilder.substring(1, stringBuilder.length());
+		}
+	}
+
+	/**
+	 * 获取Object对象的String值，主要处理时间和日期类型
+	 * @param obj
+	 * @return
+	 */
+	private String getObjectStringValue (Object obj){
+		if(obj == null) {
+			return null;
+		}
+		if(obj instanceof Instant){
+			//输出yyyy-MM-dd HH:mm:ss格式字符串
+			return DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss").withZone(ZoneId.systemDefault()).format(((Instant)obj));
+		}
+		if(obj instanceof LocalDateTime){
+			//输出yyyy-MM-dd HH:mm:ss格式字符串
+			return ((LocalDateTime)obj).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		if(obj instanceof Date){
+			return sdf.format((Date)obj);
+		}
+		return String.valueOf(obj);
 	}
 
 	/**
