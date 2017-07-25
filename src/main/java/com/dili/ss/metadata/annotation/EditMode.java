@@ -1,8 +1,6 @@
 package com.dili.ss.metadata.annotation;
 
 import com.dili.ss.metadata.FieldEditor;
-import com.dili.ss.metadata.ValueProvider;
-import com.dili.ss.metadata.provider.EmptyValueProvider;
 
 import java.lang.annotation.*;
 
@@ -57,14 +55,20 @@ public @interface EditMode {
 	 */
 	boolean sortable() default true;
 
+	boolean formable() default true;
+
+	boolean gridable() default true;
+
+	boolean queryable() default true;
+
 	//===========================================   值模式  ===========================================
 
 	/**
-	 * 值提供者
+	 * 值提供者, spring bean id
 	 *
 	 * @return
 	 */
-	Class<? extends ValueProvider> provider() default EmptyValueProvider.class;
+	String provider() default "emptyValueProvider";
 
 	/**
 	 * 显示文本的字段名

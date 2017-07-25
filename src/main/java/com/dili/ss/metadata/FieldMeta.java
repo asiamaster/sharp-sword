@@ -19,7 +19,7 @@ public class FieldMeta implements Comparable<FieldMeta>, Serializable, Cloneable
 	String defValue; // 缺省值
 	Class<?> type; // DTO中的数据类型
 
-	Class<? extends ValueProvider> provider; // 编辑值的提供者
+	String provider; // 编辑值的提供者
 	String txtField; // 显示文本的字段
 
 	boolean required; // 是否必填
@@ -30,6 +30,8 @@ public class FieldMeta implements Comparable<FieldMeta>, Serializable, Cloneable
 	boolean sortable; // 是否将作为排序字段
 	boolean formable; // 是否允许显示在form中
 	boolean gridable; // 是否允许显示在gird中
+	boolean queryable = true; //是否允许作为查询字段
+	String column; //数据库对应的列名
 
 	int index = Integer.MAX_VALUE; // 编辑列的顺序
 
@@ -53,6 +55,14 @@ public class FieldMeta implements Comparable<FieldMeta>, Serializable, Cloneable
 		} catch (CloneNotSupportedException e) {
 			throw new InternalError();
 		}
+	}
+
+	public String getColumn() {
+		return column;
+	}
+
+	public void setColumn(String column) {
+		this.column = column;
 	}
 
 	public String getName() {
@@ -95,11 +105,11 @@ public class FieldMeta implements Comparable<FieldMeta>, Serializable, Cloneable
 		this.type = type;
 	}
 
-	public Class<? extends ValueProvider> getProvider() {
+	public String getProvider() {
 		return provider;
 	}
 
-	public void setProvider(Class<? extends ValueProvider> provider) {
+	public void setProvider(String provider) {
 		this.provider = provider;
 	}
 
@@ -173,5 +183,13 @@ public class FieldMeta implements Comparable<FieldMeta>, Serializable, Cloneable
 
 	public void setIndex(int index) {
 		this.index = index;
+	}
+
+	public boolean isQueryable() {
+		return queryable;
+	}
+
+	public void setQueryable(boolean queryable) {
+		this.queryable = queryable;
 	}
 }

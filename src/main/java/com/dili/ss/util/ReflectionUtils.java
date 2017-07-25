@@ -3,12 +3,15 @@ package com.dili.ss.util;
 /**
  * Created by asiamastor on 2017/1/3.
  */
+
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.*;
+import java.util.List;
 
 /**
  * 反射工具类.
@@ -80,6 +83,37 @@ public class ReflectionUtils {
         } catch (IllegalAccessException e) {
             logger.error("不可能抛出的异常:{}", e.getMessage());
         }
+    }
+
+    /**
+     * 循环向上转型, 获取对象的所有Field, 并强制设置为可访问.
+     *
+     * 如向上转型到Object仍无法找到, 返回null.
+     */
+    public static List<Field> getAccessibleFields(final Class clazz, boolean excludeStatic, boolean excludeFinal) {
+        Assert.notNull(clazz, "clazz不能为空");
+        List<Field> fields = Lists.newArrayList();
+        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
+            Field[] declaredFields = superClass.getDeclaredFields();
+            for(Field field : declaredFields){
+                if(field.getName().equals("serialVersionUID")){
+                    continue;
+                }
+                //是否排除static字段
+                if(excludeStatic && Modifier.isStatic(field.getModifiers())){
+                    continue;
+                }
+                //是否排除Final字段
+                if(excludeFinal && Modifier.isFinal(field.getModifiers())){
+                    continue;
+                }
+                if(!fields.contains(field)){
+                    field.setAccessible(true);
+                    fields.add(field);
+                }
+            }
+        }
+        return fields;
     }
 
     /**

@@ -1,8 +1,8 @@
 package com.dili.ss.controller;
 
-import com.dili.ss.util.SpringUtil;
 import com.dili.ss.metadata.ValuePair;
 import com.dili.ss.metadata.ValueProviderUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +24,9 @@ import java.util.Map;
 public class ProviderController {
     private static final String PROVIDER_KEY = "provider";
 
+    @Autowired
+    private ValueProviderUtils valueProviderUtils;
+
     @RequestMapping("/getLookupList")
     public @ResponseBody
     List<ValuePair<?>> getLookupList(HttpServletRequest request, HttpServletResponse response, @RequestBody String queryParams) throws UnsupportedEncodingException {
@@ -32,7 +35,7 @@ public class ProviderController {
         String provider = queryMap.get(PROVIDER_KEY).toString();
         queryMap.remove(PROVIDER_KEY);
         //这里查下拉不需要提供当前字段的值
-        return SpringUtil.getBean(ValueProviderUtils.class).getLookupList(provider, null, queryMap);
+        return valueProviderUtils.getLookupList(provider, null, queryMap);
     }
 
     private Map<String, Object> parseQuery(String queryParams) {

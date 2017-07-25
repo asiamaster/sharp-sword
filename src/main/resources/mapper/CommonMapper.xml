@@ -2,7 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dili.ss.dao.CommonMapper">
 
-  <select id="select" parameterType="java.util.Map" resultType="com.dili.ss.metadata.ValuePairImpl">
+  <select id="selectValuePair" parameterType="java.util.Map" resultType="com.dili.ss.metadata.ValuePairImpl">
+    ${sql}
+  </select>
+
+  <select id="selectJSONObject" parameterType="java.util.Map" resultType="com.alibaba.fastjson.JSONObject">
     ${sql}
   </select>
 

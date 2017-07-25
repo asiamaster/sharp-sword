@@ -10,6 +10,7 @@ import com.dili.ss.util.SpringUtil;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -40,6 +41,8 @@ public class SimpleValueProvider implements ValueProvider {
     private static final String ORDER_BY_CLAUSE_KEY = "orderByClause";
     private static final String QUERY_PARAMS_KEY = "queryParams";
 
+    @Autowired
+    private CommonMapper commonMapper;
 
     public SimpleValueProvider(){}
 
@@ -76,7 +79,7 @@ public class SimpleValueProvider implements ValueProvider {
         buildParam(paramMap);
         Map map = Maps.newHashMap();
         map.put("sql", buildSql());
-        List<ValuePair<?>> data = SpringUtil.getBean(CommonMapper.class).select(map);
+        List<ValuePair<?>> data = commonMapper.selectValuePair(map);
         data.add(0, new ValuePairImpl(EMPTY_ITEM_TEXT, null));
         return data;
     }
@@ -114,7 +117,7 @@ public class SimpleValueProvider implements ValueProvider {
         buildParam(paramMap);
         Map map = Maps.newHashMap();
         map.put("sql", buildSql());
-        List<ValuePair<?>> data = SpringUtil.getBean(CommonMapper.class).select(map);
+        List<ValuePair<?>> data = SpringUtil.getBean(CommonMapper.class).selectValuePair(map);
         if(data.isEmpty()) return "";
         return data.get(0).getText();
     }

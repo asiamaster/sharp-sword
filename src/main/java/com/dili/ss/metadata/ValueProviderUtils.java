@@ -50,9 +50,9 @@ public class ValueProviderUtils {
      * @param paramMap
      * @return
      */
-    public static String getDisplayText(FieldMeta fieldMeta,Object theVal, Map<String, Object> paramMap) {
+    public String getDisplayText(FieldMeta fieldMeta,Object theVal, Map<String, Object> paramMap) {
         assert (fieldMeta.getProvider() != null);
-        ValueProvider providerObj = ValueProviderFactory.getProviderObj(fieldMeta.getProvider());
+        ValueProvider providerObj = valueProviderMap.get(fieldMeta.getProvider());
         return providerObj == null ? "" : providerObj.getDisplayText(theVal, paramMap, fieldMeta);
     }
 
@@ -88,9 +88,9 @@ public class ValueProviderUtils {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static List<ValuePair<?>> getLookupList(FieldMeta fieldMeta, Object theVal, Map<String, Object> paramMap) {
+    public List<ValuePair<?>> getLookupList(FieldMeta fieldMeta, Object theVal, Map<String, Object> paramMap) {
         assert (fieldMeta.getProvider() != null);
-        ValueProvider providerObj = ValueProviderFactory.getProviderObj(fieldMeta.getProvider());
+        ValueProvider providerObj = valueProviderMap.get(fieldMeta.getProvider());
         return providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(theVal, paramMap, fieldMeta);
     }
 
@@ -105,13 +105,54 @@ public class ValueProviderUtils {
      * @return
      * @throws Exception
      */
-    public static <T extends BaseDomain> List buildDataByProvider(T domain, List<T> list) throws Exception {
+    public static <T extends BaseDomain> List buildDataByProvider(T domain, List list) throws Exception {
         if(domain.getMetadata() == null || domain.getMetadata().isEmpty()) return list;
         List<Map> results = new ArrayList<>(list.size());
+        ObjectMeta objectMeta = MetadataUtils.getDTOMeta(domain.getClass());
         Map<String, ValueProvider> buffer = new HashMap<>();
-        for(T t: list) {
+        for(Object t: list) {
             Map dataMap = BeanConver.transformObjectToMap(t);
             domain.getMetadata().forEach((k, v) -> {
+                ValueProvider valueProvider = null;
+                //key是字段field
+                String key = k.toString();
+                //value是provider相关的json对象
+                JSONObject jsonValue = JSONObject.parseObject(v.toString());
+                String providerBeanId  =jsonValue.get("provider").toString();
+                jsonValue.remove("provider");
+                if(buffer.containsKey(providerBeanId)){
+                    valueProvider = buffer.get(providerBeanId);
+                }else {
+                    valueProvider = SpringUtil.getBean(providerBeanId, ValueProvider.class);
+                    buffer.put(providerBeanId, valueProvider);
+                }
+                //保留原值，用于在修改时提取表单加载，但是需要过滤掉日期类型，
+                // 因为前台无法转换Long类型的日期格式,并且也没法判断是日期格式
+                if(!(dataMap.get(key) instanceof Date)) {
+                    dataMap.put(ORIGINAL_KEY_PREFIX + key, dataMap.get(key));
+                }
+                dataMap.put(key, valueProvider.getDisplayText(dataMap.get(key), jsonValue, objectMeta.getFieldMetaById(key)));
+            });
+            results.add(dataMap);
+        }
+        return results;
+    }
+
+    /**
+     * 根据Provider构造表格显示数据，保留原始值，前缀为ORIGINAL_KEY_PREFIX
+     * @param medadata
+     * @param list
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
+    public static <T extends BaseDomain> List buildDataByProvider(Map medadata, List list) throws Exception {
+        if(medadata == null || medadata.isEmpty()) return list;
+        List<Map> results = new ArrayList<>(list.size());
+        Map<String, ValueProvider> buffer = new HashMap<>();
+        for(Object t: list) {
+            Map dataMap = BeanConver.transformObjectToMap(t);
+            medadata.forEach((k, v) -> {
                 ValueProvider valueProvider = null;
                 //key是字段field
                 String key = k.toString();

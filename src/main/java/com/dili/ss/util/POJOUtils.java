@@ -432,7 +432,7 @@ public final class POJOUtils {
             matcher.appendReplacement(sb, "_"+matcher.group(0).toLowerCase());
         }
         matcher.appendTail(sb);
-        return sb.toString();
+        return sb.indexOf("_") == 0 ? sb.substring(1) : sb.toString();
     }
 
 }

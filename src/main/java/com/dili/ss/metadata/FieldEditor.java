@@ -24,11 +24,11 @@ public enum FieldEditor {
 	// 多选框
 	CheckBox("check"),
 	// 日期编辑
-	Date(""),
+	Date("datebox"),
 	// 时间编辑
-	Datetime(""),
+	Datetime("datetimebox"),
 	//多行本文
-	TextArea("");
+	Textarea("textarea");
 
 	private String editor;
 

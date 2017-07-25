@@ -3,10 +3,13 @@ package com.dili.ss.metadata;
 import com.dili.ss.metadata.annotation.EditMode;
 import com.dili.ss.metadata.annotation.FieldDef;
 import com.dili.ss.util.POJOUtils;
+import com.dili.ss.util.ReflectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.Column;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,7 +122,7 @@ public class MetadataUtils {
 	 * @return 有可能返回null
 	 */
 	@SuppressWarnings("unchecked")
-	private static FieldMeta newFieldMetaFromGetMethod(Method method) {
+	private static FieldMeta newFieldMetaFromGetMethod(Class<?> dtoClazz, Method method) {
 		FieldMeta retval = null;
 		FieldDef fieldDef = method.getAnnotation(FieldDef.class);
 		if (fieldDef != null) {
@@ -130,8 +133,27 @@ public class MetadataUtils {
 		if (retval != null) {
 			retval.setType(method.getReturnType());
 			updateFieldMetaByEditMode(retval, method);
+			updateFieldMetaFromField(retval, method, dtoClazz);
 		}
 		return retval;
+	}
+
+	private static void updateFieldMetaFromField(FieldMeta fMeta, Method method, Class<?> dtoClazz) {
+		String fieldName = POJOUtils.getBeanField(method);
+		Field field = ReflectionUtils.getAccessibleField(dtoClazz, fieldName);
+		String dbFieldName = null;
+        //没找到getter对应的字段, 直接转换getter的字段名为下线划，以和数据库字段对应
+        if(field == null){
+            dbFieldName = POJOUtils.humpToLineFast(fieldName);
+        }else{ //找到getter对应的字段则取字段上的@javax.persistence.Column注解
+            Column column = field.getAnnotation(Column.class);
+            if(column != null) {
+                dbFieldName = column.name();
+            }else{
+                dbFieldName = POJOUtils.humpToLineFast(fieldName);
+            }
+        }
+		fMeta.setColumn(dbFieldName);
 	}
 
 	/**
@@ -166,6 +188,9 @@ public class MetadataUtils {
 			fMeta.setEditor(editMode.editor());
 			fMeta.setIndex(editMode.index());
 			fMeta.setSortable(editMode.sortable());
+			fMeta.setFormable(editMode.formable());
+			fMeta.setGridable(editMode.gridable());
+			fMeta.setQueryable(editMode.queryable());
 			// 界面显示所用的字段
 			if (StringUtils.isNotBlank(editMode.txtField())) {
 				fMeta.setTxtField(editMode.txtField());
@@ -182,9 +207,10 @@ public class MetadataUtils {
 			for (Method method : methods) {
 				if (POJOUtils.isGetMethod(method)
 						|| POJOUtils.isISMethod(method)) {
-					FieldMeta fieldMeta = newFieldMetaFromGetMethod(method);
-					if (fieldMeta != null)
+					FieldMeta fieldMeta = newFieldMetaFromGetMethod(dtoClazz, method);
+					if (fieldMeta != null) {
 						retval.add(fieldMeta);
+					}
 				}
 			}
 		}
