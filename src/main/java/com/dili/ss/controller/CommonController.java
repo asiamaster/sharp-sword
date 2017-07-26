@@ -60,34 +60,40 @@ public class CommonController {
         }
         String beforeFromSql = stringBuilder.substring(0, stringBuilder.length()-2);
         stringBuilder = new StringBuilder(beforeFromSql);
-        stringBuilder.append(" from ").append(tableName).append(" where");
+        stringBuilder.append(" from ").append(tableName);
         //where以前的sql
         String sqlStart = stringBuilder.toString();
-        stringBuilder = new StringBuilder();
-        for(String str : conditionItems.getConditionItems()){
-            String[] condition = str.split(":");
-            String conditionField = condition[0];
-            String relationField = condition[1];
-            //将:条件值中的冒号替换回来
-            String conditionValueField = condition[2].replaceAll(SsConstants.COLON_ENCODE, ":");
-            stringBuilder.append(" ").append(conditionItems.getConditionRelationField()).append(" ")
-                    .append(conditionField).append(" ").append(RelationOperator.valueOf(relationField).getValue()).append(" ");
-            //如果是like或not like，在两边加%号
-            if(relationField.equals(RelationOperator.Match.name()) || relationField.equals(RelationOperator.NotMatch.name())) {
-                stringBuilder.append("'%")
-                        .append(conditionValueField)
-                        .append("%'");
-            //如果是Is或IsNot，conditionValueField直接写死成null
-            }else if(relationField.equals(RelationOperator.Is.name()) || relationField.equals(RelationOperator.IsNot.name())) {
-                stringBuilder.append("null");
-            }else {
-                stringBuilder.append("'")
-                        .append(conditionValueField)
-                        .append("'");
+        //声明最终执行的sql变量
+        String sql = null;
+        if(conditionItems.getConditionRelationField().equals("none")){
+            sql = sqlStart;
+        }else {
+            stringBuilder = new StringBuilder();
+            for (String str : conditionItems.getConditionItems()) {
+                String[] condition = str.split(":");
+                String conditionField = condition[0];
+                String relationField = condition[1];
+                //将:条件值中的冒号替换回来
+                String conditionValueField = condition[2].replaceAll(SsConstants.COLON_ENCODE, ":");
+                stringBuilder.append(" ").append(conditionItems.getConditionRelationField()).append(" ")
+                        .append(conditionField).append(" ").append(RelationOperator.valueOf(relationField).getValue()).append(" ");
+                //如果是like或not like，在两边加%号
+                if (relationField.equals(RelationOperator.Match.name()) || relationField.equals(RelationOperator.NotMatch.name())) {
+                    stringBuilder.append("'%")
+                            .append(conditionValueField)
+                            .append("%'");
+                    //如果是Is或IsNot，conditionValueField直接写死成null
+                } else if (relationField.equals(RelationOperator.Is.name()) || relationField.equals(RelationOperator.IsNot.name())) {
+                    stringBuilder.append("null");
+                } else {
+                    stringBuilder.append("'")
+                            .append(conditionValueField)
+                            .append("'");
+                }
             }
+            //组合sql，第三段where之后的sql需要去掉前面的空格和and/or操作符
+            sql = sqlStart + " where" + stringBuilder.substring(conditionItems.getConditionRelationField().length()+1);
         }
-        //组合sql，第二段sql需要去掉前面的空格和and/or操作符
-        String sql = sqlStart + stringBuilder.substring(conditionItems.getConditionRelationField().length()+1);
         logger.info("listEasyuiPageByConditionItems_sql:"+sql);
         Integer page = conditionItems.getPage();
         page = (page == null) ? Integer.valueOf(1) : page;

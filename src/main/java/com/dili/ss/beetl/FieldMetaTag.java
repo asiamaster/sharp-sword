@@ -8,6 +8,7 @@ import com.dili.ss.util.BeanConver;
 import org.apache.commons.lang3.StringUtils;
 import org.beetl.core.Tag;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class FieldMetaTag extends Tag {
 				return;
 			}
 			Class clazz = Class.forName(dtoClass);
-			varName = varName == null ? BeanConver.lowerCaseFirstChar(clazz.getSimpleName()) : varName;
+			varName = varName == null ? getVarName(clazz.getSimpleName()) : varName;
 			ObjectMeta objectMeta = MetadataUtils.getDTOMeta(clazz);
 			JSONObject jsonObject = new JSONObject();
 			for(FieldMeta fieldMeta : objectMeta){
@@ -52,6 +53,16 @@ public class FieldMetaTag extends Tag {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * 根据类全名获取js变量名称
+	 * @param clazzFullName
+	 * @return
+	 */
+	public static String getVarName(String clazzFullName){
+		Assert.hasText(clazzFullName, "clazzFullName不能为空");
+		return BeanConver.lowerCaseFirstChar(clazzFullName.substring(clazzFullName.lastIndexOf(".")+1))+"Meta";
 	}
 
 
