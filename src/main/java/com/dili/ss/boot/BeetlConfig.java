@@ -82,7 +82,6 @@ public class BeetlConfig  {
         beetlGroupUtilConfiguration.setFormats(formats);
         beetlGroupUtilConfiguration.setTagFactorys(getTagFactoryMaps());
         beetlGroupUtilConfiguration.setConfigFileResource(patternResolver.getResource("classpath:conf/beetl.properties"));
-
         return beetlGroupUtilConfiguration;
     }
 

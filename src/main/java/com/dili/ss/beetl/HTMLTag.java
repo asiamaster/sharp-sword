@@ -178,8 +178,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         if (tagFactory == null)
         {
             String path = getHtmlTagResourceId(child);
-            Template t = null;
-            t = gt.getTemplate(path, this.ctx.getResourceId());
+            Template t = gt.getHtmlFunctionOrTagTemplate(path, this.ctx.getResourceId());
             t.binding(ctx.globalVar);
             t.dynamic(ctx.objectKeys);
             t.binding("tag", this);
@@ -241,10 +240,17 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         String path = child.replace(':', File.separatorChar);
         StringBuilder sb = new StringBuilder("/");
         sb.append(this.tagRoot).append("/").append(path).append(".").append(this.tagSuffix);
-        String key = sb.toString();
+        //html标签支持子文件夹 前台标签以下划线"_"分隔文件夹
+        String key = sb.toString().replaceAll("_", "/");
+//        ClasspathResource cr = ((ClasspathResource)gt.getHtmlFunctionOrTagTemplate(key).program.res);
+//        try{
+//            cr.openReader();
+//        }catch (BeetlException ex) {
+//        }
 //        HttpServletRequest request = (HttpServletRequest)ctx.getGlobal("request");
         return key;
     }
+
 
     protected void addThis() {
         TagTree tree = (TagTree) request.getAttribute("tagTreeContext");
