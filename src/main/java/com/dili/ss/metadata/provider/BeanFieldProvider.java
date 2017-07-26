@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
+import javax.persistence.Transient;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -48,9 +49,10 @@ public class BeanFieldProvider implements ValueProvider {
                     //取getter方法对应的字段(包括搜索父类)，以获取数据库字段名
                     Field field = ReflectionUtils.getAccessibleField(dtoClass, fieldName);
                     String dbFieldName = null;
-                    //没找到getter对应的字段, 直接转换getter的字段名为下线划，以和数据库字段对应
-                    if(field == null){
-                        dbFieldName = POJOUtils.humpToLineFast(fieldName);
+//                    不添加Transient字段和没找到getter对应的字段
+                    if(field == null || field.getAnnotation(Transient.class) != null){
+//                        dbFieldName = POJOUtils.humpToLineFast(fieldName);
+                        continue;
                     }else{ //找到getter对应的字段则取字段上的@javax.persistence.Column注解
                         Column column = field.getAnnotation(Column.class);
                         if(column != null) {
