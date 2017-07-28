@@ -3,6 +3,7 @@ package com.dili.ss.mbg;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.mbg.beetl.BeetlTemplateUtil;
 import com.dili.ss.util.POJOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
@@ -175,10 +176,11 @@ public class MyMapperPlugin extends PluginAdapter {
         for(Method method : methods){
             if(POJOUtils.isGetMethod(method.getName())) {
                 IntrospectedColumn introspectedColumn = introspectedTable.getColumn(POJOUtils.humpToLineFast(POJOUtils.getBeanField(method.getName())));
+                String fieldLabel = StringUtils.isBlank(introspectedColumn.getRemarks()) ? introspectedColumn.getJavaProperty() : BeetlTemplateUtil.getFieldName(introspectedColumn.getRemarks());
                 if(introspectedColumn.getJdbcTypeName().equals("VARCHAR")) {
-                    method.addAnnotation("@FieldDef(label=\"" + BeetlTemplateUtil.getFieldName(introspectedColumn.getRemarks()) + "\", maxLength = " + introspectedColumn.getLength() + ")");
+                    method.addAnnotation("@FieldDef(label=\"" + fieldLabel + "\", maxLength = " + introspectedColumn.getLength() + ")");
                 } else {
-                    method.addAnnotation("@FieldDef(label=\"" + BeetlTemplateUtil.getFieldName(introspectedColumn.getRemarks()) + "\")");
+                    method.addAnnotation("@FieldDef(label=\"" + fieldLabel + "\")");
                 }
                 JSONObject jsonObject = BeetlTemplateUtil.getJsonObject(introspectedColumn.getRemarks());
 //                注释中有JSON参数，则处理成下拉框
