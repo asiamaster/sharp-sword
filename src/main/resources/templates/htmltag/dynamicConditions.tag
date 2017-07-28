@@ -5,9 +5,34 @@
     <#fieldEditor varName="fieldEditor" />
 
     var conditionValueFieldInput = '<input name="conditionValueField" id="conditionValueField" data-options="label:\'条件值:\',required:false, width:253, onLoadSuccess:conditionValueFieldLoadSuccess" />';
-    //选择下拉时切换条件控件
+
+    //选择关系下拉时切换条件值控件
+    function onChangeRelation(newValue, oldValue){
+        if(newValue == "Is" || newValue == "IsNot"){
+            $("#conditionValueField").textbox({
+                value : "空",
+                readonly : true
+            });
+        }else {
+            renderConditionValue($("#conditionField").combobox("getValue"));
+        }
+    }
+    //选择条件项下拉时切换条件值控件
     function onChangeCondition(newValue, oldValue){
-        var newValueFieldMeta = ${@com.dili.ss.beetl.FieldMetaTag.getVarName(dtoClass)}[newValue];
+        //先将关系选中第一个，避免上次选中非后和控件冲突
+        var relationFieldData =  $("#relationField").combobox("getData");
+        $("#relationField").combobox("select", relationFieldData[0]["value"]);
+//        根据条件项渲染条件值控件
+        renderConditionValue(newValue);
+    }
+
+    /**
+     * 私有方法
+     * 根据条件项渲染条件值控件
+     * @param val
+     */
+    function renderConditionValue (val){
+        var newValueFieldMeta = ${@com.dili.ss.beetl.FieldMetaTag.getVarName(dtoClass)}[val];
         var editor = "";
         //没有meta信息，默认为textbox
         if(!newValueFieldMeta || newValueFieldMeta == null ){
@@ -85,6 +110,7 @@
             });
         }
     }
+
     //条件值加载成功后默认选中第一项
     function conditionValueFieldLoadSuccess(){
         $("#conditionValueField").combobox("select", $("#conditionValueField").combobox("getData")[0]["value"]);
@@ -201,7 +227,7 @@
             </tr>
             <tr>
                 <td style="padding:5px;">
-                    <input name="relationField" id="relationField" data-options="label:'关系:', editable:false, width:250" required="true" />
+                    <input name="relationField" id="relationField" data-options="label:'关系:', editable:false, width:250, onChange:onChangeRelation" required="true" />
                     <#comboProvider _id="relationField" _data='[{"text":"等于","value":"Equal"}, {"text":"不等于","value":"NotEqual"}, {"text":"大于","value":"GreatThan"}, {"text":"大于等于","value":"GreatEqualThan"}, {"text":"小于","value":"LittleThan"}, {"text":"小于等于","value":"LittleEqualThan"}, {"text":"匹配","value":"Match"}, {"text":"不匹配","value":"NotMatch"}, {"text":"是","value":"Is"}, {"text":"非","value":"IsNot"}]' />
                 </td>
                 <td>
