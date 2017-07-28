@@ -26,6 +26,7 @@ public class FieldMeta implements Comparable<FieldMeta>, Serializable, Cloneable
 	boolean visible = true; // 是否可见
 	boolean readonly; // 是否只读
 	FieldEditor editor; // 编辑器类型
+	String params; //初始化参数
 
 	boolean sortable; // 是否将作为排序字段
 	boolean formable; // 是否允许显示在form中
@@ -191,5 +192,13 @@ public class FieldMeta implements Comparable<FieldMeta>, Serializable, Cloneable
 
 	public void setQueryable(boolean queryable) {
 		this.queryable = queryable;
+	}
+
+	public String getParams() {
+		return params;
+	}
+
+	public void setParams(String params) {
+		this.params = params;
 	}
 }

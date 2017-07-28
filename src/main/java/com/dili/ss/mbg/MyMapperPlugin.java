@@ -1,5 +1,9 @@
 package com.dili.ss.mbg;
 
+import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.mbg.beetl.BeetlTemplateUtil;
+import com.dili.ss.util.POJOUtils;
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
@@ -154,6 +158,44 @@ public class MyMapperPlugin extends PluginAdapter {
                 || StringUtility.stringHasValue(beginningDelimiter)
                 || StringUtility.stringHasValue(endingDelimiter)) {
             topLevelClass.addAnnotation("@Table(name = \"" + getDelimiterName(tableName) + "\")");
+        }
+        processEntityGetMethodAnnotation(topLevelClass, introspectedTable);
+    }
+
+    /**
+     * 生成实体get方法上的FieldDef和EditMode注解
+     * @param topLevelClass
+     * @param introspectedTable
+     */
+    private void processEntityGetMethodAnnotation(TopLevelClass topLevelClass, IntrospectedTable introspectedTable){
+        topLevelClass.addImportedType("com.dili.ss.metadata.annotation.FieldDef");
+        topLevelClass.addImportedType("com.dili.ss.metadata.annotation.EditMode");
+        List<Method> methods = topLevelClass.getMethods();
+
+        for(Method method : methods){
+            if(POJOUtils.isGetMethod(method.getName())) {
+                IntrospectedColumn introspectedColumn = introspectedTable.getColumn(POJOUtils.humpToLineFast(POJOUtils.getBeanField(method.getName())));
+                if(introspectedColumn.getJdbcTypeName().equals("VARCHAR")) {
+                    method.addAnnotation("@FieldDef(label=\"" + BeetlTemplateUtil.getFieldName(introspectedColumn.getRemarks()) + "\", maxLength = " + introspectedColumn.getLength() + ")");
+                } else {
+                    method.addAnnotation("@FieldDef(label=\"" + BeetlTemplateUtil.getFieldName(introspectedColumn.getRemarks()) + "\")");
+                }
+                JSONObject jsonObject = BeetlTemplateUtil.getJsonObject(introspectedColumn.getRemarks());
+//                注释中有JSON参数，则处理成下拉框
+                if(jsonObject != null){
+                    method.addAnnotation("@EditMode(editor = FieldEditor.Combo, required = "+!introspectedColumn.isNullable()+", params=\""+jsonObject.toJSONString().replaceAll("\"", "\\\\\"")+"\")");
+                }else {
+                    if(introspectedColumn.getJdbcTypeName().equals("TIMESTAMP")){
+                        method.addAnnotation("@EditMode(editor = FieldEditor.Datetime, required = "+!introspectedColumn.isNullable()+")");
+                    } else if(introspectedColumn.getJdbcTypeName().equals("DATE")){
+                        method.addAnnotation("@EditMode(editor = FieldEditor.Date, required = "+!introspectedColumn.isNullable()+")");
+                    } else if(introspectedColumn.getJdbcTypeName().equals("INTEGER") || introspectedColumn.getJdbcTypeName().equals("BIGINT") || introspectedColumn.getJdbcTypeName().equals("BIT")){
+                        method.addAnnotation("@EditMode(editor = FieldEditor.Number, required = "+!introspectedColumn.isNullable()+")");
+                    } else {
+                        method.addAnnotation("@EditMode(editor = FieldEditor.Text, required = "+!introspectedColumn.isNullable()+")");
+                    }
+                }
+            }
         }
     }
 

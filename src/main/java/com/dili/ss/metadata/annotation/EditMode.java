@@ -44,6 +44,13 @@ public @interface EditMode {
 	FieldEditor editor() default FieldEditor.Text;
 
 	/**
+	 * 编辑参数,编辑器的初始参数
+	 *
+	 * @return
+	 */
+	String params() default "";
+
+	/**
 	 * 在界面上出现的顺序
 	 */
 	int index() default Integer.MAX_VALUE;

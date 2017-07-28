@@ -186,6 +186,7 @@ public class MetadataUtils {
 			fMeta.setVisible(editMode.visible());
 			fMeta.setReadonly(editMode.readOnly());
 			fMeta.setEditor(editMode.editor());
+			fMeta.setParams(editMode.params());
 			fMeta.setIndex(editMode.index());
 			fMeta.setSortable(editMode.sortable());
 			fMeta.setFormable(editMode.formable());

@@ -2,6 +2,7 @@
     <% if(has(_data)){ %>
     $("#${_id}").combobox({
         data:${_data}
+        ,editable : false
         ,valueField:'${_valueField!"value"}'
         ,textField:'${_textField!"text"}'
     })
@@ -15,6 +16,7 @@
     $("#${_id}").combobox({
         url:"${contextPath}/provider/getLookupList"
         ,method:"POST"
+        ,editable : false
         ,valueField:"value"
         ,textField:"text"
         ,queryParams:_comboProviderParamObj_${_id}

@@ -87,7 +87,7 @@
         <!--<table tableName="%" >-->
             <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
         <!--</table>-->
-        <table domainObjectName="Device" tableName="device">
+        <table domainObjectName="ScheduleJob" tableName="schedule_job">
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
         <!--<table domainObjectName="Person" tableName="person">-->

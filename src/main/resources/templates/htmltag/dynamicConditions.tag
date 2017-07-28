@@ -9,25 +9,68 @@
     function onChangeCondition(newValue, oldValue){
         var newValueFieldMeta = ${@com.dili.ss.beetl.FieldMetaTag.getVarName(dtoClass)}[newValue];
         var editor = "";
+        //没有meta信息，默认为textbox
         if(!newValueFieldMeta || newValueFieldMeta == null ){
             editor = "textbox";
         }else{
-            editor = fieldEditor[${@com.dili.ss.beetl.FieldMetaTag.getVarName(dtoClass)}[newValue]["editor"]];
+            editor = fieldEditor[newValueFieldMeta["editor"]];
         }
         $("#conditionValueField").textbox("destroy");
         //conditionValueFieldDiv是外层div，该id将作为标签的参数
         $("#${divId}").append(conditionValueFieldInput);
         if(editor == 'combobox') {
-            $("#conditionValueField").combobox({
-                url:"${contextPath}/provider/getLookupList"
-                , method : "POST"
-                , valueField : "value"
-                , textField : "text"
-                , panelHeight : "auto"
-                , selectOnNavigation : true //定义是否允许使用键盘导航来选择项目
-                , editable : false //定义用户是否可以直接输入文本到字段中
-                , queryParams : {provider : ${@com.dili.ss.beetl.FieldMetaTag.getVarName(dtoClass)}[newValue]["provider"]} //从meta中取当前下拉框字段的提供者
-            });
+//            var params = eval(newValueFieldMeta["params"]);
+            var params = $.parseJSON(newValueFieldMeta["params"]);
+            //如果没有初始化json参数，直接调用provider
+            if(params == ""){
+                $("#conditionValueField").combobox({
+                    url:"${contextPath}/provider/getLookupList"
+                    , method : "POST"
+                    , valueField : "value"
+                    , textField : "text"
+                    , panelHeight : "auto"
+                    , selectOnNavigation : true //定义是否允许使用键盘导航来选择项目
+                    , editable : false //定义用户是否可以直接输入文本到字段中
+                    , queryParams : {provider : newValueFieldMeta["provider"]} //从meta中取当前下拉框字段的提供者
+                });
+            } else {//有初始化json参数，构建动态或静态查询下拉框
+                if(params["data"] != null){
+                    $("#conditionValueField").combobox({
+                        data:params["data"]
+                        ,valueField:'${_valueField!"value"}'
+                        ,textField:'${_textField!"text"}'
+                    })
+                }else if (params["table"] != null){
+                    var _comboProviderParamObj_conditionValueField = {};
+                    _comboProviderParamObj_conditionValueField.queryParams = JSON.stringify(params["queryParams"]);
+                    _comboProviderParamObj_conditionValueField.valueField = params["valueField"]||"value";
+                    _comboProviderParamObj_conditionValueField.textField = params["textField"]||"text";
+                    _comboProviderParamObj_conditionValueField.table = params["table"] || "";
+                    _comboProviderParamObj_conditionValueField.provider = params["provider"] || "simpleValueProvider";
+                    $("#conditionValueField").combobox({
+                        url:"${contextPath}/provider/getLookupList"
+                        ,method:"POST"
+                        ,valueField:"value"
+                        ,textField:"text"
+                        ,editable : false
+                        ,queryParams:_comboProviderParamObj_conditionValueField
+                    })
+                } else { //既没有data，又没有table参数，就调注解配置的provider,并传入初始化参数
+                    //从meta中取当前下拉框字段的提供者
+                    params["provider"] = newValueFieldMeta["provider"];
+                    $("#conditionValueField").combobox({
+                        url:"${contextPath}/provider/getLookupList"
+                        , method : "POST"
+                        , valueField : "value"
+                        , textField : "text"
+                        , panelHeight : "auto"
+                        , selectOnNavigation : true //定义是否允许使用键盘导航来选择项目
+                        , editable : false //定义用户是否可以直接输入文本到字段中
+                        , queryParams : params
+                    });
+                }
+            }
+
         } else if(editor == "textbox"){
             $("#conditionValueField").textbox({
             });

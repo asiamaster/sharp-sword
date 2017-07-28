@@ -74,7 +74,7 @@ public class CommonController {
                 String conditionField = condition[0];
                 String relationField = condition[1];
                 //将:条件值中的冒号替换回来
-                String conditionValueField = condition[2].replaceAll(SsConstants.COLON_ENCODE, ":");
+                String conditionValueField = condition.length<3 ? "" : condition[2].replaceAll(SsConstants.COLON_ENCODE, ":");
                 stringBuilder.append(" ").append(conditionItems.getConditionRelationField()).append(" ")
                         .append(conditionField).append(" ").append(RelationOperator.valueOf(relationField).getValue()).append(" ");
                 //如果是like或not like，在两边加%号
@@ -92,7 +92,12 @@ public class CommonController {
                 }
             }
             //组合sql，第三段where之后的sql需要去掉前面的空格和and/or操作符
-            sql = sqlStart + " where" + stringBuilder.substring(conditionItems.getConditionRelationField().length()+1);
+            //没有条件则不加where部分
+            if(stringBuilder.length()<=0){
+                sql = sqlStart;
+            }else {
+                sql = sqlStart + " where" + stringBuilder.substring(conditionItems.getConditionRelationField().length() + 1);
+            }
         }
         logger.info("listEasyuiPageByConditionItems_sql:"+sql);
         Integer page = conditionItems.getPage();
