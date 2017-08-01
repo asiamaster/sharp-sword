@@ -140,19 +140,25 @@ public class MetadataUtils {
 
 	private static void updateFieldMetaFromField(FieldMeta fMeta, Method method, Class<?> dtoClazz) {
 		String fieldName = POJOUtils.getBeanField(method);
-		Field field = ReflectionUtils.getAccessibleField(dtoClazz, fieldName);
+		Field field = null;
+		if(!dtoClazz.isInterface()) {
+			field = ReflectionUtils.getAccessibleField(dtoClazz, fieldName);
+		}
 		String dbFieldName = null;
-        //没找到getter对应的字段, 直接转换getter的字段名为下线划，以和数据库字段对应
+		Column column = null;
+        //没找到getter对应的字段,或者dtoClass是接口，则先取getter方法上的Column@javax.persistence.Column注解
+
         if(field == null){
-            dbFieldName = POJOUtils.humpToLineFast(fieldName);
+	        column = method.getAnnotation(Column.class);
         }else{ //找到getter对应的字段则取字段上的@javax.persistence.Column注解
-            Column column = field.getAnnotation(Column.class);
-            if(column != null) {
-                dbFieldName = column.name();
-            }else{
-                dbFieldName = POJOUtils.humpToLineFast(fieldName);
-            }
+            column = field.getAnnotation(Column.class);
         }
+		//字段和getter上都没有Column注解，则直接转换getter的字段名为下线划，以和数据库字段对应
+		if(column != null) {
+			dbFieldName = column.name();
+		}else{
+			dbFieldName = POJOUtils.humpToLineFast(fieldName);
+		}
 		fMeta.setColumn(dbFieldName);
 	}
 

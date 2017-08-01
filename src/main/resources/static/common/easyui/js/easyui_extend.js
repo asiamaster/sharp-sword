@@ -225,6 +225,42 @@ $.extend($.fn.textbox.methods, {
         });
     }
 });
+/**
+ * 根据字段按百分比重置列宽
+ * 示例:
+ * grid.datagrid('resizeColumn', [{
+ *							field : 'id',
+ *							width : '35%'
+ *						}, {
+ *							field : 'name',
+ *							width : '35%'
+ *						}]);
+ */
+$.extend($.fn.datagrid.methods, {
+    resizeColumn : function(jq, param) {
+        return jq.each(function() {
+            var dg = $(this);
+            var fn = function(item) {
+                var col = dg.datagrid('getColumnOption', item.field);
+                col.width = item.width;
+                if (typeof(col.width) == 'string') {
+                    var width = parseInt(col.width.replace('%', ''));
+                    col.boxWidth = col.boxWidth * width / 100;
+                } else {
+                    col.boxWidth = col.width;
+                }
+                dg.datagrid('fixColumnSize', param.field);
+            };
+            if (param instanceof Array) {
+                $(param).each(function(index, item) {
+                    fn.call(this, item);
+                });
+            } else {
+                fn.call(this, param);
+            }
+        })
+    }
+});
 
 /*******************************************************************************
  * 表单光标定位

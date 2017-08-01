@@ -93,7 +93,7 @@ public class ReflectionUtils {
     public static List<Field> getAccessibleFields(final Class clazz, boolean excludeStatic, boolean excludeFinal) {
         Assert.notNull(clazz, "clazz不能为空");
         List<Field> fields = Lists.newArrayList();
-        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
+        for (Class<?> superClass = clazz; superClass != Object.class && superClass != null; superClass = superClass.getSuperclass()) {
             Field[] declaredFields = superClass.getDeclaredFields();
             for(Field field : declaredFields){
                 if(field.getName().equals("serialVersionUID")){
@@ -135,7 +135,7 @@ public class ReflectionUtils {
     public static Field getAccessibleField(final Class clazz, final String fieldName) {
         Assert.notNull(clazz, "clazz不能为空");
         Assert.hasText(fieldName, "fieldName");
-        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
+        for (Class<?> superClass = clazz; superClass != Object.class && superClass != null; superClass = superClass.getSuperclass()) {
             try {
                 Field field = superClass.getDeclaredField(fieldName);
                 field.setAccessible(true);
@@ -186,7 +186,7 @@ public class ReflectionUtils {
     public static Method getAccessibleMethod(final Class clazz, final String methodName,
                                              final Class<?>... parameterTypes) {
         Assert.notNull(clazz, "clazz不能为空");
-        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
+        for (Class<?> superClass = clazz; superClass != Object.class && superClass != null; superClass = superClass.getSuperclass()) {
             try {
                 Method method = superClass.getDeclaredMethod(methodName, parameterTypes);
                 method.setAccessible(true);

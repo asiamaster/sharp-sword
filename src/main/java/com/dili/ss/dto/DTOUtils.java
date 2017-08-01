@@ -452,7 +452,7 @@ public class DTOUtils {
 		assert (sources != null);
 		assert (proxyClz != null);
 
-		List<T> list = new ArrayList<T>();
+		List<T> list = new ArrayList<T>(sources.size());
 		for (Object source : sources) {
 			list.add(internalAs(source, proxyClz, DTOHandler.class));
 		}
@@ -490,7 +490,6 @@ public class DTOUtils {
 	public static <T extends IDTO> List<T> switchEntityListToDTOList(List<BaseDomain> sources, Class<T> proxyClz) {
 		assert (sources != null);
 		assert (proxyClz != null);
-
 		List<T> list = new ArrayList<T>();
 		for (BaseDomain source : sources) {
 			list.add(switchEntityTODTO(source, proxyClz));

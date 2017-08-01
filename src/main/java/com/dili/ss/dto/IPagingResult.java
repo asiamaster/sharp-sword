@@ -12,7 +12,7 @@ public interface IPagingResult {
 	 * 取得当前的总行数
 	 * @return rowCount
 	 */
-	public abstract int getRowCount();
+	int getRowCount();
 
 }
 
