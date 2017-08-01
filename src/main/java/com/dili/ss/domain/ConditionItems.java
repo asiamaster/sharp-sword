@@ -1,11 +1,10 @@
-package com.dili.ss.dto;
-
-import com.dili.ss.domain.BaseDomain;
+package com.dili.ss.domain;
 
 /**
+ * 用于动态查询控件
  * Created by asiamaster on 2017/7/24 0024.
  */
-public class ConditionItemsDto extends BaseDomain {
+public class ConditionItems extends BaseDomain {
 
 	private String dtoClass;
 	private String conditionRelationField;

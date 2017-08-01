@@ -3,8 +3,8 @@ package com.dili.ss.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.SsConstants;
+import com.dili.ss.domain.ConditionItems;
 import com.dili.ss.domain.EasyuiPageOutput;
-import com.dili.ss.dto.ConditionItemsDto;
 import com.dili.ss.glossary.RelationOperator;
 import com.dili.ss.metadata.ValueProviderUtils;
 import com.dili.ss.service.CommonService;
@@ -38,7 +38,7 @@ public class CommonController {
     CommonService commonService;
 
     @RequestMapping(value="/listEasyuiPageByConditionItems", method = {RequestMethod.GET, RequestMethod.POST})
-    public @ResponseBody String listEasyuiPageByConditionItems(@ModelAttribute ConditionItemsDto conditionItems) throws Exception {
+    public @ResponseBody String listEasyuiPageByConditionItems(@ModelAttribute ConditionItems conditionItems) throws Exception {
         if(conditionItems.getConditionRelationField() == null || conditionItems.getConditionItems() == null || conditionItems.getDtoClass() == null) {
             return null;
         }

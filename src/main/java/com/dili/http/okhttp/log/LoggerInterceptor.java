@@ -1,19 +1,13 @@
 package com.dili.http.okhttp.log;
 
-import java.io.IOException;
-
 import com.dili.http.okhttp.utils.L;
-import okhttp3.Headers;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import okhttp3.*;
 import okio.Buffer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Created by wm on 17/3/9.
@@ -53,8 +47,8 @@ public class LoggerInterceptor implements Interceptor
     {
         try
         {
-            //===>response log
-            Log.debug("========response'log=======");
+            //===>response logger
+            Log.debug("========response'logger=======");
             Response.Builder builder = response.newBuilder();
             Response clone = builder.build();
             Log.debug( "url : " + clone.request().url());
@@ -87,7 +81,7 @@ public class LoggerInterceptor implements Interceptor
                 }
             }
 
-            Log.debug( "========response'log=======end");
+            Log.debug( "========response'logger=======end");
         } catch (Exception e)
         {
 //            e.printStackTrace();
@@ -103,7 +97,7 @@ public class LoggerInterceptor implements Interceptor
             String url = request.url().toString();
             Headers headers = request.headers();
 
-            Log.debug( "========request'log=======");
+            Log.debug( "========request'logger=======");
             Log.debug( "method : " + request.method());
             Log.debug( "url : " + url);
             if (headers != null && headers.size() > 0)
@@ -126,7 +120,7 @@ public class LoggerInterceptor implements Interceptor
                     }
                 }
             }
-            Log.debug( "========request'log=======end");
+            Log.debug( "========request'logger=======end");
         } catch (Exception e)
         {
 //            e.printStackTrace();

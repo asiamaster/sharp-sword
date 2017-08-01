@@ -10,6 +10,9 @@ import java.util.Map;
  * 基础实体类
  */
 public class BaseDomain implements Serializable {
+
+	public final static String ID = "id";
+
 	/** id */
 //	@Id
 //	@Column(name = "id")

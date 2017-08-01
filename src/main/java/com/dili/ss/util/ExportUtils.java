@@ -262,7 +262,7 @@ public class ExportUtils {
                         .execute();
             }
             if(resp.isSuccessful()){
-//                log.info(String.format("远程调用["+url+"]成功,code:[%s], message:[%s]", resp.code(),resp.message()));
+//                logger.info(String.format("远程调用["+url+"]成功,code:[%s], message:[%s]", resp.code(),resp.message()));
                 return resp.body().string();
             }else{
                 log.error(String.format("远程调用["+url+"]发生失败,code:[%s], message:[%s]", resp.code(),resp.message()));
