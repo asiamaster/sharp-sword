@@ -2,68 +2,14 @@
 
 
 //============================  方法定义  ============================
-//自定义日期解析
-$.fn.datebox.defaults.parser = function(s){
-    if (!s) return new Date();
-    var ss = (s.split('-'));
-    var y = parseInt(ss[0],10);
-    var m = parseInt(ss[1],10);
-    var d = parseInt(ss[2],10);
-    if (!isNaN(y) && !isNaN(m) && !isNaN(d)){
-        return new Date(y,m-1,d);
-    } else {
-        return new Date();
-    }
-}
-//自定义日期格式化
-$.fn.datebox.defaults.formatter = function(date){
-    var y = date.getFullYear();
-    var m = date.getMonth()+1;
-    var d = date.getDate();
-    return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
-}
+
 //表格日期格式化器
 function dateFormatter(value) {
     var date = new Date(value);
     var y = date.getFullYear();
     var m = date.getMonth() + 1;
     var d = date.getDate();
-    return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
-}
-//自定义日期时间解析
-$.fn.datetimebox.defaults.parser = function(s){
-    if (!s) return new Date();
-    var y = s.substring(0,4);
-    var m =s.substring(5,7);
-    var d = s.substring(8,10);
-    var h = s.substring(11,14);
-    var min = s.substring(15,17);
-    var sec = s.substring(18,20);
-    if (!isNaN(y) && !isNaN(m) && !isNaN(d) && !isNaN(h) && !isNaN(min) && !isNaN(sec)){
-        return new Date(y,m-1,d,h,min,sec);
-    } else {
-        return new Date();
-    }
-}
-//自定义日期时间格式化
-$.fn.datetimebox.defaults.formatter = function(date){
-    var y = date.getFullYear();
-    var m = date.getMonth()+1;
-    var d = date.getDate();
-    var h = date.getHours();
-    var min = date.getMinutes();
-    var sec = date.getSeconds();
-    return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d)+'-'+' '+(h<10?('0'+h):h)+':'+(min<10?('0'+min):min)+':'+(sec<10?('0'+sec):sec);
-}
-//表格日期时间格式化器
-function datetimeFormatter(date){
-    var y = date.getFullYear();
-    var m = date.getMonth()+1;
-    var d = date.getDate();
-    var h = date.getHours();
-    var min = date.getMinutes();
-    var sec = date.getSeconds();
-    return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d)+'-'+' '+(h<10?('0'+h):h)+':'+(min<10?('0'+min):min)+':'+(sec<10?('0'+sec):sec);
+    return y + '-' + m + '-' + d;
 }
 
 /**
@@ -231,71 +177,120 @@ function changeBorder(gridId, cls){
     $('#'+gridId).datagrid('getPanel').removeClass('lines-both lines-no lines-right lines-bottom').addClass(cls);
 }
 
-//文本框添加清空按钮
-$.extend($.fn.textbox.methods, {
-    addClearBtn: function(jq, iconCls){
-        return jq.each(function(){
-            var t = $(this);
-            var opts = t.textbox('options');
-            opts.icons = opts.icons || [];
-            opts.icons.unshift({
-                iconCls: iconCls,
-                handler: function(e){
-                    $(e.data.target).textbox('clear').textbox('textbox').focus();
-                    $(this).css('visibility','hidden');
-                }
-            });
-            t.textbox();
-            if (!t.textbox('getText')){
-                t.textbox('getIcon',0).css('visibility','hidden');
-            }
-            t.textbox('textbox').bind('keyup', function(){
-                var icon = t.textbox('getIcon',0);
-                if ($(this).val()){
-                    icon.css('visibility','visible');
-                } else {
-                    icon.css('visibility','hidden');
-                }
-            });
-        });
+$(function() {
+    //自定义日期解析
+    $.fn.datebox.defaults.parser = function(s){
+        if (!s) return new Date();
+        var ss = (s.split('-'));
+        var y = parseInt(ss[0],10);
+        var m = parseInt(ss[1],10);
+        var d = parseInt(ss[2],10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)){
+            return new Date(y,m-1,d);
+        } else {
+            return new Date();
+        }
     }
-});
-/**
- * 根据字段按百分比重置列宽
- * 示例:
- * grid.datagrid('resizeColumn', [{
+    //自定义日期格式化
+    $.fn.datebox.defaults.formatter = function(date){
+        var y = date.getFullYear();
+        var m = date.getMonth()+1;
+        var d = date.getDate();
+        return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+    }
+    //自定义日期时间解析
+    $.fn.datetimebox.defaults.parser = function(s){
+        if (!s) return new Date();
+        var y = s.substring(0,4);
+        var m =s.substring(5,7);
+        var d = s.substring(8,10);
+        var h = s.substring(11,14);
+        var min = s.substring(15,17);
+        var sec = s.substring(18,20);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d) && !isNaN(h) && !isNaN(min) && !isNaN(sec)){
+            return new Date(y,m-1,d,h,min,sec);
+        } else {
+            return new Date();
+        }
+    }
+//自定义日期时间格式化
+    $.fn.datetimebox.defaults.formatter = function(date){
+        var y = date.getFullYear();
+        var m = date.getMonth()+1;
+        var d = date.getDate();
+        var h = date.getHours();
+        var min = date.getMinutes();
+        var sec = date.getSeconds();
+        return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d)+'-'+' '+(h<10?('0'+h):h)+':'+(min<10?('0'+min):min)+':'+(sec<10?('0'+sec):sec);
+    }
+    //文本框添加清空按钮
+    $.extend($.fn.textbox.methods, {
+        addClearBtn: function(jq, iconCls){
+            return jq.each(function(){
+                var t = $(this);
+                var opts = t.textbox('options');
+                opts.icons = opts.icons || [];
+                opts.icons.unshift({
+                    iconCls: iconCls,
+                    handler: function(e){
+                        $(e.data.target).textbox('clear').textbox('textbox').focus();
+                        $(this).css('visibility','hidden');
+                    }
+                });
+                t.textbox();
+                if (!t.textbox('getText')){
+                    t.textbox('getIcon',0).css('visibility','hidden');
+                }
+                t.textbox('textbox').bind('keyup', function(){
+                    var icon = t.textbox('getIcon',0);
+                    if ($(this).val()){
+                        icon.css('visibility','visible');
+                    } else {
+                        icon.css('visibility','hidden');
+                    }
+                });
+            });
+        }
+    });
+
+    /**
+     * 根据字段按百分比重置列宽
+     * 示例:
+     * grid.datagrid('resizeColumn', [{
  *							field : 'id',
  *							width : '35%'
  *						}, {
  *							field : 'name',
  *							width : '35%'
  *						}]);
- */
-$.extend($.fn.datagrid.methods, {
-    resizeColumn : function(jq, param) {
-        return jq.each(function() {
-            var dg = $(this);
-            var fn = function(item) {
-                var col = dg.datagrid('getColumnOption', item.field);
-                col.width = item.width;
-                if (typeof(col.width) == 'string') {
-                    var width = parseInt(col.width.replace('%', ''));
-                    col.boxWidth = col.boxWidth * width / 100;
+     */
+    $.extend($.fn.datagrid.methods, {
+        resizeColumn : function(jq, param) {
+            return jq.each(function() {
+                var dg = $(this);
+                var fn = function(item) {
+                    var col = dg.datagrid('getColumnOption', item.field);
+                    col.width = item.width;
+                    if (typeof(col.width) == 'string') {
+                        var width = parseInt(col.width.replace('%', ''));
+                        col.boxWidth = col.boxWidth * width / 100;
+                    } else {
+                        col.boxWidth = col.width;
+                    }
+                    dg.datagrid('fixColumnSize', param.field);
+                };
+                if (param instanceof Array) {
+                    $(param).each(function(index, item) {
+                        fn.call(this, item);
+                    });
                 } else {
-                    col.boxWidth = col.width;
+                    fn.call(this, param);
                 }
-                dg.datagrid('fixColumnSize', param.field);
-            };
-            if (param instanceof Array) {
-                $(param).each(function(index, item) {
-                    fn.call(this, item);
-                });
-            } else {
-                fn.call(this, param);
-            }
-        })
-    }
+            })
+        }
+    });
 });
+
 
 /*******************************************************************************
  * 表单光标定位

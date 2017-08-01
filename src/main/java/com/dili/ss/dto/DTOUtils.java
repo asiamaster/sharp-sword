@@ -385,7 +385,7 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static Object getId(Object object) {
-		return getProperty(object, BaseDomain.ID);
+		return getProperty(object, IBaseDomain.ID);
 	}
 
 	/**

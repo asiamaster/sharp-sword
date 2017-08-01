@@ -1,11 +1,11 @@
 package com.dili.ss.base;
 
 
-import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.BasePage;
 import com.dili.ss.domain.EasyuiPageOutput;
 import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
+import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.metadata.ValueProviderUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -27,7 +27,10 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -35,7 +38,7 @@ import java.util.*;
  * Created by asiamastor on 2016/12/28.
  */
 @Service
-public abstract class BaseServiceImpl<T extends BaseDomain, KEY extends Serializable> implements BaseService<T, KEY> {
+public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Serializable> implements BaseService<T, KEY> {
 	protected static final Logger LOGGER = LoggerFactory.getLogger(BaseServiceImpl.class);
 
 	@Autowired
@@ -120,8 +123,8 @@ public abstract class BaseServiceImpl<T extends BaseDomain, KEY extends Serializ
 	@Transactional(rollbackFor = Exception.class)
 	public int saveOrUpdate(T t) {
 		Long id = 0l;
-		if (t instanceof BaseDomain) {
-			id = ((BaseDomain) t).getId();
+		if (t instanceof IBaseDomain) {
+			id = ((IBaseDomain) t).getId();
 		} else {
 			try {
 				Class<?> clz = t.getClass();
@@ -139,8 +142,8 @@ public abstract class BaseServiceImpl<T extends BaseDomain, KEY extends Serializ
 	@Transactional(rollbackFor = Exception.class)
 	public int saveOrUpdateSelective(T t) {
 		Long id = 0l;
-		if (t instanceof BaseDomain) {
-			id = ((BaseDomain) t).getId();
+		if (t instanceof IBaseDomain) {
+			id = ((IBaseDomain) t).getId();
 		} else {
 			try {
 				Class<?> clz = t.getClass();

@@ -123,21 +123,25 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 		Iterator it =  converters.iterator();
-		boolean added = false;
+		int index = -1;
+		int tmp = 0;
 		while (it.hasNext()){
 			Object obj = it.next();
 			//去掉MappingJackson2HttpMessageConverter
 			if(obj instanceof MappingJackson2HttpMessageConverter ){
 				it.remove();
-				//将FastJsonHttpMessageConverter加在MappingJackson2HttpMessageConverter，比xml解析器靠前，以提升性能
-				if(!added){
-					converters.add(new FastJsonHttpMessageConverter());
-					added = true;
-				}
+				index = tmp;
+			}
+			if(index == -1) {
+				tmp++;
 			}
 		}
-		//如果没有MappingJackson2HttpMessageConverter，还是要加上FastJsonHttpMessageConverter
-		if(!added){
+		//将FastJsonHttpMessageConverter加在MappingJackson2HttpMessageConverter的位置，比xml解析器靠前，以提升性能
+		if(index != -1){
+			converters.add(index, new FastJsonHttpMessageConverter());
+		}
+		//如果没有MappingJackson2HttpMessageConverter，还是要在最后加上FastJsonHttpMessageConverter
+		else {
 			converters.add(new FastJsonHttpMessageConverter());
 		}
 	}

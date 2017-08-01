@@ -1,17 +1,16 @@
 package com.dili.ss.domain;
 
+import com.dili.ss.dto.IBaseDomain;
+import com.dili.ss.util.POJOUtils;
+
 import javax.persistence.Transient;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  * 基础实体类
  */
-public class BaseDomain implements Serializable {
-
-	public final static String ID = "id";
+public class BaseDomain implements IBaseDomain {
 
 	/** id */
 //	@Id
@@ -69,14 +68,14 @@ public class BaseDomain implements Serializable {
 //		this.order = order;
 //	}
 
-	public void mset(String key, Object value){
+	public void setMetadata(String key, Object value){
 		if(metadata == null){
 			metadata = new HashMap();
 		}
 		metadata.put(key, value);
 	}
 
-	public Object mget(String key){
+	public Object getMetadata(String key){
 		return metadata == null ? null : metadata.get(key);
 	}
 
@@ -86,5 +85,26 @@ public class BaseDomain implements Serializable {
 
 	public void setMetadata(Map metadata) {
 		this.metadata = metadata;
+	}
+
+	/**
+	 * 附加属性中是否存在
+	 * @param key
+	 * @return
+	 */
+	public Boolean containsMetadata(String key) {
+		if(metadata != null)
+			return metadata.containsKey(key);
+		return false;
+	}
+
+	@Override
+	public Object aget(String property) {
+		return POJOUtils.getProperty(this, property);
+	}
+
+	@Override
+	public void aset(String property, Object value) {
+		POJOUtils.setProperty(this, property, value);
 	}
 }

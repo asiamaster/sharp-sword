@@ -1,9 +1,11 @@
 package com.dili.ss.dto;
 
+import java.io.Serializable;
+
 /**
  * Created by asiamaster on 2017/7/31 0031.
  */
-public interface IDTO {
+public interface IDTO extends Serializable {
 	/**
 	 * 代理取值
 	 *

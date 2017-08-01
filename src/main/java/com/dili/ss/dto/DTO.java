@@ -18,7 +18,7 @@ public class DTO extends HashMap<String, Object> {
 	private static final long serialVersionUID = -514229978937800587L;
 	// 附属信息
 	// 缺省情况下均没有,只有在有属性要求的情况下才创建
-	private Map<String, Object> attached;
+	private Map<String, Object> metadata;
 
 	// 是否监听修改
 	private boolean listenModify;
@@ -111,9 +111,9 @@ public class DTO extends HashMap<String, Object> {
 	 * @param key
 	 * @return
 	 */
-	public boolean isAttach(String key) {
-		if(attached != null)
-			return attached.containsKey(key);
+	public boolean containsMetadata(String key) {
+		if(metadata != null)
+			return metadata.containsKey(key);
 		return false;
 	}
 
@@ -122,9 +122,9 @@ public class DTO extends HashMap<String, Object> {
 	 * @param key
 	 * @return
 	 */
-	public Object getAttach(String key) {
-		if(attached != null)
-			return attached.get(key);
+	public Object getMetadata(String key) {
+		if(metadata != null)
+			return metadata.get(key);
 		return null;
 	}
 
@@ -135,11 +135,11 @@ public class DTO extends HashMap<String, Object> {
 	 * @param value
 	 * @return
 	 */
-	public Object attach(String key, Object value) {
-		if (attached == null)
-			// 由于附加属性均比较少,因此,此处初始创建3个
-			attached = new HashMap<String, Object>(3);
-		return attached.put(key, value);
+	public Object setMetadata(String key, Object value) {
+		if (metadata == null)
+			// 由于附加属性均比较少,因此,此处初始创建4个
+			metadata = new HashMap<String, Object>(4);
+		return metadata.put(key, value);
 	}
 
 	/**
@@ -147,9 +147,9 @@ public class DTO extends HashMap<String, Object> {
 	 * @param key
 	 * @return
 	 */
-	public Object unattach(String key) {
-		if (attached != null)
-			return attached.remove(key);
+	public Object removeMetadata(String key) {
+		if (metadata != null)
+			return metadata.remove(key);
 		return null;
 	}
 
