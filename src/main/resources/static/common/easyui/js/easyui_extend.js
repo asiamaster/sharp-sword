@@ -28,7 +28,42 @@ function dateFormatter(value) {
     var y = date.getFullYear();
     var m = date.getMonth() + 1;
     var d = date.getDate();
-    return y + '-' + m + '-' + d;
+    return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+}
+//自定义日期时间解析
+$.fn.datetimebox.defaults.parser = function(s){
+    if (!s) return new Date();
+    var y = s.substring(0,4);
+    var m =s.substring(5,7);
+    var d = s.substring(8,10);
+    var h = s.substring(11,14);
+    var min = s.substring(15,17);
+    var sec = s.substring(18,20);
+    if (!isNaN(y) && !isNaN(m) && !isNaN(d) && !isNaN(h) && !isNaN(min) && !isNaN(sec)){
+        return new Date(y,m-1,d,h,min,sec);
+    } else {
+        return new Date();
+    }
+}
+//自定义日期时间格式化
+$.fn.datetimebox.defaults.formatter = function(date){
+    var y = date.getFullYear();
+    var m = date.getMonth()+1;
+    var d = date.getDate();
+    var h = date.getHours();
+    var min = date.getMinutes();
+    var sec = date.getSeconds();
+    return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d)+'-'+' '+(h<10?('0'+h):h)+':'+(min<10?('0'+min):min)+':'+(sec<10?('0'+sec):sec);
+}
+//表格日期时间格式化器
+function datetimeFormatter(date){
+    var y = date.getFullYear();
+    var m = date.getMonth()+1;
+    var d = date.getDate();
+    var h = date.getHours();
+    var min = date.getMinutes();
+    var sec = date.getSeconds();
+    return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d)+'-'+' '+(h<10?('0'+h):h)+':'+(min<10?('0'+min):min)+':'+(sec<10?('0'+sec):sec);
 }
 
 /**
