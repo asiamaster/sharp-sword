@@ -1,7 +1,6 @@
 package com.dili.ss.domain;
 
 import com.dili.ss.dto.IBaseDomain;
-import com.dili.ss.util.POJOUtils;
 
 import javax.persistence.Transient;
 import java.util.HashMap;
@@ -80,7 +79,7 @@ public class BaseDomain implements IBaseDomain {
 	}
 
 	public Map getMetadata() {
-		return metadata;
+		return metadata == null ? new HashMap() : metadata;
 	}
 
 	public void setMetadata(Map metadata) {
@@ -96,15 +95,5 @@ public class BaseDomain implements IBaseDomain {
 		if(metadata != null)
 			return metadata.containsKey(key);
 		return false;
-	}
-
-	@Override
-	public Object aget(String property) {
-		return POJOUtils.getProperty(this, property);
-	}
-
-	@Override
-	public void aset(String property, Object value) {
-		POJOUtils.setProperty(this, property, value);
 	}
 }

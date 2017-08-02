@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * DTO层的代理处理器
@@ -33,6 +35,8 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 	// 委托对象
 	private T delegate;
 
+	private Map<String, Object> metadata;
+
 	/**
 	 * 约定的构造器
 	 *
@@ -42,6 +46,7 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 	public DTOHandler(Class<?> proxyClazz, T delegate) {
 		this.proxyClazz = proxyClazz;
 		this.delegate = delegate;
+		metadata = new HashMap<String, Object>(4);
 	}
 
 	/**
@@ -138,6 +143,19 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 			return delegate.get(((String) args[0]));
 		} else if ("aset".equals(method.getName())) {
 			return delegate.put(((String) args[0]), args[1]);
+		} else if ("mget".equals(method.getName())) {
+			if(args == null) {
+				return metadata;
+			}else {
+				return metadata.get(((String) args[0]));
+			}
+		} else if ("mset".equals(method.getName())) {
+			if(args.length == 1 && args[0] instanceof Map){
+				metadata.putAll((Map) args[0]);
+				return null;
+			}else {
+				return metadata.put(((String) args[0]), args[1]);
+			}
 		} else {
 			return method.invoke(delegate, args);
 		}
@@ -176,6 +194,14 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 	 */
 	T getDelegate() {
 		return delegate;
+	}
+
+	/**
+	 * 取meta信息
+	 * @return
+	 */
+	public Map<String, Object> getMetadata() {
+		return metadata;
 	}
 
 	void setProxyClazz(Class<?> proxyClazz) {

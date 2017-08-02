@@ -430,7 +430,9 @@ public class DTOUtils {
 	public static <T extends IDTO> T proxy(DTO realObj, Class<T> proxyClz) {
 		assert (realObj != null);
 		assert (proxyClz != null);
-		return internalProxy(realObj, proxyClz, DTOHandler.class);
+		T dto = internalProxy(realObj, proxyClz, DTOHandler.class);
+		dto.mset(realObj.getMetadata());
+		return dto;
 	}
 
 	public static <T extends IDTO> T newDTOProxy(Class<T> proxyClz) {
@@ -608,4 +610,5 @@ public class DTOUtils {
 		temp.putAll(go(master));
 		return as(second, masterClazz);
 	}
+
 }

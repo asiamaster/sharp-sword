@@ -2,6 +2,7 @@ package com.dili.ss.metadata;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.BaseDomain;
+import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.SpringUtil;
@@ -109,7 +110,7 @@ public class ValueProviderUtils {
     public static <T extends IBaseDomain> List buildDataByProvider(T domain, List list) throws Exception {
         if(domain.getMetadata() == null || domain.getMetadata().isEmpty()) return list;
         List<Map> results = new ArrayList<>(list.size());
-        ObjectMeta objectMeta = MetadataUtils.getDTOMeta(domain.getClass());
+        ObjectMeta objectMeta = MetadataUtils.getDTOMeta(DTOUtils.getDTOClass(domain));
         Map<String, ValueProvider> buffer = new HashMap<>();
         for(Object t: list) {
             Map dataMap = BeanConver.transformObjectToMap(t);

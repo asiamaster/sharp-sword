@@ -18,7 +18,7 @@ public class DTO extends HashMap<String, Object> {
 	private static final long serialVersionUID = -514229978937800587L;
 	// 附属信息
 	// 缺省情况下均没有,只有在有属性要求的情况下才创建
-	private Map<String, Object> metadata;
+	private Map<String, Object> metadata = new HashMap<>();
 
 	// 是否监听修改
 	private boolean listenModify;
@@ -126,6 +126,14 @@ public class DTO extends HashMap<String, Object> {
 		if(metadata != null)
 			return metadata.get(key);
 		return null;
+	}
+
+	public Map<String, Object> getMetadata(){
+		return metadata;
+	}
+
+	public void setMetadata(Map<String, Object> metadata){
+		this.metadata = metadata;
 	}
 
 	/**

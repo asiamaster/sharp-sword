@@ -9,8 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.annotation.Resource;
@@ -32,7 +34,7 @@ import java.util.List;
  */
 @Configuration
 @ConditionalOnExpression("'${web.enable}'=='true'")
-//@EnableWebMvc不能使用@EnableWebMvc
+//@EnableWebMvc //不能使用@EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
 //	public class CSRFInterceptorConfig extends WebMvcConfigurationSupport {
 
@@ -115,9 +117,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 //	如果加了@EnableWebMvc 注解，只能自己添加添加加载处理了,还要注意是否需要添加webJars，所以最好不要添加@EnableWebMvc注解
 //	增加@EnableWebMvc注解以后WebMvcAutoConfiguration中配置就不会生效
-//	@Overrid
+//	@Override
 //	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//		registry.addResourceHandler("/**").addResourceLocations("/resources/**");
+//		registry.addResourceHandler("/**").addResourceLocations("/static/**");
 //	}
 
 	@Override
@@ -144,6 +146,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		else {
 			converters.add(new FastJsonHttpMessageConverter());
 		}
+	}
+
+	@Override
+	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		super.addArgumentResolvers(argumentResolvers);
+		argumentResolvers.add(new DTOArgumentResolver());
 	}
 
 
