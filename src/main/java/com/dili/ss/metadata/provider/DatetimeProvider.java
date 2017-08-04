@@ -39,7 +39,7 @@ public class DatetimeProvider implements ValueProvider {
         if(obj == null || obj.equals("")) return "";
         if(obj instanceof Instant){
             //输出yyyy-MM-dd HH:mm:ss格式字符串
-            return DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss").withZone(ZoneId.systemDefault()).format(((Instant)obj));
+            return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault()).format(((Instant)obj));
         }
         if(obj instanceof LocalDateTime){
             //输出yyyy-MM-dd HH:mm:ss格式字符串

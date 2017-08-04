@@ -108,13 +108,19 @@ public class ValueProviderUtils {
      * @throws Exception
      */
     public static <T extends IBaseDomain> List buildDataByProvider(T domain, List list) throws Exception {
-        if(domain.getMetadata() == null || domain.getMetadata().isEmpty()) return list;
+        Map metadata = null;
+        if(DTOUtils.isDTOProxy(domain)){
+            metadata = domain.mget();
+        }else{
+            metadata = domain.getMetadata();
+        }
+        if(metadata == null || metadata.isEmpty()) return list;
         List<Map> results = new ArrayList<>(list.size());
         ObjectMeta objectMeta = MetadataUtils.getDTOMeta(DTOUtils.getDTOClass(domain));
         Map<String, ValueProvider> buffer = new HashMap<>();
         for(Object t: list) {
             Map dataMap = BeanConver.transformObjectToMap(t);
-            domain.getMetadata().forEach((k, v) -> {
+            metadata.forEach((k, v) -> {
                 ValueProvider valueProvider = null;
                 //key是字段field
                 String key = k.toString();

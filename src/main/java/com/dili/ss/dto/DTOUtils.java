@@ -435,7 +435,7 @@ public class DTOUtils {
 		return dto;
 	}
 
-	public static <T extends IDTO> T newDTOProxy(Class<T> proxyClz) {
+	public static <T extends IDTO> T newDTO(Class<T> proxyClz) {
 		return proxy(new DTO(), proxyClz);
 	}
 
@@ -509,7 +509,7 @@ public class DTOUtils {
 	 */
 	public static <T extends IDTO> T switchEntityTODTO(BaseDomain source, Class<T> proxyClz) {
 		if(source==null||proxyClz==null) return null;
-		T temp = DTOUtils.newDTOProxy(proxyClz);
+		T temp = DTOUtils.newDTO(proxyClz);
 		try {
 			BeanUtils.copyProperties(temp, source);
 		}catch(Exception e) {

@@ -10,6 +10,7 @@ import com.dili.ss.metadata.ValueProviderUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -240,6 +238,9 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 			try {
 				field.setAccessible(true);
 				value = field.get(domain);
+				if(value instanceof Date){
+					value = DateFormatUtils.format((Date)value, "yyyy-MM-dd HH:mm:ss");
+				}
 			} catch (IllegalAccessException e) {
 			}
 			//没值就不拼接sql

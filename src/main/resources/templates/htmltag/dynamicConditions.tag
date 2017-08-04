@@ -42,7 +42,7 @@
         }
         $("#conditionValueField").textbox("destroy");
         //conditionValueFieldDiv是外层div，该id将作为标签的参数
-        $("#${divId}").append(conditionValueFieldInput);
+        $("#${divId!"conditionValueFieldDiv"}").append(conditionValueFieldInput);
         if(editor == 'combobox') {
 //            var params = eval(newValueFieldMeta["params"]);
             var params = $.parseJSON(newValueFieldMeta["params"]);
@@ -236,7 +236,7 @@
             </tr>
             <tr>
                 <td style="padding:5px;">
-                    <div id="conditionValueFieldDiv"></div>
+                    <div id="${divId!"conditionValueFieldDiv"}"></div>
                 </td>
                 <td></td>
             </tr>

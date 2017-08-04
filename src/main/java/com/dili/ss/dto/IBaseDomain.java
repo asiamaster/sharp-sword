@@ -1,5 +1,6 @@
 package com.dili.ss.dto;
 
+import javax.persistence.Transient;
 import java.util.Map;
 
 
@@ -9,24 +10,24 @@ import java.util.Map;
 public interface IBaseDomain extends IDTO {
 
 	public final static String ID = "id";
-
+	@Transient
 	public Long getId();
 	public void setId(Long id);
 
+	@Transient
 	public Integer getPage();
-
 	public void setPage(Integer page);
 
+	@Transient
 	public Integer getRows();
-
 	public void setRows(Integer rows);
 
+	@Transient
+	public Object getMetadata(String key);
 	public void setMetadata(String key, Object value);
 
-	public Object getMetadata(String key);
-
+	@Transient
 	public Map getMetadata();
-
 	public void setMetadata(Map metadata);
 
 	public Boolean containsMetadata(String key);

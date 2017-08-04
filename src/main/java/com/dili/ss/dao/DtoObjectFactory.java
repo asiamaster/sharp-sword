@@ -31,7 +31,7 @@ public class DtoObjectFactory extends DefaultObjectFactory {
 	@Override
 	public <T> T create(Class<T> type) {
 		if(type.isInterface() && IDTO.class.isAssignableFrom(type)){
-			return (T) DTOUtils.newDTOProxy((Class<IDTO>)type);
+			return (T) DTOUtils.newDTO((Class<IDTO>)type);
 		}else {
 			return super.create(type);
 		}

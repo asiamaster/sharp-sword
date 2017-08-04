@@ -79,7 +79,7 @@ public class BaseDomain implements IBaseDomain {
 	}
 
 	public Map getMetadata() {
-		return metadata == null ? new HashMap() : metadata;
+		return metadata;
 	}
 
 	public void setMetadata(Map metadata) {

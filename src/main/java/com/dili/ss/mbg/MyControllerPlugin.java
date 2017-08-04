@@ -1,6 +1,8 @@
 package com.dili.ss.mbg;
 
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.dto.IBaseDomain;
+import com.dili.ss.dto.IDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -20,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by asiam on 2017/4/10 0007.
@@ -32,6 +32,12 @@ public class MyControllerPlugin extends PluginAdapter {
     private final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     public MyControllerPlugin() {
+    }
+
+    @Override
+    public void setProperties(Properties properties) {
+        super.setProperties(properties);
+
     }
     @Override
     public boolean validate(List<String> warnings) {
@@ -82,9 +88,9 @@ public class MyControllerPlugin extends PluginAdapter {
                 clazz.addAnnotation("@RequestMapping(\"/"+StringUtils.uncapitalize(shortName)+"\")");
 
                 //import实体类
-                clazz.addImportedType(baseModelJavaType);
+                clazz.addImportedType(unit.getType());
 
-                addCRUDMethod(clazz, baseModelJavaType);
+                addCRUDMethod(clazz, unit);
 
                 //添加当前controller类
                 controllerJavafile = new GeneratedJavaFile(clazz, controllerTargetDir, javaFormatter);
@@ -139,8 +145,10 @@ public class MyControllerPlugin extends PluginAdapter {
     }
 
     //添加增删改查方法
-    private void addCRUDMethod(TopLevelClass clazz, FullyQualifiedJavaType baseModelJavaType){
-        clazz.addImportedType(ModelAttribute.class.getName());
+    private void addCRUDMethod(TopLevelClass clazz, CompilationUnit unit){
+        if(!isDTO(unit)){
+            clazz.addImportedType(ModelAttribute.class.getName());
+        }
         clazz.addImportedType(ModelMap.class.getName());
         clazz.addImportedType(BaseOutput.class.getName());
         clazz.addImportedType(ResponseBody.class.getName());
@@ -150,36 +158,39 @@ public class MyControllerPlugin extends PluginAdapter {
         clazz.addImportedType(ApiImplicitParams.class.getName());
         clazz.addImportedType(ApiImplicitParam.class.getName());
 
-        addIndexMethod(clazz, baseModelJavaType);
-        addListMethod(clazz, baseModelJavaType);
-        addListPageMethod(clazz, baseModelJavaType);
-        addInsertMethod(clazz, baseModelJavaType);
-        addUpdateMethod(clazz, baseModelJavaType);
-        addDeleteMethod(clazz, baseModelJavaType);
+        addIndexMethod(clazz, unit);
+        addListMethod(clazz, unit);
+        addListPageMethod(clazz, unit);
+        addInsertMethod(clazz, unit);
+        addUpdateMethod(clazz, unit);
+        addDeleteMethod(clazz, unit);
     }
 
     //添加index方法
-    private void addIndexMethod(TopLevelClass clazz, FullyQualifiedJavaType baseModelJavaType){
+    private void addIndexMethod(TopLevelClass clazz, CompilationUnit unit){
         Method listMethod = new Method("index");
         FullyQualifiedJavaType modelMapType = new FullyQualifiedJavaType("org.springframework.ui.ModelMap");
         listMethod.addParameter(0, new Parameter(modelMapType, "modelMap"));
         listMethod.setReturnType(new FullyQualifiedJavaType("java.lang.String"));
         listMethod.setVisibility(JavaVisibility.PUBLIC);
         List<String> bodyLines = new ArrayList<>();
-        String returnLine = "return \""+StringUtils.uncapitalize(baseModelJavaType.getShortName())+"/index\";";
+        String returnLine = "return \""+StringUtils.uncapitalize(unit.getType().getShortName())+"/index\";";
         bodyLines.add(returnLine);
         listMethod.addBodyLines(bodyLines);
 
-        listMethod.addAnnotation("@ApiOperation(\"跳转到" + baseModelJavaType.getShortName() + "页面\")");
+        listMethod.addAnnotation("@ApiOperation(\"跳转到" + unit.getType().getShortName() + "页面\")");
         listMethod.addAnnotation("@RequestMapping(value=\"/index\", method = RequestMethod.GET)");
         clazz.addMethod(listMethod);
     }
 
     //添加list方法
-    private void addListMethod(TopLevelClass clazz, FullyQualifiedJavaType baseModelJavaType){
+    private void addListMethod(TopLevelClass clazz, CompilationUnit unit){
         Method listMethod = new Method("list");
+        FullyQualifiedJavaType baseModelJavaType = unit.getType();
         Parameter entityParameter = new Parameter(baseModelJavaType, StringUtils.uncapitalize(baseModelJavaType.getShortName()));
-        entityParameter.addAnnotation("@ModelAttribute");
+        if(!isDTO(unit)){
+            entityParameter.addAnnotation("@ModelAttribute");
+        }
         listMethod.addParameter(0, entityParameter);
         FullyQualifiedJavaType returnType = new FullyQualifiedJavaType("@ResponseBody List");
         returnType.addTypeArgument(baseModelJavaType);
@@ -203,10 +214,13 @@ public class MyControllerPlugin extends PluginAdapter {
     }
 
     //添加listPage方法
-    private void addListPageMethod(TopLevelClass clazz, FullyQualifiedJavaType baseModelJavaType){
+    private void addListPageMethod(TopLevelClass clazz, CompilationUnit unit){
+        FullyQualifiedJavaType baseModelJavaType = unit.getType();
         Method listPageMethod = new Method("listPage");
         Parameter entityParameter = new Parameter(baseModelJavaType, StringUtils.uncapitalize(baseModelJavaType.getShortName()));
-        entityParameter.addAnnotation("@ModelAttribute");
+        if(!isDTO(unit)){
+            entityParameter.addAnnotation("@ModelAttribute");
+        }
         listPageMethod.addParameter(0, entityParameter);
         FullyQualifiedJavaType exception = new FullyQualifiedJavaType("Exception");
         listPageMethod.addException(exception);
@@ -229,10 +243,13 @@ public class MyControllerPlugin extends PluginAdapter {
     }
 
     //添加insert方法
-    private void addInsertMethod(TopLevelClass clazz, FullyQualifiedJavaType baseModelJavaType){
+    private void addInsertMethod(TopLevelClass clazz, CompilationUnit unit){
+        FullyQualifiedJavaType baseModelJavaType = unit.getType();
         Method listMethod = new Method("insert");
         Parameter entityParameter = new Parameter(baseModelJavaType, StringUtils.uncapitalize(baseModelJavaType.getShortName()));
-        entityParameter.addAnnotation("@ModelAttribute");
+        if(!isDTO(unit)){
+            entityParameter.addAnnotation("@ModelAttribute");
+        }
         listMethod.addParameter(0, entityParameter);
         listMethod.setReturnType(new FullyQualifiedJavaType("@ResponseBody BaseOutput"));
         listMethod.setVisibility(JavaVisibility.PUBLIC);
@@ -254,10 +271,13 @@ public class MyControllerPlugin extends PluginAdapter {
     }
 
     //添加update方法
-    private void addUpdateMethod(TopLevelClass clazz, FullyQualifiedJavaType baseModelJavaType){
+    private void addUpdateMethod(TopLevelClass clazz, CompilationUnit unit){
+        FullyQualifiedJavaType baseModelJavaType = unit.getType();
         Method listMethod = new Method("update");
         Parameter entityParameter = new Parameter(baseModelJavaType, StringUtils.uncapitalize(baseModelJavaType.getShortName()));
-        entityParameter.addAnnotation("@ModelAttribute");
+        if(!isDTO(unit)){
+            entityParameter.addAnnotation("@ModelAttribute");
+        }
         listMethod.addParameter(0, entityParameter);
         listMethod.setReturnType(new FullyQualifiedJavaType("@ResponseBody BaseOutput"));
         listMethod.setVisibility(JavaVisibility.PUBLIC);
@@ -279,7 +299,8 @@ public class MyControllerPlugin extends PluginAdapter {
     }
 
     //添加delete方法
-    private void addDeleteMethod(TopLevelClass clazz, FullyQualifiedJavaType baseModelJavaType){
+    private void addDeleteMethod(TopLevelClass clazz, CompilationUnit unit){
+        FullyQualifiedJavaType baseModelJavaType = unit.getType();
         Method listMethod = new Method("delete");
         Parameter entityParameter = new Parameter(new FullyQualifiedJavaType("Long"), "id");
         listMethod.addParameter(0, entityParameter);
@@ -300,6 +321,20 @@ public class MyControllerPlugin extends PluginAdapter {
         listMethod.addAnnotation(sb.toString());
         listMethod.addAnnotation("@RequestMapping(value=\"/delete\", method = {RequestMethod.GET, RequestMethod.POST})");
         clazz.addMethod(listMethod);
+    }
+
+    //判断是否是DTO接口
+    private boolean isDTO(CompilationUnit unit){
+        Set<FullyQualifiedJavaType> fullyQualifiedJavaTypes = unit.getSuperInterfaceTypes();
+        if(fullyQualifiedJavaTypes.isEmpty()) {
+            return false;
+        }
+        for(FullyQualifiedJavaType fullyQualifiedJavaType : fullyQualifiedJavaTypes) {
+            if (fullyQualifiedJavaType.getFullyQualifiedName().equals(IBaseDomain.class.getName()) || fullyQualifiedJavaType.getFullyQualifiedName().equals(IDTO.class.getName())){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
