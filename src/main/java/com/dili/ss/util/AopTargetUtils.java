@@ -10,11 +10,14 @@ import org.springframework.aop.support.AopUtils;
 
 import java.lang.reflect.Field;
 
+/**
+ * Aop代理对象获取工具
+ */
 public class AopTargetUtils {
 
 
     /**
-     * 获取 目标对象
+     * 获取Spring Aop代理的实际对象
      * @param proxy 代理对象
      * @return
      * @throws Exception
