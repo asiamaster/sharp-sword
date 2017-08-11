@@ -20,5 +20,17 @@ public class EncryptTest {
 		encryptor.setPassword(PASSWORD);
 		String encrypted = encryptor.encrypt("123456");
 		System.out.println(encrypted);
+
+		// 加密
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+		textEncryptor.setPassword(PASSWORD);
+		String newPassword = textEncryptor.encrypt("123456");
+		System.out.println(newPassword);
+		// 解密
+		BasicTextEncryptor textEncryptor2 = new BasicTextEncryptor();
+		textEncryptor2.setPassword(PASSWORD);
+		String oldPassword = textEncryptor2.decrypt(newPassword);
+		System.out.println(oldPassword);
+		System.out.println("--------------------------");
 	}
 }
