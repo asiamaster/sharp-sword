@@ -5,7 +5,7 @@ import com.dili.ss.datasource.selector.OneMasterMultiSlavesDataSourceSelector;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 /**
- * 动态选择器数据源
+ * 主从模式，动态选择器数据源
  * Created by asiamaster on 2017/8/10
  */
 public class DynamicSelectorDataSource extends AbstractRoutingDataSource {

@@ -24,6 +24,11 @@ spring.datasource.filters=stat,wall,log4j
 spring.datasource.connectionProperties=druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
 #spring.datasource.useGlobalDataSourceStat=true
 
+#druid监控配置
+druidFilter.loginUsername=admin
+druidFilter.loginPassword=123456
+druidFilter.resetEnable=true
+
 #mybatis
 mybatis.mapperLocations=classpath:mapper/*.xml
 mybatis.typeAliasesPackage=com.dili.${appName}.domain

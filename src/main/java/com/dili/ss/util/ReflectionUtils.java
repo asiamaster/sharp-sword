@@ -261,5 +261,29 @@ public class ReflectionUtils {
         }
         return new RuntimeException("Unexpected Checked Exception.", e);
     }
+
+    /**
+     * 获取当前运行时方法名(jdk1.5+)
+     * jdk1.4的方法:new Exception().getStackTrace()[i].getMethodName();//其中i == 0就是当前的类的方法名字 ;i == 1就是调用者的方法
+     * @return
+     */
+    public static String getCurrentMethodName(){
+        return Thread.currentThread().getStackTrace()[1].getMethodName();
+    }
+
+    public static String getJavaVersion(){
+        return System.getProperty("java.version");
+    }
+
+    /**
+     * 判断是否是java8
+     * @return
+     */
+    public static boolean isJava8(){
+        if (getJavaVersion().contains("1.8.")) {
+            return true;
+        }
+        return false;
+    }
 }
 

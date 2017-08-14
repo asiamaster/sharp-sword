@@ -63,7 +63,7 @@ public class DynamicRoutingDataSourceContextHolder {
 		return contextHolder.get().pop();
 	}
 
-	public static void clearDataSourceType() {
+	public static void clear() {
 		contextHolder.remove();
 	}
 

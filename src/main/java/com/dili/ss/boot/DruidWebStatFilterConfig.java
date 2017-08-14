@@ -2,7 +2,10 @@ package com.dili.ss.boot;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +18,23 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnExpression("'${druidFilter.enable}'=='true'")
+@ConfigurationProperties(prefix="druidFilter")
 public class DruidWebStatFilterConfig {
+
+    @Value("${loginUsername:admin}")
+    private String loginUsername;
+
+    @Value("${loginPassword:123456}")
+    private String loginPassword;
+
+    @Value("${resetEnable:true}")
+    private String resetEnable;
+
+    @Value("${allow:}")
+    private String allow;
+
+    @Value("${deny:}")
+    private String deny;
 
     //   解决spring boot druid SQL监控无数据
 //    @Bean
@@ -33,14 +52,18 @@ public class DruidWebStatFilterConfig {
         servletRegistrationBean.addUrlMappings("/druid/*");
         //添加初始化参数：initParams
 //        //白名单：没有配置或者为空，则允许所有访问
-//        servletRegistrationBean.addInitParameter("allow","127.0.0.1");
+        if(StringUtils.isNoneBlank(allow)) {
+            servletRegistrationBean.addInitParameter("allow", allow);
+        }
+        if(StringUtils.isNoneBlank(deny)) {
 //        //IP黑名单 (存在共同时，deny优先于allow) : 如果满足deny的话提示:Sorry, you are not permitted to view this page.
-//        servletRegistrationBean.addInitParameter("deny","192.168.1.73");
+            servletRegistrationBean.addInitParameter("deny", deny);
+        }
 //        //登录查看信息的账号密码.
-        servletRegistrationBean.addInitParameter("loginUsername","admin");
-        servletRegistrationBean.addInitParameter("loginPassword","123456");
+        servletRegistrationBean.addInitParameter("loginUsername",loginUsername);
+        servletRegistrationBean.addInitParameter("loginPassword",loginPassword);
 //        //是否能够重置数据.
-//        servletRegistrationBean.addInitParameter("resetEnable","false");
+        servletRegistrationBean.addInitParameter("resetEnable",resetEnable);
         return servletRegistrationBean;
     }
 
@@ -55,5 +78,45 @@ public class DruidWebStatFilterConfig {
         reg.addInitParameter("profileEnable","true");
         reg.addInitParameter("principalCookieName","SessionId");
         return reg;
+    }
+
+    public String getLoginUsername() {
+        return loginUsername;
+    }
+
+    public void setLoginUsername(String loginUsername) {
+        this.loginUsername = loginUsername;
+    }
+
+    public String getLoginPassword() {
+        return loginPassword;
+    }
+
+    public void setLoginPassword(String loginPassword) {
+        this.loginPassword = loginPassword;
+    }
+
+    public String getResetEnable() {
+        return resetEnable;
+    }
+
+    public void setResetEnable(String resetEnable) {
+        this.resetEnable = resetEnable;
+    }
+
+    public String getAllow() {
+        return allow;
+    }
+
+    public void setAllow(String allow) {
+        this.allow = allow;
+    }
+
+    public String getDeny() {
+        return deny;
+    }
+
+    public void setDeny(String deny) {
+        this.deny = deny;
     }
 }

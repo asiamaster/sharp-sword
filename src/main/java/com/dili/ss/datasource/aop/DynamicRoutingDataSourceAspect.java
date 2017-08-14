@@ -52,6 +52,6 @@ public class DynamicRoutingDataSourceAspect {
 //	@After(value = "@within(com.dili.ec.datasource.TargetDataSource) && args(ds)", argNames = "point,ds")
 	public void restoreDataSource(JoinPoint point, SwitchDataSource ds) {
 		logger.debug("Revert DataSource : {} > {}", ds.value(), point.getSignature());
-		DynamicRoutingDataSourceContextHolder.clearDataSourceType();
+		DynamicRoutingDataSourceContextHolder.clear();
 	}
 }

@@ -8,6 +8,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     ${"<#"}css/>
     ${"<#"}js/>
+
+    <%
+    if(has(pageCss) && pageCss=="true"){
+    %>
+    <#pageCss/>
+    <%
+    }
+    %>
+
+    <% if(has(pageJs) && pageJs=="true"){%>
+    <#pageJs/>
+    <%}%>
     <script type="text/javascript">
         var contextPath = '\${contextPath}';
     </script>

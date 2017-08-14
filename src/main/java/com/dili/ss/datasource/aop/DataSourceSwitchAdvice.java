@@ -67,7 +67,7 @@ public class DataSourceSwitchAdvice implements MethodInterceptor {
 //		targetDataSource = targetDataSource == null ? (TargetDataSource)declaringType.getAnnotation(TargetDataSource.class) : targetDataSource;
 //		logger.debug("Revert DataSource : {} > {}", targetDataSource.value(), declaringType.getTypeName());
 		if(DynamicRoutingDataSourceContextHolder.getDataSourceType().isEmpty()) {
-			DynamicRoutingDataSourceContextHolder.clearDataSourceType();
+			DynamicRoutingDataSourceContextHolder.clear();
 		}else {
 			DynamicRoutingDataSourceContextHolder.pop();
 		}
