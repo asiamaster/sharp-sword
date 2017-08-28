@@ -35,7 +35,7 @@ public class ProviderController {
         String provider = queryMap.get(PROVIDER_KEY).toString();
         queryMap.remove(PROVIDER_KEY);
         //这里查下拉不需要提供当前字段的值
-        return valueProviderUtils.getLookupList(provider, null, queryMap);
+        return valueProviderUtils.getLookupList(provider, queryMap.get("value"), queryMap);
     }
 
     private Map<String, Object> parseQuery(String queryParams) {

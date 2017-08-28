@@ -176,6 +176,7 @@ public class MyMapperPlugin extends PluginAdapter {
 	private void processEntityGetMethodAnnotation(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
 		topLevelClass.addImportedType("com.dili.ss.metadata.annotation.FieldDef");
 		topLevelClass.addImportedType("com.dili.ss.metadata.annotation.EditMode");
+		topLevelClass.addImportedType("com.dili.ss.metadata.FieldEditor");
 		List<Method> methods = topLevelClass.getMethods();
 
 		for (Method method : methods) {
