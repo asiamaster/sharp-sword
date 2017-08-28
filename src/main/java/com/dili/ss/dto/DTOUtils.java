@@ -47,20 +47,20 @@ public class DTOUtils {
 		return internalIsProxy(object, DTOHandler.class);
 	}
 
+
 	/**
 	 * 将DTO对象或其代理对象统一还原回DTO对象
 	 *
-	 * @param obj DTO或DTO接口
+	 * @param obj
 	 * @return 如果不是DTO对象实例或其代理对象，则返回null;
 	 */
-	public static DTO goDTO(Object obj) {
+	public static DTO go(Object obj) {
 		if (obj == null)
 			return null;
 		else if (obj instanceof DTO)
 			return (DTO) obj;
-		else if (internalIsProxy(obj, DTOHandler.class)) {
-			DTOHandler<DTO> handler = (DTOHandler<DTO>) Proxy
-					.getInvocationHandler(obj);
+		else if (isProxy(obj)) {
+			DTOHandler handler = (DTOHandler) Proxy.getInvocationHandler(obj);
 			return handler.getDelegate();
 		}
 		return null;
@@ -144,24 +144,6 @@ public class DTOUtils {
 	public static boolean isProxy(Object object) {
 		assert (object != null);
 		return internalIsProxy(object, DTOHandler.class);
-	}
-
-	/**
-	 * 将DTO对象或其代理对象统一还原回DTO对象
-	 *
-	 * @param obj
-	 * @return 如果不是DTO对象实例或其代理对象，则返回null;
-	 */
-	public static DTO go(Object obj) {
-		if (obj == null)
-			return null;
-		else if (obj instanceof DTO)
-			return (DTO) obj;
-		else if (isProxy(obj)) {
-			DTOHandler handler = (DTOHandler) Proxy.getInvocationHandler(obj);
-			return handler.getDelegate();
-		}
-		return null;
 	}
 
 	/**
@@ -309,14 +291,20 @@ public class DTOUtils {
 	 *          DTO对象的实例或其代理,作为源
 	 * @param entityClazz
 	 *          实体的类名, 作为目标
+	 * @param enhance
+	 *          增强转换，即会把隐藏的属性也转换到Entity里面
 	 * @return
 	 */
-	public static <M, N extends BaseDomain> N toEntity(M sourceDTO, Class<N> entityClazz) {
+	public static <M, N extends BaseDomain> N toEntity(M sourceDTO, Class<N> entityClazz, boolean enhance) {
 		assert (sourceDTO != null);
 		assert (DTOUtils.isInstance(sourceDTO));
 		assert (entityClazz != null);
 		try {
-			return BeanConver.copyBean(sourceDTO, entityClazz);
+			if(enhance) {
+				return BeanConver.copyMap(go(sourceDTO), entityClazz);
+			}else {
+				return BeanConver.copyBean(sourceDTO, entityClazz);
+			}
 		} catch (Exception e) {
 			String message = MessageFormat.format(TO_ENTITY_ERROR, sourceDTO.getClass().getName(), entityClazz.getName());
 			logger.error(message, e);
@@ -375,7 +363,7 @@ public class DTOUtils {
 	 */
 	final static Object getProperty(Object object, String name) {
 		if(isDTOProxy(object)){
-			return POJOUtils.getProperty(goDTO(object), name);
+			return POJOUtils.getProperty(go(object), name);
 		}
 		return POJOUtils.getProperty(object, name);
 	}
