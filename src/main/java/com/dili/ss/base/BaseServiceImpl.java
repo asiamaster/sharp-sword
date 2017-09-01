@@ -1,12 +1,14 @@
 package com.dili.ss.base;
 
 
+import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.BasePage;
 import com.dili.ss.domain.EasyuiPageOutput;
 import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
 import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.metadata.ValueProviderUtils;
+import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
@@ -25,9 +27,7 @@ import javax.persistence.Column;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 
 
@@ -192,31 +192,6 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 	}
 
 	/**
-	 * 获取子类和所有超类的属性<br/>
-	 * 过滤掉子类和父类同名的属性，以子类为主
-	 * @param clazz
-	 * @param fields
-	 * @return
-	 */
-	protected List<Field> getDeclaredField(Class clazz, List<Field> fields){
-		List<Field> addFields = Lists.newArrayList(Arrays.copyOf(clazz.getDeclaredFields(), clazz.getDeclaredFields().length));
-		//过滤掉子类和父类同名的属性，以子类为主
-		for(Field declaredField : clazz.getDeclaredFields()){
-			for(int i=0; i<fields.size(); i++) {
-				if (fields.get(i).getName().equals(declaredField.getName())){
-					addFields.remove(i);
-				}
-			}
-		}
-		fields.addAll(addFields);
-		if(clazz.getSuperclass() != null){
-			getDeclaredField(clazz.getSuperclass(), fields);
-		}
-
-		return fields;
-	}
-
-	/**
 	 * 用于支持like, order by 的查询
 	 * @param domain
 	 * @return
@@ -224,6 +199,29 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 	public List<T> listByExample(T domain){
 		Class tClazz = getSuperClassGenricType(getClass(), 0);
 		Example example = new Example(tClazz);
+		//接口只取getter方法
+		if(tClazz.isInterface()) {
+			buildExampleByGetterMethods(domain, tClazz, example);
+		}else {//类取属性
+			buildExampleByFields(domain, tClazz, example);
+		}
+		Integer page = domain.getPage();
+		page = (page == null) ? Integer.valueOf(1) : page;
+		Integer rows = domain.getRows() == null ? Integer.valueOf(Integer.MAX_VALUE) : domain.getRows();
+		//为了线程安全,请勿改动下面两行代码的顺序
+		PageHelper.startPage(page, rows);
+		return mapper.selectByExample(example);
+	}
+
+	/**
+	 * 根据类的属性构建查询Example
+	 * @param tClazz
+	 */
+	private void buildExampleByFields(T domain, Class tClazz, Example example){
+		//不处理接口
+		if(tClazz.isInterface()) {
+			return;
+		}
 		Example.Criteria criteria = example.createCriteria();
 		List<Field> fields = new ArrayList<>();
 		getDeclaredField(tClazz, fields);
@@ -234,6 +232,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 			Operator operator = field.getAnnotation(Operator.class);
 			Column column = field.getAnnotation(Column.class);
 			String columnName = column == null ? field.getName() : column.name();
+			Class<?> fieldType = field.getType();
 			Object value = null;
 			try {
 				field.setAccessible(true);
@@ -262,11 +261,11 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 			}else if(operator != null){
 				if(operator.value().equals(Operator.IN)){
 					StringBuilder sb = new StringBuilder();
-					if(Collection.class.isAssignableFrom(field.getType())){
+					if(Collection.class.isAssignableFrom(fieldType)){
 						for(Object o : (Collection)value){
 							sb.append(", ").append(o);
 						}
-					}else if(field.getType().isArray()){
+					}else if(fieldType.isArray()){
 						for(Object o : ( (Object[])value)){
 							sb.append(", ").append(o);
 						}
@@ -281,7 +280,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 				criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
 			}
 		}
-		StringBuilder sb = new StringBuilder();
+		StringBuilder orderByClauseBuilder = new StringBuilder();
 		for(Field field : tClazz.getFields()) {
 			Transient transient1 = field.getAnnotation(Transient.class);
 			if(transient1 != null) continue;
@@ -289,17 +288,113 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 			if(orderBy == null) continue;
 			Column column = field.getAnnotation(Column.class);
 			String columnName = column == null ? field.getName() : column.name();
-			sb.append(","+columnName+" "+orderBy.value());
+			orderByClauseBuilder.append(","+columnName+" "+orderBy.value());
 		}
-		if(sb.length()>1) {
-			example.setOrderByClause(sb.substring(1));
+		if(orderByClauseBuilder.length()>1) {
+			example.setOrderByClause(orderByClauseBuilder.substring(1));
 		}
-		Integer page = domain.getPage();
-		page = (page == null) ? Integer.valueOf(1) : page;
-		Integer rows = domain.getRows() == null ? Integer.valueOf(Integer.MAX_VALUE) : domain.getRows();
-		//为了线程安全,请勿改动下面两行代码的顺序
-		PageHelper.startPage(page, rows);
-		return mapper.selectByExample(example);
+	}
+
+	/**
+	 * 判断该方法是否要排除，用于buildExampleByGetterMethods
+	 * 排除非getter，getPage(),getRows(),getMetadata()和getMetadata(String key)等IBaseDomain或BaseDomain上定义的基础方法
+	 * @param method
+	 * @return
+	 */
+	private boolean excludeMethod(Method method){
+		//只处理getter方法
+		if(!POJOUtils.isGetMethod(method)){
+			return true;
+		}
+		Class<?> declaringClass = method.getDeclaringClass();
+		//排除IBaseDomain或BaseDomain上定义的基础方法
+		if (IBaseDomain.class.equals(declaringClass) || BaseDomain.class.equals(declaringClass)){
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * 根据类或接口的getter方法构建查询Example
+	 * @param tClazz
+	 */
+	private void buildExampleByGetterMethods(T domain, Class tClazz, Example example){
+		Example.Criteria criteria = example.createCriteria();
+		List<Method> methods = new ArrayList<>();
+		getDeclaredMethod(tClazz, methods);
+		for(Method method : methods){
+			if(excludeMethod(method)) {
+				continue;
+			}
+			Transient transient1 = method.getAnnotation(Transient.class);
+			if(transient1 != null) continue;
+			Like like = method.getAnnotation(Like.class);
+			Operator operator = method.getAnnotation(Operator.class);
+			Column column = method.getAnnotation(Column.class);
+			String columnName = column == null ? POJOUtils.getBeanField(method) : column.name();
+			Class<?> fieldType = method.getReturnType();
+			Object value = null;
+			try {
+				method.setAccessible(true);
+				value = method.invoke(domain);
+				if(value instanceof Date){
+					value = DateFormatUtils.format((Date)value, "yyyy-MM-dd HH:mm:ss");
+				}
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+			//没值就不拼接sql
+			if(value == null) continue;
+			if(like != null) {
+				switch(like.value()){
+					case Like.LEFT:
+						criteria = criteria.andCondition(columnName + " like '%" + value + "' ");
+						break;
+					case Like.RIGHT:
+						criteria = criteria.andCondition(columnName + " like '" + value + "%' ");
+						break;
+					case Like.BOTH:
+						criteria = criteria.andCondition(columnName + " like '%" + value + "%' ");
+						break;
+					default :
+						criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
+				}
+			}else if(operator != null){
+				if(operator.value().equals(Operator.IN)){
+					StringBuilder sb = new StringBuilder();
+					if(Collection.class.isAssignableFrom(fieldType)){
+						for(Object o : (Collection)value){
+							sb.append(", ").append(o);
+						}
+					}else if(fieldType.isArray()){
+						for(Object o : ( (Object[])value)){
+							sb.append(", ").append(o);
+						}
+					}else{
+						sb.append(", ").append(value);
+					}
+					criteria = criteria.andCondition(columnName + " " + operator.value() + "("+sb.substring(1)+")");
+				}else {
+					criteria = criteria.andCondition(columnName + " " + operator.value() + " '" + value + "' ");
+				}
+			}else{
+				criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
+			}
+		}
+		StringBuilder orderByClauseBuilder = new StringBuilder();
+		for(Method method : methods){
+			Transient transient1 = method.getAnnotation(Transient.class);
+			if(transient1 != null) continue;
+			OrderBy orderBy = method.getAnnotation(OrderBy.class);
+			if(orderBy == null) continue;
+			Column column = method.getAnnotation(Column.class);
+			String columnName = column == null ? POJOUtils.getBeanField(method) : column.name();
+			orderByClauseBuilder.append(","+columnName+" "+orderBy.value());
+		}
+		if(orderByClauseBuilder.length()>1) {
+			example.setOrderByClause(orderByClauseBuilder.substring(1));
+		}
 	}
 
 	/**
@@ -351,6 +446,69 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 	public List<T> selectByExample(Object example){
 		return getDao().selectByExample(example);
 	}
+
+	/**
+	 * 获取子类和所有超类的属性<br/>
+	 * 过滤掉子类和父类同名的属性，以子类为主
+	 * @param clazz
+	 * @param fields
+	 * @return
+	 */
+	protected List<Field> getDeclaredField(Class clazz, List<Field> fields){
+		List<Field> clazzFields = Lists.newArrayList(Arrays.copyOf(clazz.getDeclaredFields(), clazz.getDeclaredFields().length));
+		//过滤掉子类和父类同名的属性，以子类为主
+		for (Iterator<Field> it = clazzFields.iterator(); it.hasNext();) {
+			Field clazzField = it.next();
+			for(int i=0; i<fields.size(); i++) {
+				if (fields.get(i).getName().equals(clazzField.getName())){
+					it.remove();
+				}
+			}
+		}
+		fields.addAll(clazzFields);
+		if(clazz.getSuperclass() != null){
+			getDeclaredField(clazz.getSuperclass(), fields);
+		}
+
+		return fields;
+	}
+
+	/**
+	 * 获取子类和所有超类的方法<br/>
+	 * 过滤掉子类和父类同名的方法，以子类为主
+	 * @param clazz
+	 * @param methods
+	 * @return
+	 */
+	protected List<Method> getDeclaredMethod(Class clazz, List<Method> methods){
+		List<Method> clazzMethods = Lists.newArrayList(Arrays.copyOf(clazz.getDeclaredMethods(), clazz.getDeclaredMethods().length));
+		//过滤掉子类和父类同名的方法，以子类为主(注重该处只判断了方法名相同，并没判断参数，毕竟javaBean的方法参数都一致)
+		for (Iterator<Method> it = clazzMethods.iterator(); it.hasNext();) {
+			Method clazzMethod = it.next();
+			for(int i=0; i<methods.size(); i++) {
+				if (methods.get(i).getName().equals(clazzMethod.getName())){
+					it.remove();
+				}
+			}
+		}
+		methods.addAll(clazzMethods);
+		//clazz是接口，则找所有父接口上的方法
+		if(clazz.isInterface()) {
+			Class<?>[] interfaces = clazz.getInterfaces();
+			if (interfaces != null) {
+				for(Class<?> intf : interfaces) {
+					getDeclaredMethod(intf, methods);
+				}
+			}
+		}else {//clazz是类，则找所有父类上的方法，但不找父接口，毕竟类会有接口方法的实现
+			if (clazz.getSuperclass() != null) {
+				getDeclaredMethod(clazz.getSuperclass(), methods);
+			}
+		}
+		return methods;
+	}
+
+
 
 	/**
 	 * 通过反射, 获得定义Class时声明的父类的泛型参数的类型. 如无法找到, 返回Object.class.

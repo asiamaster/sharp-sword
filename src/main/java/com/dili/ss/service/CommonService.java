@@ -11,8 +11,9 @@ import java.util.List;
  */
 public interface CommonService {
 
-	public List<ValuePair<?>> selectValuePair(String sql);
+	List<ValuePair<?>> selectValuePair(String sql);
 
-	public List<JSONObject> selectJSONObject(String sql, Integer page, Integer rows);
+	List<JSONObject> selectJSONObject(String sql, Integer page, Integer rows);
 
+	void execute(String sql);
 }

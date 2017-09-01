@@ -153,7 +153,7 @@ public final class POJOUtils {
      *
      * @param methodName
      *          方法名
-     * @return 此处在2008.8.20被方永红修改，原来加了断言，现取消，并不再记日志，因为，意义不大．
+     * @return 原来加了断言，现取消，并不再记日志，因为，意义不大．
      */
     public final static String getBeanField(String methodName) {
         if (isGetOrSetMethod(methodName)) {

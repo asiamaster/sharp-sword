@@ -7,7 +7,6 @@ import com.dili.ss.metadata.ValuePair;
 import com.dili.ss.metadata.ValuePairImpl;
 import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.SpringUtil;
-import com.google.common.collect.Maps;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,9 +76,7 @@ public class SimpleValueProvider implements ValueProvider {
      */
     public List<ValuePair<?>> getLookupList(Object value, Map paramMap, FieldMeta fieldMeta){
         buildParam(paramMap);
-        Map map = Maps.newHashMap();
-        map.put("sql", buildSql());
-        List<ValuePair<?>> data = commonMapper.selectValuePair(map);
+        List<ValuePair<?>> data = commonMapper.selectValuePair(buildSql());
         data.add(0, new ValuePairImpl(EMPTY_ITEM_TEXT, null));
         return data;
     }
@@ -115,9 +112,7 @@ public class SimpleValueProvider implements ValueProvider {
         }
         paramMap.put(VALUE_KEY, value);
         buildParam(paramMap);
-        Map map = Maps.newHashMap();
-        map.put("sql", buildSql());
-        List<ValuePair<?>> data = SpringUtil.getBean(CommonMapper.class).selectValuePair(map);
+        List<ValuePair<?>> data = SpringUtil.getBean(CommonMapper.class).selectValuePair(buildSql());
         if(data.isEmpty()) return "";
         return data.get(0).getText();
     }

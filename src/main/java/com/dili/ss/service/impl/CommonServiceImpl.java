@@ -8,9 +8,7 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by asiamaster on 2017/7/25 0025.
@@ -22,17 +20,21 @@ public class CommonServiceImpl implements CommonService {
 	private CommonMapper commonMapper;
 
 	public List<ValuePair<?>> selectValuePair(String sql) {
-		Map paramMap = new HashMap();
-		paramMap.put("sql", sql);
-		return commonMapper.selectValuePair(paramMap);
+//		Map paramMap = new HashMap();
+//		paramMap.put("sql", sql);
+		return commonMapper.selectValuePair(sql);
 	}
 
 	public List<JSONObject> selectJSONObject(String sql, Integer page, Integer rows) {
-		Map paramMap = new HashMap();
-		paramMap.put("sql", sql);
+//		Map paramMap = new HashMap();
+//		paramMap.put("sql", sql);
 		//为了线程安全,请勿改动下面两行代码的顺序
 		PageHelper.startPage(page, rows);
-		return commonMapper.selectJSONObject(paramMap);
+		return commonMapper.selectJSONObject(sql);
+	}
+
+	public void execute(String sql) {
+		commonMapper.execute(sql);
 	}
 
 }
