@@ -21,10 +21,11 @@ public class BaseDomain implements IBaseDomain {
 	private Integer page;	//页码，从1开始
 	@Transient
 	private Integer rows; //每页行数
-//	@Transient
-//	private String sort;    //排序字段，以逗号分隔
-//	@Transient
-//	private String order;   //排序类型: asc,desc
+	//sort和order作为easyui的远程排序的关键字，同时也不建议数据库字段使用这两个词
+	@Transient
+	private String sort;    //排序字段，以逗号分隔
+	@Transient
+	private String order;   //排序类型: asc,desc
 	@Transient
 	private Map metadata;
 
@@ -51,21 +52,21 @@ public class BaseDomain implements IBaseDomain {
 		this.rows = rows;
 	}
 
-//	public String getSort() {
-//		return sort;
-//	}
-//
-//	public void setSort(String sort) {
-//		this.sort = sort;
-//	}
-//
-//	public String getOrder() {
-//		return order;
-//	}
-//
-//	public void setOrder(String order) {
-//		this.order = order;
-//	}
+	public String getSort() {
+		return sort;
+	}
+
+	public void setSort(String sort) {
+		this.sort = sort;
+	}
+
+	public String getOrder() {
+		return order;
+	}
+
+	public void setOrder(String order) {
+		this.order = order;
+	}
 
 	public void setMetadata(String key, Object value){
 		if(metadata == null){

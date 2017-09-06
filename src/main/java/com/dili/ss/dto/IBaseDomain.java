@@ -23,6 +23,14 @@ public interface IBaseDomain extends IDTO {
 	public void setRows(Integer rows);
 
 	@Transient
+	public String getSort();
+	public void setSort(String sort);
+
+	@Transient
+	public String getOrder();
+	public void setOrder(String order);
+
+	@Transient
 	public Object getMetadata(String key);
 	public void setMetadata(String key, Object value);
 
