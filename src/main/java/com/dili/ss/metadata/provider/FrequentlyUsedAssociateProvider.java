@@ -57,7 +57,7 @@ public class FrequentlyUsedAssociateProvider implements ApplicationListener<Cont
 	private final static int concurrencyLevel = 8;
 	//设置缓存容器的初始容量为10
 	private final static int initialCapacity = 10;
-	//设置缓存最大容量为100，超过100之后就会按照LRU最近虽少使用算法来移除缓存项
+	//设置缓存最大容量为100，超过100之后就会按照LRU最近最少使用算法来移除缓存项
 	private final static int maximumSize = 100;
 
 	//首次命中指定次数后进行持久化

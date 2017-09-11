@@ -43,10 +43,17 @@ function datetimeFormatter (value) {
     return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
 }
 
-//绑定实体的metadata信息，用于提供者转换
-function bindMetadata(gridId){
+/**
+ * 绑定实体的metadata信息，用于提供者转换
+ * @param gridId    datagrid Id
+ * @param isClearQueryParams    是否清空queryParams, 默认为false,不清空
+ * @returns {queryParams|{provider}|*|string|{}}
+ */
+function bindMetadata(gridId, isClearQueryParams){
     var opts=$("#"+gridId).datagrid("options");
-    var params = {}||opts.queryParams;
+    //赋默认值
+    isClearQueryParams = isClearQueryParams || false;
+    var params = isClearQueryParams ? {} : opts.queryParams || {};
     var lastColumns = opts.columns[opts.columns.length-1];
     params["metadata"] = {};
     for(var column in lastColumns){

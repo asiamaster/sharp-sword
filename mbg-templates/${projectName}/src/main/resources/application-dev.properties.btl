@@ -32,7 +32,7 @@ druidFilter.resetEnable=true
 #mybatis
 mybatis.mapperLocations=classpath:mapper/*.xml
 mybatis.typeAliasesPackage=com.dili.${appName}.domain
-mybatis.configLocation=classpath:mybatis-config.xml
+mybatis.configLocation=classpath:conf/mybatis-config.xml
 
 #mybatis mapper
 mapper.mappers[0]=com.dili.ss.base.MyMapper
@@ -48,7 +48,7 @@ pagehelper.params=count=countSql
 #logging.level.com.dili.yqyw.gateway=INFO
 #logging.level.root=INFO
 #logging.file=logs/gateway-dev.log
-logging.config=classpath:logback-springboot.xml
+logging.config=classpath:conf/logback-springboot.xml
 
 #redis
 #spring.redis.database=0

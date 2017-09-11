@@ -29,7 +29,7 @@ import org.springframework.context.annotation.ComponentScan;
 //@EnableScheduling
 @EnableTransactionManagement
 @EnableAutoConfiguration(exclude = {ThymeleafAutoConfiguration.class, VelocityAutoConfiguration.class})
-@MapperScan(basePackages = "com.dili.${appName}.dao", markerInterface = MyMapper.class)
+@MapperScan(basePackages = {"com.dili.${appName}.dao", "com.dili.ss.dao"})
 //@ImportResource(locations = "classpath:applicationContext.xml")
 @ComponentScan(basePackages={"com.dili.ss","com.dili.${appName}"})
 //@EnableEncryptableProperties

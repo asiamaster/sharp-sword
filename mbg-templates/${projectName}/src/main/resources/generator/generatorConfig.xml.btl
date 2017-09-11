@@ -15,6 +15,7 @@
             <property name="beginningDelimiter" value="`"/>
             <property name="endingDelimiter" value="`"/>
             <property name="mappers" value="\${mapper.Mapper}"/>
+            <property name="isDTO" value="true"/>
         </plugin>
 
         <!-- Mybatis配置文件生成插件 -->

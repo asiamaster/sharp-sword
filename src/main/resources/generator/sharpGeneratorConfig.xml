@@ -55,15 +55,15 @@
         <!-- 根据beetl模板文件生成代码插件 -->
         <!-- targetDir和templateRootDir必填 -->
         <!-- overwrite属性默认为false，这里无法获取maven plugin中配置的overwrite属性，需要单独解析 -->
-        <!--<plugin type="com.dili.ss.mbg.beetl.BeetlTemplatesPlugin">-->
-            <!--<property name="targetDir" value="d:/tpl"></property>-->
-            <!--<property name="templateRootDir" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/mbg-templates"></property>-->
-            <!--<property name="basePackage" value="com.dili.${appName}" />-->
-            <!--<property name="basePackage_dir" value="com/dili/${appName}/" />-->
-            <!--<property name="overwrite" value="true" />-->
-            <!--<property name="appName" value="${appName}"/>-->
-            <!--<property name="projectName" value="${projectName}"/>-->
-        <!--</plugin>-->
+        <plugin type="com.dili.ss.mbg.beetl.BeetlTemplatesPlugin">
+            <property name="targetDir" value="d:/tpl"></property>
+            <property name="templateRootDir" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/mbg-templates"></property>
+            <property name="basePackage" value="com.dili.${appName}" />
+            <property name="basePackage_dir" value="com/dili/${appName}/" />
+            <property name="overwrite" value="true" />
+            <property name="appName" value="${appName}"/>
+            <property name="projectName" value="${projectName}"/>
+        </plugin>
 
         <commentGenerator type="org.mybatis.generator.internal.DefaultCommentGenerator">
             <!--**阻止**生成注释，默认为false-->
@@ -81,8 +81,8 @@
         <javaModelGenerator targetPackage="com.dili.${appName}.domain" targetProject="d:/tpl"/>
         <!--<javaModelGenerator targetPackage="com.dili.ss.domain.mbg" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"/>-->
 
-        <sqlMapGenerator targetPackage="mapper"  targetProject="d:/tpl"/>
-        <javaClientGenerator targetPackage="com.dili.${appName}.dao" targetProject="d:/tpl" type="XMLMAPPER" />
+        <!--<sqlMapGenerator targetPackage="mapper"  targetProject="d:/tpl"/>-->
+        <!--<javaClientGenerator targetPackage="com.dili.${appName}.dao" targetProject="d:/tpl" type="XMLMAPPER" />-->
 
         <!--<sqlMapGenerator targetPackage="mapper"  targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources"/>-->
         <!--<javaClientGenerator targetPackage="com.dili.sso" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java" type="XMLMAPPER" />-->

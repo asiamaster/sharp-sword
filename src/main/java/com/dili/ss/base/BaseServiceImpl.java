@@ -12,6 +12,7 @@ import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,6 +206,16 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 		}else {//类取属性
 			buildExampleByFields(domain, tClazz, example);
 		}
+		//设置排序信息
+		if(StringUtils.isNotBlank(domain.getSort())) {
+			StringBuilder orderByClauseBuilder = new StringBuilder();
+			String orderBy = StringUtils.isBlank(domain.getOrder()) ? "asc" : domain.getOrder();
+			orderByClauseBuilder.append(","+POJOUtils.humpToLineFast(domain.getSort())+" "+orderBy);
+			if(orderByClauseBuilder.length()>1) {
+				example.setOrderByClause(orderByClauseBuilder.substring(1));
+			}
+		}
+		//设置分页信息
 		Integer page = domain.getPage();
 		page = (page == null) ? Integer.valueOf(1) : page;
 		Integer rows = domain.getRows() == null ? Integer.valueOf(Integer.MAX_VALUE) : domain.getRows();
