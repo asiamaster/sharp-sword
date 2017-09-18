@@ -7,7 +7,10 @@
             return;
         var param = {};
         param.columns = JSON.stringify(opts.columns);
-        param.queryParams = JSON.stringify(bindMetadata(gridId));
+        var _gridExportQueryParams = bindMetadata(gridId);
+        _gridExportQueryParams["sort"] = opts.sortName;
+        _gridExportQueryParams["order"] = opts.sortOrder;
+        param.queryParams = JSON.stringify(_gridExportQueryParams);
         param.title = opts.title;
         param.url = opts.url;
         if($("#_exportForm").length <= 0) {
@@ -21,6 +24,7 @@
             $.parser.parse("#_exportFormDiv");
         }
 //            $.messager.progress();	// 显示进度条
+
         $('#_exportForm').form("load", param);
         $('#_exportForm').form("submit",{
             url:"${contextPath}/export/serverExport",

@@ -30,7 +30,7 @@ druidFilter.loginPassword=123456
 druidFilter.resetEnable=true
 
 #mybatis
-mybatis.mapperLocations=classpath:mapper/*.xml
+mybatis.mapperLocations=classpath*:mapper/*.xml
 mybatis.typeAliasesPackage=com.dili.${appName}.domain
 mybatis.configLocation=classpath:conf/mybatis-config.xml
 

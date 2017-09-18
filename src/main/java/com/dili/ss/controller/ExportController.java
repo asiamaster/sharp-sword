@@ -2,9 +2,10 @@ package com.dili.ss.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.util.ExportUtils;
 import com.dili.ss.domain.ExportParam;
+import com.dili.ss.util.ExportUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +26,8 @@ public class ExportController {
 
     public final static Logger log = Logger.getLogger(ExportController.class);
 
+    @Autowired
+    ExportUtils exportUtils;
 
 
     /**
@@ -43,7 +46,7 @@ public class ExportController {
                       @RequestParam("title") String title,
                       @RequestParam("url") String url) {
         try {
-            ExportUtils.export(request, response, buildExportParam(columns, queryParams, title, url));
+            exportUtils.export(request, response, buildExportParam(columns, queryParams, title, url));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,6 +60,5 @@ public class ExportController {
         exportParam.setUrl(url);
         return exportParam;
     }
-
 
 }
