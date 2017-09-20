@@ -102,14 +102,16 @@ public class FrequentlyUsedAssociateProvider implements ApplicationListener<Cont
 				}
 			}
 		});
-		if(contextRefreshedEvent.getApplicationContext().getParent() == null) {
+		//非spring boot项目在这里判断是为了只初始化一次，
+		// contextRefreshedEvent.getApplicationContext().getParent() == null说明当前ApplicationContext是web applicationContext
+//		if(contextRefreshedEvent.getApplicationContext().getParent() == null) {
 			if(models == null || models.isEmpty()) {
 				return;
 			}
 			for (String key : models) {
 				initByKey(key);
 			}
-		}
+//		}
 	}
 
 	@Override

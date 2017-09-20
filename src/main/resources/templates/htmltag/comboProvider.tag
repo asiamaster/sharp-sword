@@ -2,7 +2,6 @@
     <% if(has(_data)){ %>
     $("#${_id}").combobox({
         data:${_data}
-        ,editable : false
         ,valueField:'${_valueField!"value"}'
         ,textField:'${_textField!"text"}'
     })

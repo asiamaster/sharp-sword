@@ -393,3 +393,32 @@ function bindFormEvent(formId, focusInputId, subFunction, escFunction) {
     }
     formFocus(formId, focusInputId);
 }
+
+/**
+ * 单独实现一个combobox的keyHandler的回车(enter)事件函数，
+ * 用于解决如果输入的值不是下拉中的值，按回车键会被清空问题
+ * @param target
+ */
+function _doComboboxEnter(target){
+    var t = $(target);
+    var opts = t.combobox('options');
+    var panel = t.combobox('panel');
+    var item = panel.children('div.combobox-item-hover');
+    if (item.length){
+        item.removeClass('combobox-item-hover');
+        var row = opts.finder.getRow(target, item);
+        var value = row[opts.valueField];
+        if (opts.multiple){
+            if (item.hasClass('combobox-item-selected')){
+                t.combobox('unselect', value);
+            } else {
+                t.combobox('select', value);
+            }
+        } else {
+            t.combobox('select', value);
+        }
+    }
+    if (!opts.multiple){
+        t.combobox('hidePanel');
+    }
+}
