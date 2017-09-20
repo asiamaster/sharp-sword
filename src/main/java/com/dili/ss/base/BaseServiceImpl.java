@@ -206,11 +206,18 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 		}else {//类取属性
 			buildExampleByFields(domain, tClazz, example);
 		}
-		//设置排序信息
+		//设置排序信息(domain.getSort()是排序字段名，多个以逗号分隔)
 		if(StringUtils.isNotBlank(domain.getSort())) {
 			StringBuilder orderByClauseBuilder = new StringBuilder();
-			String orderBy = StringUtils.isBlank(domain.getOrder()) ? "asc" : domain.getOrder();
-			orderByClauseBuilder.append(","+POJOUtils.humpToLineFast(domain.getSort())+" "+orderBy);
+			String[] sortFields = domain.getSort().split(",");
+			String[] orderByTypes = domain.getOrder().split(",");
+			//sortFields和orderTypes的对应顺序一致
+			for(int i=0; i < sortFields.length; i++) {
+				String sortField = sortFields[i].trim();
+				String orderByType = orderByTypes[i].trim();
+				orderByType = StringUtils.isBlank(orderByType) ? "asc" : orderByType;
+				orderByClauseBuilder.append("," + POJOUtils.humpToLineFast(sortField) + " " + orderByType);
+			}
 			if(orderByClauseBuilder.length()>1) {
 				example.setOrderByClause(orderByClauseBuilder.substring(1));
 			}
