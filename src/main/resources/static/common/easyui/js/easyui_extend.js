@@ -46,7 +46,7 @@ function datetimeFormatter (value) {
 /**
  * 绑定实体的metadata信息，用于提供者转换
  * @param gridId    datagrid Id
- * @param isClearQueryParams    是否清空queryParams, 默认为false,不清空
+ * @param isClearQueryParams    是否清空datagrid中原有的queryParams, 默认为false,不清空
  * @returns {queryParams|{provider}|*|string|{}}
  */
 function bindMetadata(gridId, isClearQueryParams){
@@ -54,11 +54,13 @@ function bindMetadata(gridId, isClearQueryParams){
     //赋默认值
     isClearQueryParams = isClearQueryParams || false;
     var params = isClearQueryParams ? {} : opts.queryParams || {};
+    //获取最后一行的列(可能是多表头)
     var lastColumns = opts.columns[opts.columns.length-1];
     params["metadata"] = {};
     for(var column in lastColumns){
         var _provider = lastColumns[column]["_provider"];
         var _data = lastColumns[column]["_data"];
+        //优先解析直接数据的_data属性
         if(_data != null){
             var field = lastColumns[column]["field"];
             var fieldMetadata = {};
@@ -67,6 +69,7 @@ function bindMetadata(gridId, isClearQueryParams){
             params["metadata"][field] = JSON.stringify(fieldMetadata);
             continue;
         }
+        //没有_data属性，则解析_table,_valueField和_textField等其它属性
         var _table = lastColumns[column]["_table"];
         var _valueField = lastColumns[column]["_valueField"];
         var _textField = lastColumns[column]["_textField"];

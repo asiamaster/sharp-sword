@@ -38,7 +38,7 @@ public class CommonController {
     CommonService commonService;
 
     /**
-     * 用于动态查询选择框
+     * 动态查询选择框
      * @param conditionItems
      * @return
      * @throws Exception
@@ -112,7 +112,7 @@ public class CommonController {
         EasyuiPageOutput easyuiPageOutput = new EasyuiPageOutput();
         List<JSONObject> list = commonService.selectJSONObject(sql, page, rows);
         Page<T> pageList = (Page)list;
-        List results = ValueProviderUtils.buildDataByProvider(conditionItems.getMetadata(), list);
+        ValueProviderUtils.buildDataByProvider(conditionItems.getMetadata(), list);
         return new EasyuiPageOutput(Integer.parseInt(String.valueOf(pageList.getTotal())), pageList).toString();
     }
 
