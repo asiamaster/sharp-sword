@@ -57,6 +57,7 @@
                                     <%
                                     //优先解析provider，如果有data，则会在provider插件中生成后台的Provider类
                                     if(provider != null && provider!=""){
+                                        provider = strutil.toLowerCase(strutil.subStringTo(provider, 0, 1))+strutil.subString(provider,1);
                                     %>
                                     ${"<#"}comboProvider _id="${field.javaProperty}" _provider='${provider}'/>
                                     <%
@@ -142,7 +143,7 @@
                                 var queryParams = jsonObject["queryParams"];
                                 //优先处理provider(有provider，这里不在attr变量中处理，仅赋值，交由下面th标签的if语句中处理)
                                 if(provider != null && provider != ""){
-
+                                    provider = strutil.toLowerCase(strutil.subStringTo(provider, 0, 1))+strutil.subString(provider,1);
                                 }//有直接的json数据
                                 else if(data != null && data!=""){
                                     attr = "_data:"+strutil.replace(data+"","\"","'")+",";
@@ -231,6 +232,7 @@
                        <%
                        //优先解析provider，如果有data，则会在provider插件中生成后台的Provider类
                        if(provider != null && provider!=""){
+                       provider = strutil.toLowerCase(strutil.subStringTo(provider, 0, 1))+strutil.subString(provider,1);
                        %>
                        ${"<#"}comboProvider _id="_${field.javaProperty}" _provider='${provider}'/>
                        <%
