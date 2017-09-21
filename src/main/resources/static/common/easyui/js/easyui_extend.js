@@ -343,7 +343,7 @@ function bindEnter(formId, element, subFunction, eventName) {
     $("#" + formId + " " + element).bind(eventName, function(event) {
         //回车
         if (event.keyCode == '13') {
-            subFunction();
+            return subFunction(event);
         }
         //下拉
         // if (event.keyCode == '40') {
@@ -368,7 +368,7 @@ function bindEsc(formId, element, subFunction, eventName) {
     $("#" + formId + " " + element).bind(eventName, function(event) {
         //ESC
         if (event.keyCode == '27') {
-            subFunction();
+            return subFunction(event);
         }
     });
 }
