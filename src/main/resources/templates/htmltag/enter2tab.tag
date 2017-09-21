@@ -12,7 +12,13 @@
             if (index == inputs.length - 1) // 判断是否是最后一个输入框
             {
 //                    if (confirm("最后一个输入框已经输入,是否提交?")) // 用户确认
+                <%
+                if(has(_submitFun)){
+                %>
                 ${_submitFun}(); // 提交表单
+                <%
+                }
+                %>
             } else {
                 inputs[index + 1].focus(); // 设置焦点
                 inputs[index + 1].select(); // 选中文字

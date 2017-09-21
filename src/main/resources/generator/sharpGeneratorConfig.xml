@@ -19,12 +19,12 @@
 
         <!-- Service生成插件 -->
         <!-- targetProject和targetPackage必填 -->
-        <!--<plugin type="com.dili.ssg.MyServicePlugin">-->
+        <!--<plugin type="com.dili.ss.mbg.MyServicePlugin">-->
             <!--<property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"></property>-->
             <!--<property name="targetPackage" value="com.dili.ss.service"></property>-->
             <!--&lt;!&ndash; 此配置用于getActualDao方法的返回对象import，需要获取Mapper类的包路径 &ndash;&gt;-->
             <!--&lt;!&ndash; 如果不配置，则从下面的<javaClientGenerator>标签的targetPackage属性获取 &ndash;&gt;-->
-            <!--&lt;!&ndash; 如果再没有<javaClientGenerator>标签，则根据targetPackage属性减去service加上dao来生成 &ndash;&gt;-->
+            <!--&lt;!&ndash; 如果再没有<javaClientGenerator>标签，则根据targetPackage属性减去service加上dao来生成service中mapper的包路径 &ndash;&gt;-->
             <!--<property name="javaClientTargetPackage" value="com.dili.ss"></property>-->
             <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
             <!--<property name="serviceSuperClass" value="com.dili.ssse.BaseServiceImpl"></property>-->
@@ -32,16 +32,23 @@
             <!--<property name="serviceSuperInterface" value="com.dili.ssse.BaseService"></property>-->
         <!--</plugin>-->
 
+        <!-- provider生成插件 -->
+        <!--targetProject和targetPackage必填 -->
+        <plugin type="com.dili.ss.mbg.MyProviderPlugin">
+            <property name="targetProject" value="d:/tpl"></property>
+            <property name="targetPackage" value="com.dili.ss.provider"></property>
+        </plugin>
+
         <!-- Controller生成插件 -->
         <!-- targetProject和targetPackage必填 -->
-        <plugin type="com.dili.ss.mbg.MyControllerPlugin">
-            <property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"></property>
-            <property name="targetPackage" value="com.dili.ss.controller"></property>
-            <!-- 如果不配置，则不会在类上继承 -->
-            <!--<property name="controllerSuperClass" value="com.dili.ssse.BaseControllerImpl"></property>-->
-            <!-- 如果不配置，则不会在接口上继承 -->
-            <!--<property name="controllerSuperInterface" value="com.dili.ssse.BaseController"></property>-->
-        </plugin>
+        <!--<plugin type="com.dili.ss.mbg.MyControllerPlugin">-->
+            <!--<property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"></property>-->
+            <!--<property name="targetPackage" value="com.dili.ss.controller"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="controllerSuperClass" value="com.dili.ssse.BaseControllerImpl"></property>&ndash;&gt;-->
+            <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="controllerSuperInterface" value="com.dili.ssse.BaseController"></property>&ndash;&gt;-->
+        <!--</plugin>-->
 
         <!-- Mybatis配置文件生成插件 -->
         <!-- targetProject和targetPackage必填 -->
@@ -85,7 +92,7 @@
         <!--<javaClientGenerator targetPackage="com.dili.${appName}.dao" targetProject="d:/tpl" type="XMLMAPPER" />-->
 
         <!--<sqlMapGenerator targetPackage="mapper"  targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources"/>-->
-        <!--<javaClientGenerator targetPackage="com.dili.sso" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java" type="XMLMAPPER" />-->
+        <!--<javaClientGenerator targetPackage="com.dili.ss" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java" type="XMLMAPPER" />-->
 
         <!--<table tableName="%" >-->
             <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->

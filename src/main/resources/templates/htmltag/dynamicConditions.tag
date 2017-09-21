@@ -154,7 +154,7 @@
 //        if (null == opts.url || "" == opts.url) {
             opts.url = "${contextPath}/common/listEasyuiPageByConditionItems";
 //        }
-        var param = bindMetadata("${gridId}");
+        var param = bindMetadata("${gridId}", true);
         //获取条件项关系
         var conditionRelationFieldValue = $("input[name='conditionRelationField']:checked").val();
         var rows = $("#conditionItemsList").datalist("getRows");
@@ -163,7 +163,6 @@
             conditionItemsArray.push(rows[row]["value"]);
         }
         var conditionParams = {dtoClass:"${dtoClass}", conditionRelationField:conditionRelationFieldValue, conditionItems:conditionItemsArray.join(",")};
-        var param = bindMetadata("grid");
         $.extend( conditionParams, param);
         $("#${gridId}").datagrid("load", conditionParams);
 //             $.ajax({
@@ -185,6 +184,7 @@
         selectOne();
     }
 
+    //选中第一个元素
     function selectOne(){
         var conditionFieldData = $("#conditionField").combobox("getData");
         var relationFieldData =  $("#relationField").combobox("getData");

@@ -167,16 +167,16 @@ public class MyServicePlugin extends PluginAdapter {
         }
     }
 
-    //添加list方法
+    //添加getActualDao方法
     private void addGetActualDaoMethod(TopLevelClass clazz, FullyQualifiedJavaType baseModelJavaType){
-        Method listMethod = new Method("getActualDao");
-        listMethod.setReturnType(new FullyQualifiedJavaType(baseModelJavaType.getShortName()+"Mapper"));
-        listMethod.setVisibility(JavaVisibility.PUBLIC);
+        Method getActualDaoMethod = new Method("getActualDao");
+        getActualDaoMethod.setReturnType(new FullyQualifiedJavaType(baseModelJavaType.getShortName()+"Mapper"));
+        getActualDaoMethod.setVisibility(JavaVisibility.PUBLIC);
         List<String> bodyLines = new ArrayList<>();
         String returnLine = "return ("+baseModelJavaType.getShortName()+"Mapper)getDao();";
         bodyLines.add(returnLine);
-        listMethod.addBodyLines(bodyLines);
-        clazz.addMethod(listMethod);
+        getActualDaoMethod.addBodyLines(bodyLines);
+        clazz.addMethod(getActualDaoMethod);
         String javaClientTargetPackage = null;
         if(getContext().getJavaClientGeneratorConfiguration() != null) {
             javaClientTargetPackage = getContext().getJavaClientGeneratorConfiguration().getTargetPackage();
