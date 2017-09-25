@@ -46,19 +46,34 @@ public class BeanFieldProvider implements ValueProvider {
                 if(POJOUtils.isGetMethod(method)){
                     String fieldName = POJOUtils.getBeanField(method);
                     FieldMeta fieldMeta1 = objectMeta.getFieldMetaById(fieldName);
-                    //取getter方法对应的字段(包括搜索父类)，以获取数据库字段名
-                    Field field = ReflectionUtils.getAccessibleField(dtoClass, fieldName);
+                    //数据库的下划线规则字段名
                     String dbFieldName = null;
-//                    不添加Transient字段和没找到getter对应的字段
-                    if(field == null || field.getAnnotation(Transient.class) != null){
-//                        dbFieldName = POJOUtils.humpToLineFast(fieldName);
-                        continue;
-                    }else{ //找到getter对应的字段则取字段上的@javax.persistence.Column注解
-                        Column column = field.getAnnotation(Column.class);
-                        if(column != null) {
+
+                    //接口只能从getter方法取
+                    if(dtoClass.isInterface()){
+                        if(method.getAnnotation(Transient.class) != null){
+                            continue;
+                        }
+                        Column column = method.getAnnotation(Column.class);
+                        if (column != null) {
                             dbFieldName = column.name();
-                        }else{
+                        } else {
                             dbFieldName = POJOUtils.humpToLineFast(fieldName);
+                        }
+                    }else {
+                        //java bean类取getter方法对应的字段(包括搜索父类)，以获取数据库字段名
+                        Field field = ReflectionUtils.getAccessibleField(dtoClass, fieldName);
+//                    不添加Transient字段和没找到getter对应的字段
+                        if (field == null || field.getAnnotation(Transient.class) != null) {
+//                        dbFieldName = POJOUtils.humpToLineFast(fieldName);
+                            continue;
+                        } else { //找到getter对应的字段则取字段上的@javax.persistence.Column注解
+                            Column column = field.getAnnotation(Column.class);
+                            if (column != null) {
+                                dbFieldName = column.name();
+                            } else {
+                                dbFieldName = POJOUtils.humpToLineFast(fieldName);
+                            }
                         }
                     }
                     //如果没有定义FieldDef注解则直接取getter方法转换的字段名为显示值

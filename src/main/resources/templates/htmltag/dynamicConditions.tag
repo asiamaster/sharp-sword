@@ -1,8 +1,8 @@
 <script type="text/javascript">
     //bean对象的fieldMeta
     <#fieldMeta dtoClass="${dtoClass}"/>
-    //fieldEditor的对应关系
-    <#fieldEditor varName="fieldEditor" />
+        //fieldEditor的对应关系
+        <#fieldEditor varName="fieldEditor" />
 
     var conditionValueFieldInput = '<input name="conditionValueField" id="conditionValueField" data-options="label:\'条件值:\',required:false, width:253, onLoadSuccess:conditionValueFieldLoadSuccess" />';
 
@@ -44,10 +44,8 @@
         //conditionValueFieldDiv是外层div，该id将作为标签的参数
         $("#${divId!"conditionValueFieldDiv"}").append(conditionValueFieldInput);
         if(editor == 'combobox') {
-//            var params = eval(newValueFieldMeta["params"]);
-            var params = $.parseJSON(newValueFieldMeta["params"]);
             //如果没有初始化json参数，直接调用provider
-            if(params == ""){
+            if(newValueFieldMeta["params"] == ""){
                 $("#conditionValueField").combobox({
                     url:"${contextPath}/provider/getLookupList"
                     , method : "POST"
@@ -59,6 +57,7 @@
                     , queryParams : {provider : newValueFieldMeta["provider"]} //从meta中取当前下拉框字段的提供者
                 });
             } else {//有初始化json参数，构建动态或静态查询下拉框
+                var params = $.parseJSON(newValueFieldMeta["params"]);
                 if(params["data"] != null){
                     $("#conditionValueField").combobox({
                         data:params["data"]
@@ -152,7 +151,7 @@
     function queryGridByConditionItems() {
         var opts = $("#${gridId}").datagrid("options");
 //        if (null == opts.url || "" == opts.url) {
-            opts.url = "${contextPath}/common/listEasyuiPageByConditionItems";
+        opts.url = "${contextPath}/common/listEasyuiPageByConditionItems";
 //        }
         var param = bindMetadata("${gridId}", true);
         //获取条件项关系

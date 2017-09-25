@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -195,6 +196,41 @@ public class ReflectionUtils {
                 // Method不在当前类定义,继续向上转型
             }
         }
+        //如果当前clazz是接口，则需要搜索所有父接口
+        if(clazz.isInterface()) {
+            return getIntefacesAccessibleMethod(clazz, methodName, parameterTypes);
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * 获取接口及所有父接口中的所有方法,并强制设置为可访问
+     * @param intfClasses
+     * @return
+     */
+    public static List<Method> getAccessibleMethods(Class<?> intfClasses){
+        List<Method> methods = new ArrayList<>();
+        getAccessibleMethodsRecursive(methods, intfClasses);
+        return methods;
+    }
+
+    /**
+     * 递归获取接口及所有父接口中的所有方法,并强制设置为可访问，最后放入到methods对象中
+     * @param intfClass
+     */
+    public static Method getIntefacesAccessibleMethod(final Class<?> intfClass,final String methodName, final Class<?>... parameterTypes){
+        Assert.notNull(intfClass, "intfClasses不能为空");
+        try {
+            Method method = intfClass.getDeclaredMethod(methodName, parameterTypes);
+            method.setAccessible(true);
+            return method;
+        } catch (NoSuchMethodException e) {
+            // Method不在当前类定义,继续向上转型
+        }
+        for (Class<?> clazz : intfClass.getInterfaces()) {
+            return getIntefacesAccessibleMethod(clazz, methodName, parameterTypes);
+        }
         return null;
     }
 
@@ -224,9 +260,7 @@ public class ReflectionUtils {
      */
     @SuppressWarnings("rawtypes")
     public static Class getSuperClassGenricType(final Class clazz, final int index) {
-
         Type genType = clazz.getGenericSuperclass();
-
         if (!(genType instanceof ParameterizedType)) {
             logger.warn(clazz.getSimpleName() + "'s superclass not ParameterizedType");
             return Object.class;
@@ -284,6 +318,26 @@ public class ReflectionUtils {
             return true;
         }
         return false;
+    }
+
+
+
+    /**
+     * 私有方法<br/>
+     * 递归获取接口及所有父接口中的所有方法,并强制设置为可访问，最后放入到methods对象中
+     * @param methods
+     * @param intfClasses
+     */
+    private static void getAccessibleMethodsRecursive(List<Method> methods, Class<?> intfClasses){
+        Assert.notNull(intfClasses, "intfClasses不能为空");
+        Assert.notNull(methods, "methods不能为空");
+        for(Method method : intfClasses.getDeclaredMethods()){
+            method.setAccessible(true);
+            methods.add(method);
+        }
+        for (Class<?> intfClass : intfClasses.getInterfaces()) {
+            getAccessibleMethodsRecursive(methods, intfClass);
+        }
     }
 }
 

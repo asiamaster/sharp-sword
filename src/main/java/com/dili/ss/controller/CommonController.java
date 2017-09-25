@@ -26,6 +26,7 @@ import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 
@@ -53,17 +54,35 @@ public class CommonController {
         //获取数据库表名
         String tableName = table == null ? POJOUtils.humpToLineFast(dtoClass.getSimpleName()) : table.name();
         StringBuilder stringBuilder = new StringBuilder("select ");
-        //根据字段信息拼接查询的字段，排除static和final的字段
-        for(Field field : ReflectionUtils.getAccessibleFields(dtoClass, true, true)){
-            //忽略Transient注解的字段
-            Transient aTransient = field.getAnnotation(Transient.class);
-            if(aTransient != null) {
-                continue;
+        if(dtoClass.isInterface()){
+            //根据字段信息拼接查询的字段，排除static和final的字段
+            for (Method method : ReflectionUtils.getAccessibleMethods(dtoClass)) {
+                if(!POJOUtils.isGetMethod(method)){
+                    continue;
+                }
+                //忽略Transient注解的字段
+                Transient aTransient = method.getAnnotation(Transient.class);
+                if (aTransient != null) {
+                    continue;
+                }
+                Column column = method.getAnnotation(Column.class);
+                String dbFieldName = column == null ? POJOUtils.humpToLineFast(POJOUtils.getBeanField(method)) : column.name();
+                stringBuilder.append(dbFieldName).append(" ").append(POJOUtils.getBeanField(method)).append(", ");
             }
-            Column column = field.getAnnotation(Column.class);
-            String dbFieldName = column == null ? POJOUtils.humpToLineFast(field.getName()) : column.name();
-            stringBuilder.append(dbFieldName).append(" ").append(field.getName()).append(", ");
+        }else {
+            //根据字段信息拼接查询的字段，排除static和final的字段
+            for (Field field : ReflectionUtils.getAccessibleFields(dtoClass, true, true)) {
+                //忽略Transient注解的字段
+                Transient aTransient = field.getAnnotation(Transient.class);
+                if (aTransient != null) {
+                    continue;
+                }
+                Column column = field.getAnnotation(Column.class);
+                String dbFieldName = column == null ? POJOUtils.humpToLineFast(field.getName()) : column.name();
+                stringBuilder.append(dbFieldName).append(" ").append(field.getName()).append(", ");
+            }
         }
+        //from之前的sql
         String beforeFromSql = stringBuilder.substring(0, stringBuilder.length()-2);
         stringBuilder = new StringBuilder(beforeFromSql);
         stringBuilder.append(" from ").append(tableName);
