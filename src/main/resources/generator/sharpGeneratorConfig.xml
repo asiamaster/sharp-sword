@@ -37,6 +37,9 @@
         <plugin type="com.dili.ss.mbg.MyProviderPlugin">
             <property name="targetProject" value="d:/tpl"></property>
             <property name="targetPackage" value="com.dili.ss.provider"></property>
+            <!-- 如果tableName属性存在，则会根据value中的数据库表名生成提供者 -->
+            <!-- 字段为id,provider_name,value,text,order_number -->
+            <property name="tableName" value="mbg_provider"></property>
         </plugin>
 
         <!-- Controller生成插件 -->
@@ -97,7 +100,7 @@
         <!--<table tableName="%" >-->
             <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
         <!--</table>-->
-        <table domainObjectName="ScheduleJob" tableName="schedule_job">
+        <table domainObjectName="ScheduleJob" tableName="mbg_provider">
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
         <!--<table domainObjectName="Person" tableName="person">-->
