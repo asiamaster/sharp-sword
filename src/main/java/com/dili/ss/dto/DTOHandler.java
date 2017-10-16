@@ -5,6 +5,7 @@ package com.dili.ss.dto;
  */
 
 import com.dili.ss.util.POJOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.Reader;
@@ -88,7 +89,7 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 					else if (Date.class.isAssignableFrom(returnType)) {
 						// 如果当前字段的值不是日期型, 转换返回值，并且将新的返回值填入委托对象中
 						if(String.class.equals(retval.getClass())){
-							retval = DateUtils.parseDate(retval.toString(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
+							retval = StringUtils.isNumeric(retval.toString()) ? new Date(Long.parseLong(retval.toString())) : DateUtils.parseDate(retval.toString(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
 						} else if (Long.class.equals(retval.getClass())) {
 							retval = new Date((Long)retval);
 						}

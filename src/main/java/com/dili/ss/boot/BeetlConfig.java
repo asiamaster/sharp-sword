@@ -64,7 +64,6 @@ public class BeetlConfig  {
         //并且在beetl.properties中改为RESOURCE.tagRoot =templates/htmltag,不然找不到html标签
         ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader("/");
         beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
-
         InputStream inputStream = BeetlConfig.class.getResourceAsStream("/conf/beetlSharedVars.properties");
         Properties p = new Properties();
         try {

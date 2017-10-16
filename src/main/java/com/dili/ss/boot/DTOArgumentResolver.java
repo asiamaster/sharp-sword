@@ -15,6 +15,7 @@ import java.util.Map;
 import static org.springframework.web.bind.support.WebArgumentResolver.UNRESOLVED;
 
 /**
+ * springMVC controller方法参数注入DTO
  * Created by asiamaster on 2017/8/2 0002.
  */
 //@Component

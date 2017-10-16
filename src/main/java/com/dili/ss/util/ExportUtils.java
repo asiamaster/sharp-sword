@@ -342,12 +342,14 @@ public class ExportUtils {
                             JSONObject valueJo = (JSONObject)entry.getValue();
                             //解决spring mvc参数注入@ModelAttribute Domain domain时，metadata作为Map类型的注入问题
                             for(Map.Entry<String,Object> tmpEntry:valueJo.entrySet()) {
-                                String value = tmpEntry.getValue() == null ? null : tmpEntry.getValue().toString();
-                                param.put(entry.getKey() + "[" +tmpEntry.getKey()+"]", value);
+                            	if(tmpEntry.getValue() == null) continue;
+                                param.put(entry.getKey() + "[" +tmpEntry.getKey()+"]", tmpEntry.getValue().toString());
                             }
                         }else {
-                            String value = entry.getValue() == null ? null : entry.getValue().toString();
-                            param.put(entry.getKey(),value);
+                        	//避免为空(null)的值(value)在okhttp调用时报错，这里就不传入了
+	                        if(entry.getValue() == null) continue;
+//                            String value = entry.getValue() == null ? null : entry.getValue().toString();
+                            param.put(entry.getKey(),entry.getValue().toString());
                         }
                     }
                 }

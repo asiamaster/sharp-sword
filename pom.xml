@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dili</groupId>
-    <version>1.5.4-SNAPSHOT</version>
+    <version>1.5.5-SNAPSHOT</version>
     <artifactId>sharp-sword</artifactId>
     <description>利刃</description>
     <packaging>jar</packaging>
@@ -371,7 +371,17 @@
             <artifactId>guava</artifactId>
             <version>23.0</version>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>bsh</groupId>
+            <artifactId>bsh</artifactId>
+            <version>2.0b4</version>
+        </dependency>
         <!--  ============================== spring boot starter ==============================  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
