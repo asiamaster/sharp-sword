@@ -16,3 +16,4 @@ mapper.Mapper=com.dili.ss.base.MyMapper
 myMapperConfig.Plugin=com.dili.ss.mbg.MyMapperConfigPlugin
 myService.Plugin=com.dili.ss.mbg.MyServicePlugin
 myController.Plugin=com.dili.ss.mbg.MyControllerPlugin
+myProvider.Plugin=com.dili.ss.mbg.MyProviderPlugin

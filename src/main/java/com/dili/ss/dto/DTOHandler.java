@@ -75,15 +75,24 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 					if (returnType.isPrimitive()) {
 						// 如果当前没有值,则取出初始值
 						if (retval == null) {
-							retval = POJOUtils.getPrimitiveDefault(returnType);
+							return POJOUtils.getPrimitiveDefault(returnType);
 							// 如果返回值却不是该类型,则需要对基进行转换
 						} else if (!returnType.equals(retval.getClass())) {
-							retval = POJOUtils.getPrimitiveValue(returnType, retval);
+							return POJOUtils.getPrimitiveValue(returnType, retval);
 						}
 					} // 如果是空就不处理
 					else if (retval == null){
-					} // 如果返回值要求是枚举，但是结果却是字符串是需在此进行转换
-					else if (returnType.isEnum() && retval instanceof String) {
+						return null;
+					} //如果是String型
+					else if(String.class.equals(returnType)){
+						return (String)retval;
+					}
+					//这里有可能不是String类型，但是通过aset方法传入一个空串，以下的类型都不接受空串，所以返回null
+					if(StringUtils.isBlank(retval.toString())){
+						return null;
+					}
+					// 如果返回值要求是枚举，但是结果却是字符串是需在此进行转换
+					if (returnType.isEnum() && retval instanceof String) {
 						retval = Enum.valueOf((Class<? extends Enum>) returnType, (String) retval);
 					} // 如果是日期型
 					else if (Date.class.isAssignableFrom(returnType)) {
@@ -114,9 +123,6 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 					}//如果是Clob型
 					else if(java.sql.Clob.class.equals(returnType)){
 						retval = getClobString((java.sql.Clob)retval);
-					}//如果是String型
-					else if(String.class.equals(returnType)){
-						retval = (String)retval;
 					}//如果是Instant型
 					else if (Instant.class.isAssignableFrom(returnType)){
 						if(String.class.equals(retval.getClass())){

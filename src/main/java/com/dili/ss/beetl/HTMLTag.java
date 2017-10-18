@@ -140,8 +140,6 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         request = (HttpServletRequest) this.ctx.getGlobal("request");
         Object temp = request.getAttribute(VS);
         this.status = temp == null ? RUN : (Integer) temp;
-
-
     }
 
     protected void setBinds(LinkedHashMap<String, Integer> binds) {
@@ -149,22 +147,16 @@ public class HTMLTag extends HTMLTagSupportWrapper {
     }
 
     protected void visitChild() {
-
-
         ByteWriter tempWriter = null;
         if (gt.getConf().isDirectByteOutput()) {
             tempWriter = new ByteWriter_Byte(new NoLockEmptyByteArrayOutputStream(), gt.getConf().getCharset(), ctx);
         } else {
             tempWriter = new ByteWriter_Char(new NoLockEmptyStringWriter(), gt.getConf().getCharset(), ctx);
-
         }
-
         ByteWriter realWriter = ctx.byteWriter;
         ctx.byteWriter = tempWriter;
         bs.execute(ctx);
         ctx.byteWriter = realWriter;
-
-
     }
 
     protected void runTemplateTag() {
@@ -223,8 +215,6 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         {
             callTag(tagFactory);
         }
-
-
     }
 
     public String toString() {

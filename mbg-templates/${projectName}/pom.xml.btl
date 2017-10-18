@@ -54,16 +54,15 @@
     <profiles>
         <profile>
             <id>dev</id>
-
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <build.profile.id>dev</build.profile.id>
             </properties>
         </profile>
         <profile>
             <id>test</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <build.profile.id>test</build.profile.id>
             </properties>
@@ -135,14 +134,14 @@
                     <dependency>
                         <groupId>com.dili</groupId>
                         <artifactId>sharp-sword</artifactId>
-                        <version>1.5.1-SNAPSHOT</version>
+                        <version>1.5.4-SNAPSHOT</version>
                         <!--<scope>system</scope>-->
-                        <!--<systemPath>\${\project.basedir}/lib/sharp-sword-1.5.1-SNAPSHOT.jar</systemPath>-->
+                        <!--<systemPath>\${\project.basedir}/lib/sharp-sword-1.5.4-SNAPSHOT.jar</systemPath>-->
                     </dependency>
                     <dependency>
                         <groupId>com.ibeetl</groupId>
                         <artifactId>beetl</artifactId>
-                        <version>2.7.3</version>
+                        <version>2.7.12</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -155,7 +154,7 @@
 		<dependency>
 			<groupId>com.dili</groupId>
 			<artifactId>sharp-sword</artifactId>
-			<version>1.5.1-SNAPSHOT</version>
+			<version>1.5.4-SNAPSHOT</version>
 		</dependency>
         <dependency>
             <groupId>org.mybatis.generator</groupId>
@@ -235,7 +234,7 @@
         <dependency>
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
-            <version>2.7.3</version>
+            <version>2.7.12</version>
         </dependency>
 
         <!-- fastjson -->

@@ -34,7 +34,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages={"com.dili.ss","com.dili.${appName}"})
 //@EnableEncryptableProperties
 //@PropertySource(name="EncryptedProperties", value = "classpath:security.properties")
-@EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:security.properties")
+//@EncryptablePropertySource(name = "EncryptedProperties", value = "classpath:security.properties")
 //@ServletComponentScan
 //@Import({DynamicRoutingDataSourceRegister.class}) // 注册动态多数据源
 /**
