@@ -128,6 +128,7 @@ public class ValueProviderUtils {
                 JSONObject jsonValue = JSONObject.parseObject(v.toString());
                 String providerBeanId  =jsonValue.get("provider").toString();
                 jsonValue.remove("provider");
+                jsonValue.put("_rowData", t);
                 if(buffer.containsKey(providerBeanId)){
                     valueProvider = buffer.get(providerBeanId);
                 }else {

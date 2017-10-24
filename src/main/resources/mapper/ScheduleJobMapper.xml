@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dili.ss.quartz.dao.ScheduleJobMapper">
+  <resultMap id="BaseResultMap" type="com.dili.ss.quartz.domain.ScheduleJob">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="modified" jdbcType="TIMESTAMP" property="modified" />
+    <result column="job_name" jdbcType="VARCHAR" property="jobName" />
+    <result column="job_group" jdbcType="VARCHAR" property="jobGroup" />
+    <result column="job_status" jdbcType="INTEGER" property="jobStatus" />
+    <result column="job_data" jdbcType="VARCHAR" property="jobData" />
+    <result column="cron_expression" jdbcType="VARCHAR" property="cronExpression" />
+    <result column="repeat_interval" jdbcType="INTEGER" property="repeatInterval" />
+    <result column="start_delay" jdbcType="INTEGER" property="startDelay" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="bean_class" jdbcType="VARCHAR" property="beanClass" />
+    <result column="spring_id" jdbcType="VARCHAR" property="springId" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="is_concurrent" jdbcType="INTEGER" property="isConcurrent" />
+    <result column="method_name" jdbcType="VARCHAR" property="methodName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    id, created, modified, job_name, job_group, job_status, job_data, cron_expression, 
+    repeat_interval, start_delay, description, bean_class, spring_id, url, is_concurrent, 
+    method_name
+  </sql>
+  <select id="selectBy" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    select 
+    <include refid="Base_Column_List" />
+    from schedule_job
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <update id="updateBy" parameterType="com.dili.ss.quartz.domain.ScheduleJob">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    update schedule_job
+    <set>
+      <if test="created != null">
+        created = #{created,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modified != null">
+        modified = #{modified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="jobName != null">
+        job_name = #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="jobGroup != null">
+        job_group = #{jobGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="jobStatus != null">
+        job_status = #{jobStatus,jdbcType=INTEGER},
+      </if>
+      <if test="jobData != null">
+        job_data = #{jobData,jdbcType=VARCHAR},
+      </if>
+      <if test="cronExpression != null">
+        cron_expression = #{cronExpression,jdbcType=VARCHAR},
+      </if>
+      <if test="repeatInterval != null">
+        repeat_interval = #{repeatInterval,jdbcType=INTEGER},
+      </if>
+      <if test="startDelay != null">
+        start_delay = #{startDelay,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="beanClass != null">
+        bean_class = #{beanClass,jdbcType=VARCHAR},
+      </if>
+      <if test="springId != null">
+        spring_id = #{springId,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="isConcurrent != null">
+        is_concurrent = #{isConcurrent,jdbcType=INTEGER},
+      </if>
+      <if test="methodName != null">
+        method_name = #{methodName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

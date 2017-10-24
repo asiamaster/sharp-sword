@@ -1,16 +1,18 @@
 package com.dili.ss.quartz.service;
 
-import com.dili.ss.util.SpringUtil;
+import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.quartz.domain.QuartzConstants;
 import com.dili.ss.quartz.domain.ScheduleJob;
 import com.dili.ss.quartz.job.QuartzJobDisallowConcurrentExecutionFactory;
 import com.dili.ss.quartz.job.QuartzJobFactory;
+import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -25,6 +27,7 @@ import java.util.Set;
  * Created by asiam on 2017/3/21 0021.
  */
 @Service
+@ConditionalOnProperty(name = "quartz.enabled")
 //public class JobTaskService{
 public class JobTaskService implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -98,7 +101,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
      * @throws SchedulerException
      */
     public void addJob(ScheduleJob job, boolean overwrite) throws SchedulerException {
-        if (job == null || ScheduleJob.STATUS_RUNNING.equals(job.getJobStatus())) {
+        if (job == null || QuartzConstants.JobStatus.PAUSED.getCode().equals(job.getJobStatus())) {
             return;
         }
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -107,7 +110,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
         Trigger trigger = scheduler.getTrigger(triggerKey);
         // 不存在，创建一个
         if (null == trigger) {
-            Class clazz = ScheduleJob.CONCURRENT_IS.equals(job.getIsConcurrent()) ? QuartzJobFactory.class : QuartzJobDisallowConcurrentExecutionFactory.class;
+            Class clazz = QuartzConstants.Concurrent.Async.getCode().equals(job.getIsConcurrent()) ? QuartzJobFactory.class : QuartzJobDisallowConcurrentExecutionFactory.class;
             JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(job.getJobName(), job.getJobGroup()).build();
             jobDetail.getJobDataMap().put(QuartzConstants.jobDataMapScheduleJobKey, job);
             ScheduleBuilder scheduleBuilder = null;
@@ -138,7 +141,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
                 // 按新的cronExpression表达式重新构建trigger
                 trigger = cronTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
             }
-            Class clazz = ScheduleJob.CONCURRENT_IS.equals(job.getIsConcurrent()) ? QuartzJobFactory.class : QuartzJobDisallowConcurrentExecutionFactory.class;
+            Class clazz = QuartzConstants.Concurrent.Async.getCode().equals(job.getIsConcurrent()) ? QuartzJobFactory.class : QuartzJobDisallowConcurrentExecutionFactory.class;
             JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(job.getJobName(), job.getJobGroup()).storeDurably(true).build();
 
 //            Flowable.fromArray(jobData).filter(s->!currentTargetIds.contains(s)).subscribe(ids ->currentTargetIds.addAll(ids));
@@ -165,7 +168,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
         List<JobExecutionContext> executingJobs = scheduler.getCurrentlyExecutingJobs();
         List<ScheduleJob> jobList = new ArrayList<ScheduleJob>(executingJobs.size());
         for (JobExecutionContext executingJob : executingJobs) {
-            ScheduleJob job = new ScheduleJob();
+            ScheduleJob job = DTOUtils.newDTO(ScheduleJob.class);
             JobDetail jobDetail = executingJob.getJobDetail();
             JobKey jobKey = jobDetail.getKey();
             Trigger trigger = executingJob.getTrigger();
@@ -272,7 +275,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
         for (JobKey jobKey : jobKeys) {
             List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
             for (Trigger trigger : triggers) {
-                ScheduleJob job = new ScheduleJob();
+                ScheduleJob job = DTOUtils.newDTO(ScheduleJob.class);
                 job.setJobName(jobKey.getName());
                 job.setJobGroup(jobKey.getGroup());
                 job.setDescription("触发器:" + trigger.getKey());

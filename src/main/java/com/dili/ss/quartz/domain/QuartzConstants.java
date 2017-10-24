@@ -12,6 +12,37 @@ public class QuartzConstants {
     public static final String jobDataMapScheduleJobKey = "JOB_DATA_MAPSCHEDULE_JOB_KEY";
 
 
+    public static enum Concurrent {
+        Sync(0,"同步"),
+        Async(1,"异步");
+
+        private Integer code ;
+
+        private String desc;
+
+        Concurrent(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public static Concurrent getConcurrent(Integer code) {
+            for (Concurrent concurrent : Concurrent.values()) {
+                if (concurrent.getCode().equals(code)) {
+                    return concurrent;
+                }
+            }
+            return null;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+    }
+
     public static enum JobStatus {
         NONE(0,"无"),
         NORMAL(1,"正常"),

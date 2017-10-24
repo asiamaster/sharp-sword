@@ -1,7 +1,12 @@
 <script type="text/javascript">
     //导出excel
-    function doExport(gridId){
-        var opts=$("#"+gridId).datagrid("options");
+    function doExport(gridId, isTreegrid){
+        var opts;
+        if(isTreegrid){
+            opts=$("#"+gridId).treegrid("options");
+        }else{
+            opts=$("#"+gridId).datagrid("options");
+        }
         //没有url就没有查询过，不作导出
         if(opts.url == null || opts.url == '')
             return;

@@ -14,8 +14,8 @@ import java.util.Properties;
  * 获取spring boot系统配置
  * Created by asiamaster on 2017/6/29 0029.
  */
-public class SystemConfig {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SystemConfig.class);
+public class SystemConfigUtils {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SystemConfigUtils.class);
 	private static Properties props ;
 
 	static{

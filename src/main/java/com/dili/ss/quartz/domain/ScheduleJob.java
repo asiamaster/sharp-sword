@@ -1,316 +1,149 @@
 package com.dili.ss.quartz.domain;
 
-import com.dili.ss.domain.BaseDomain;
+import com.dili.ss.dto.IBaseDomain;
+import com.dili.ss.metadata.FieldEditor;
+import com.dili.ss.metadata.annotation.EditMode;
+import com.dili.ss.metadata.annotation.FieldDef;
 
 import javax.persistence.*;
 import java.util.Date;
 
 /**
- * @Author: wangmi
-*  @Description: 计划任务信息
+ * 由MyBatis Generator工具自动生成
+ * 
+ * This file was generated on 2017-10-24 09:32:32.
  */
-@Table(name = "schedule_job")
-public class ScheduleJob extends BaseDomain {
+@Table(name = "`schedule_job`")
+public interface ScheduleJob extends IBaseDomain {
+//    //无
+//    public static final Integer STATUS_NONE = 0;
+//    //正常
+//    public static final Integer STATUS_RUNNING = 1;
+//    //暂停
+//    public static final Integer STATUS_PAUSE = 2;
+//    //完成
+//    public static final Integer STATUS_COMPLETE = 3;
+//    //错误
+//    public static final Integer STATUS_ERROR = 4;
+//    //阻塞
+//    public static final Integer STATUS_BLOCK = 5;
+//
+//    //异步
+//    public static final Integer CONCURRENT_IS = 1;
+//    //同步
+//    public static final Integer CONCURRENT_NOT = 0;
 
-	public static final Integer STATUS_RUNNING = 1;
-	public static final Integer STATUS_NOT_RUNNING = 0;
-	public static final Integer CONCURRENT_IS = 1;
-	public static final Integer CONCURRENT_NOT = 0;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "`id`")
+    @FieldDef(label="id")
+    @EditMode(editor = FieldEditor.Number, required = true)
+    Long getId();
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    void setId(Long id);
 
-	private Date created;
+    @Column(name = "`created`")
+    @FieldDef(label="创建时间")
+    @EditMode(editor = FieldEditor.Datetime, required = true)
+    Date getCreated();
 
-	private Date modified;
+    void setCreated(Date created);
 
-	@Column(name = "job_name")
-	private String jobName;
+    @Column(name = "`modified`")
+    @FieldDef(label="修改时间")
+    @EditMode(editor = FieldEditor.Datetime, required = true)
+    Date getModified();
 
-	@Column(name = "job_group")
-	private String jobGroup;
+    void setModified(Date modified);
 
-	/**
-	 * 是否启动任务
-	 */
-	@Column(name = "job_status")
-	private Integer jobStatus;
+    @Column(name = "`job_name`")
+    @FieldDef(label="任务名", maxLength = 40)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getJobName();
 
-	/**
-	 * 任务数据(JSON)
-	 */
-	@Column(name = "job_data")
-	private String jobData;
+    void setJobName(String jobName);
 
-	@Column(name = "cron_expression")
-	private String cronExpression;
+    @Column(name = "`job_group`")
+    @FieldDef(label="任务分组", maxLength = 40)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getJobGroup();
 
-	@Column(name = "repeat_interval")
-	private Integer repeatInterval;
+    void setJobGroup(String jobGroup);
 
-	@Column(name = "start_delay")
-	private Integer startDelay;
+    @Column(name = "`job_status`")
+    @FieldDef(label="任务状态")
+    @EditMode(editor = FieldEditor.Combo, required = false, params="{\"data\":[{\"text\":\"无\",\"value\":0},{\"text\":\"正常\",\"value\":1},{\"text\":\"暂停\",\"value\":2},{\"text\":\"完成\",\"value\":3},{\"text\":\"错误\",\"value\":4},{\"text\":\"阻塞\",\"value\":5}],\"provider\":\"jobStatusProvider\"}")
+    Integer getJobStatus();
 
-	private String description;
+    void setJobStatus(Integer jobStatus);
 
-	/**
-	 * 任务执行时调用哪个类的方法 包名+类名
-	 */
-	@Column(name = "bean_class")
-	private String beanClass;
+    @Column(name = "`job_data`")
+    @FieldDef(label="json", maxLength = 1000)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getJobData();
 
-	/**
-	 * 以后会支持远程调用restful url
-	 */
-	private String url;
+    void setJobData(String jobData);
 
-	@Column(name = "is_concurrent")
-	private Integer isConcurrent;
+    @Column(name = "`cron_expression`")
+    @FieldDef(label="cron表达式", maxLength = 40)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getCronExpression();
 
-	@Column(name = "spring_id")
-	private String springId;
+    void setCronExpression(String cronExpression);
 
-	@Column(name = "method_name")
-	private String methodName;
+    @Column(name = "`repeat_interval`")
+    @FieldDef(label="重复间隔(s)")
+    @EditMode(editor = FieldEditor.Number, required = false)
+    Integer getRepeatInterval();
 
-	/**
-	 * @return id
-	 */
-	public Long getId() {
-		return id;
-	}
+    void setRepeatInterval(Integer repeatInterval);
 
-	/**
-	 * @param id
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Column(name = "`start_delay`")
+    @FieldDef(label="启动间隔(s)")
+    @EditMode(editor = FieldEditor.Number, required = false)
+    Integer getStartDelay();
 
-	/**
-	 * @return created
-	 */
-	public Date getCreated() {
-		return created;
-	}
+    void setStartDelay(Integer startDelay);
 
-	/**
-	 * @param created
-	 */
-	public void setCreated(Date created) {
-		this.created = created;
-	}
+    @Column(name = "`description`")
+    @FieldDef(label="描述", maxLength = 200)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getDescription();
 
-	/**
-	 * @return modified
-	 */
-	public Date getModified() {
-		return modified;
-	}
+    void setDescription(String description);
 
-	/**
-	 * @param modified
-	 */
-	public void setModified(Date modified) {
-		this.modified = modified;
-	}
+    @Column(name = "`bean_class`")
+    @FieldDef(label="调用类全名", maxLength = 100)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getBeanClass();
 
-	/**
-	 * @return job_name
-	 */
-	public String getJobName() {
-		return jobName;
-	}
+    void setBeanClass(String beanClass);
 
-	/**
-	 * @param jobName
-	 */
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
-	}
+    @Column(name = "`spring_id`")
+    @FieldDef(label="SpringBeanId", maxLength = 40)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getSpringId();
 
-	/**
-	 * @return job_group
-	 */
-	public String getJobGroup() {
-		return jobGroup;
-	}
+    void setSpringId(String springId);
 
-	/**
-	 * @param jobGroup
-	 */
-	public void setJobGroup(String jobGroup) {
-		this.jobGroup = jobGroup;
-	}
+    @Column(name = "`url`")
+    @FieldDef(label="url", maxLength = 100)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getUrl();
 
-	/**
-	 * 获取是否启动任务
-	 *
-	 * @return job_status - 是否启动任务
-	 */
-	public Integer getJobStatus() {
-		return jobStatus;
-	}
+    void setUrl(String url);
 
-	/**
-	 * 设置是否启动任务
-	 *
-	 * @param jobStatus 是否启动任务
-	 */
-	public void setJobStatus(Integer jobStatus) {
-		this.jobStatus = jobStatus;
-	}
+    @Column(name = "`is_concurrent`")
+    @FieldDef(label="同步/异步")
+    @EditMode(editor = FieldEditor.Combo, required = false, params="{\"data\":[{\"text\":\"同步\",\"value\":0},{\"text\":\"并发\",\"value\":1}],\"provider\":\"isConcurrentProvider\"}")
+    Integer getIsConcurrent();
 
-	/**
-	 * 获取任务数据(JSON)
-	 *
-	 * @return job_data - 任务数据(JSON)
-	 */
-	public String getJobData() {
-		return jobData;
-	}
+    void setIsConcurrent(Integer isConcurrent);
 
-	/**
-	 * 设置任务数据(JSON)
-	 *
-	 * @param jobData 任务数据(JSON)
-	 */
-	public void setJobData(String jobData) {
-		this.jobData = jobData;
-	}
+    @Column(name = "`method_name`")
+    @FieldDef(label="方法名", maxLength = 40)
+    @EditMode(editor = FieldEditor.Text, required = false)
+    String getMethodName();
 
-	/**
-	 * @return cron_expression
-	 */
-	public String getCronExpression() {
-		return cronExpression;
-	}
-
-	/**
-	 * @param cronExpression
-	 */
-	public void setCronExpression(String cronExpression) {
-		this.cronExpression = cronExpression;
-	}
-
-	/**
-	 * @return repeat_interval
-	 */
-	public Integer getRepeatInterval() {
-		return repeatInterval;
-	}
-
-	/**
-	 * @param repeatInterval
-	 */
-	public void setRepeatInterval(Integer repeatInterval) {
-		this.repeatInterval = repeatInterval;
-	}
-
-	/**
-	 * @return start_delay
-	 */
-	public Integer getStartDelay() {
-		return startDelay;
-	}
-
-	/**
-	 * @param startDelay
-	 */
-	public void setStartDelay(Integer startDelay) {
-		this.startDelay = startDelay;
-	}
-
-	/**
-	 * @return description
-	 */
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 * @param description
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	/**
-	 * 获取任务执行时调用哪个类的方法 包名+类名
-	 *
-	 * @return bean_class - 任务执行时调用哪个类的方法 包名+类名
-	 */
-	public String getBeanClass() {
-		return beanClass;
-	}
-
-	/**
-	 * 设置任务执行时调用哪个类的方法 包名+类名
-	 *
-	 * @param beanClass 任务执行时调用哪个类的方法 包名+类名
-	 */
-	public void setBeanClass(String beanClass) {
-		this.beanClass = beanClass;
-	}
-
-	/**
-	 * 获取以后会支持远程调用restful url
-	 *
-	 * @return url - 以后会支持远程调用restful url
-	 */
-	public String getUrl() {
-		return url;
-	}
-
-	/**
-	 * 设置以后会支持远程调用restful url
-	 *
-	 * @param url 以后会支持远程调用restful url
-	 */
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	/**
-	 * @return is_concurrent
-	 */
-	public Integer getIsConcurrent() {
-		return isConcurrent;
-	}
-
-	/**
-	 * @param isConcurrent
-	 */
-	public void setIsConcurrent(Integer isConcurrent) {
-		this.isConcurrent = isConcurrent;
-	}
-
-	/**
-	 * @return spring_id
-	 */
-	public String getSpringId() {
-		return springId;
-	}
-
-	/**
-	 * @param springId
-	 */
-	public void setSpringId(String springId) {
-		this.springId = springId;
-	}
-
-	/**
-	 * @return method_name
-	 */
-	public String getMethodName() {
-		return methodName;
-	}
-
-	/**
-	 * @param methodName
-	 */
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}
+    void setMethodName(String methodName);
 }
