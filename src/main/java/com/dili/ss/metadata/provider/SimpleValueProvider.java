@@ -10,6 +10,7 @@ import com.dili.ss.util.SpringUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
  * Created by asiamaster on 2017/5/29 0029.
  */
 @Component
+@Scope("prototype")
 public class SimpleValueProvider implements ValueProvider {
     //    字段所在的表
     private String table;

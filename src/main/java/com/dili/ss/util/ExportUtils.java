@@ -22,10 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -156,12 +153,13 @@ public class ExportUtils {
         }
     }
 
-    /**
-     * 构建数据列
-     * @param exportParam
-     * @param workbook
-     * @param sheet
-     */
+	/**
+	 * 构建数据列
+	 * @param exportParam
+	 * @param workbook
+	 * @param sheet
+	 * @param request
+	 */
     private void buildData(ExportParam exportParam, SXSSFWorkbook workbook, Sheet sheet, HttpServletRequest request){
         //渲染数据列
         CellStyle dataColumnStyle = getDataColumnStyle(workbook);//获取列头样式对象
@@ -170,13 +168,13 @@ public class ExportUtils {
         String url = exportParam.getUrl().startsWith("/") ? exportParam.getUrl() : "/" + exportParam.getUrl();
 //        Map<String, String> queryParams = exportParam.getQueryParams();
         //先获取总数
-        int total = getCount(basePath+url, exportParam.getQueryParams());
+        int total = getCount(basePath+url, exportParam.getQueryParams(), request);
         //查询次数
         int queryCount = total % FETCH_COUNT == 0 ? total/ FETCH_COUNT : total/ FETCH_COUNT +1;
 
         //如果只查一次，就不启线程了，直接在主线程查
         if(queryCount == 1) {
-	        JSONArray rowDatas = new ExportDataThread(0, exportParam.getQueryParams(), basePath + url).queryThreadData();
+	        JSONArray rowDatas = new ExportDataThread(0, exportParam.getQueryParams(), basePath + url, request).queryThreadData();
 	        buildSingleData(0, exportParam.getColumns(), rowDatas, sheet, dataColumnStyle);
         }else {
 	        //分别进行取数
@@ -186,7 +184,7 @@ public class ExportUtils {
 		        //注意这里直接使用exportParam.getQueryParams()会产生多线程并发缺陷，所有深putAll进行半深拷贝
 		        //然而putAll也不完全是深拷贝，但它的性能优于字节拷贝，它只能深拷贝基本类型，不过这里也只有基本类型
 		        queryParams.putAll(exportParam.getQueryParams());
-		        Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, basePath + url));
+		        Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, basePath + url, request));
 		        futures.add(future);
 	        }
 	        int current = 0;
@@ -240,11 +238,13 @@ public class ExportUtils {
     	int current;
 		Map<String, String> queryParams;
 	    String exportUrl;
+		HttpServletRequest request;
 
-	    ExportDataThread(int current, Map<String, String> queryParams, String exportUrl) {
+	    ExportDataThread(int current, Map<String, String> queryParams, String exportUrl, HttpServletRequest request) {
 	    	this.current = current;
 	    	this.queryParams = queryParams;
 	    	this.exportUrl = exportUrl;
+	    	this.request = request;
 	    }
 
 	    @Override
@@ -256,16 +256,33 @@ public class ExportUtils {
 	    private JSONArray queryThreadData(){
 		    queryParams.put("page", String.valueOf(current+1));
 		    queryParams.put("rows", String.valueOf(FETCH_COUNT));
-		    String json = syncExecute(exportUrl, queryParams, "POST");
-		    return (JSONArray) JSON.parseObject(json).get("rows");
+		    String json = syncExecute(exportUrl, queryParams, "POST", request);
+		    //简单判断是JSONArray的话，就是不分页的list查询，总数直接取JSONArray
+		    if(json.trim().startsWith("[") && json.trim().endsWith("]")){
+			    return JSON.parseArray(json);
+		    }else {
+			    return (JSONArray) JSON.parseObject(json).get("rows");
+		    }
 	    }
     }
 
-    private int getCount(String url, Map<String, String> queryParams){
+	/**
+	 * 获取当前需要导出的总数
+	 * @param url
+	 * @param queryParams
+	 * @param request   为了数据权限
+	 * @return
+	 */
+	private int getCount(String url, Map<String, String> queryParams, HttpServletRequest request){
         queryParams.put("page", "1");
         queryParams.put("rows", "1");
-        String json = syncExecute(url, queryParams, "POST");
-        return (int)JSON.parseObject(json).get("total");
+        String json = syncExecute(url, queryParams, "POST", request);
+        //简单判断是JSONArray的话，就是不分页的list查询，总数直接取JSONArray的长度
+        if(json.trim().startsWith("[") && json.trim().endsWith("]")){
+        	return JSON.parseArray(json).size();
+        }else {
+	        return (int) JSON.parseObject(json).get("total");
+        }
     }
 
     /**
@@ -311,17 +328,28 @@ public class ExportUtils {
         }
     }
 
-    /**
-     * 同步调用远程方法
-     * @param url
-     * @param paramObj
-     * @param httpMethod
-     */
-    private String syncExecute(String url, Object paramObj, String httpMethod){
+	/**
+	 * 同步调用远程方法
+	 * @param url
+	 * @param paramObj
+	 * @param httpMethod
+	 * @param request   为了数据权限
+	 * @return
+	 */
+    private String syncExecute(String url, Object paramObj, String httpMethod, HttpServletRequest request){
         Response resp = null;
         try{
             Map<String, String> headersMap = new HashMap<>();
-            headersMap.put("Content-Type", "application/json;charset=utf-8");
+//            headersMap.put("Content-Type", "application/json;charset=utf-8");
+//	            传入权限的SessionConstants.SESSION_ID(值为SessionId，需要注意和权限系统同步，毕竟框架不依赖权限系统)
+	        if(request != null) {
+		        Enumeration<String> enumeration = request.getHeaderNames();
+//		            param.put("SessionId", request.getHeader("SessionId"));
+		        while(enumeration.hasMoreElements()) {
+			        String key = enumeration.nextElement();
+			        headersMap.put(key, request.getHeader(key));
+		        }
+	        }
 
             if("POST".equalsIgnoreCase(httpMethod)){
                 JSONObject paramJo = (JSONObject)JSONObject.toJSON(paramObj);
@@ -354,7 +382,7 @@ public class ExportUtils {
                     }
                 }
                 resp = OkHttpUtils
-                        .post()
+                        .post().headers(headersMap)
                         .url(url).params(param)
 //                        .mediaType(MediaType.parse("application/json; charset=utf-8"))
 //                        .mediaType(MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8"))
@@ -362,7 +390,7 @@ public class ExportUtils {
                         .execute();
             }else{ //GET方式
                 resp = OkHttpUtils
-                        .get()
+                        .get().headers(headersMap)
                         .url(url).params((Map)JSON.toJSON(paramObj))
                         .build()
                         .execute();

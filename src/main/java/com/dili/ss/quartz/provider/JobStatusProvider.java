@@ -42,7 +42,7 @@ public class JobStatusProvider implements ValueProvider {
     public String getDisplayText(Object obj, Map metaMap, FieldMeta fieldMeta) {
         if(obj == null || obj.equals("")) return null;
         for(ValuePair<?> valuePair : buffer){
-            if(obj.toString().equals(valuePair.getValue())){
+            if(obj.equals(valuePair.getValue())){
                 return valuePair.getText();
             }
         }

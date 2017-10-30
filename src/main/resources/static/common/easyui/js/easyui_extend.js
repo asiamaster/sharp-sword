@@ -1,7 +1,33 @@
-//============================  属性定义  ============================
-
+//============================  原型定义  ============================
+Array.prototype.contains = function(val){
+    for (var i = 0; i < this.length; i++){
+        if (this[i] == val){
+            return true;
+        }
+    }
+    return false;
+};
 
 //============================  方法定义  ============================
+
+//textbox有数据修改时也要显示清空按钮
+function _changeTextboxShowClear(newValue, oldValue) {
+    var icon = $(this).textbox('getIcon',0);
+    if(!newValue || newValue == null || newValue == ""){
+        icon.css('visibility','hidden');
+    } else {
+        icon.css('visibility','visible');
+    }
+}
+//判断textbox中icons对象数组中是否存在iconCls
+function _containsIconCls(iconsArr, iconCls){
+    for (var i = 0; i < iconsArr.length; i++) {
+        if (iconsArr[i]["iconCls"] == iconCls) {
+            return true;
+        }
+    }
+    return false;
+}
 
 //表格日期格式化器
 function dateFormatter(value) {
@@ -163,7 +189,11 @@ var treeLoadFilter = function(data,parent){
 var treegridLoadFilter = function(data,parent){
     var parentIdField = $(this).treegrid("options")["_parentIdField"];
     if(parentIdField && parentIdField != null && parentIdField != ""){
-        modifyJsonKey(data.rows,parentIdField,"_parentId");
+        if(data.rows){
+            modifyJsonKey(data.rows,parentIdField,"_parentId");
+        }else{
+            modifyJsonKey(data,parentIdField,"_parentId");
+        }
     }
     return data;
 }
@@ -233,6 +263,7 @@ $(function() {
         var sec = date.getSeconds();
         return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d)+' '+(h<10?('0'+h):h)+':'+(min<10?('0'+min):min)+':'+(sec<10?('0'+sec):sec);
     }
+
     //文本框添加清空按钮
     $.extend($.fn.textbox.methods, {
         addClearBtn: function(jq, iconCls){
@@ -240,15 +271,17 @@ $(function() {
                 var t = $(this);
                 var opts = t.textbox('options');
                 opts.icons = opts.icons || [];
-                opts.icons.unshift({
-                    iconCls: iconCls,
-                    handler: function(e){
-                        $(e.data.target).textbox('clear').textbox('textbox').focus();
-                        $(this).css('visibility','hidden');
-                    }
-                });
+                if(!_containsIconCls(opts.icons, iconCls)){
+                    opts.icons.unshift({
+                        iconCls: iconCls,
+                        handler: function(e){
+                            $(e.data.target).textbox('clear').textbox('textbox').focus();
+                            $(this).css('visibility','hidden');
+                        }
+                    });
+                }
                 t.textbox();
-                if (!t.textbox('getText')){
+                if (!t.textbox('getText') || t.textbox('getText') == ""){
                     t.textbox('getIcon',0).css('visibility','hidden');
                 }
                 t.textbox('textbox').bind('keyup', function(){

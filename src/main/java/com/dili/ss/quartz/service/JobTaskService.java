@@ -97,7 +97,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
      * 添加任务
      *
      * @param job   任务属性
-     * @param overwrite 是否覆盖原数据
+     * @param overwrite 是否覆盖原JobData数据
      * @throws SchedulerException
      */
     public void addJob(ScheduleJob job, boolean overwrite) throws SchedulerException {
@@ -146,6 +146,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
 
 //            Flowable.fromArray(jobData).filter(s->!currentTargetIds.contains(s)).subscribe(ids ->currentTargetIds.addAll(ids));
             jobDetail.getJobDataMap().put(QuartzConstants.jobDataMapScheduleJobKey, job);
+            //这里是反的，如果不覆盖，才取出以前的数据，再填回去
             if(!overwrite) {
                 ScheduleJob currentScheduleJob = (ScheduleJob)scheduler.getJobDetail(JobKey.jobKey(job.getJobName(),job.getJobGroup())).getJobDataMap().get(QuartzConstants.jobDataMapScheduleJobKey);
                 job.setJobData(currentScheduleJob.getJobData());
@@ -316,11 +317,16 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
         Trigger trigger = null;
-        //优先执行有表达式的job，没有表达多则使用简单调度器，间隔调度
-        if (StringUtils.isBlank(scheduleJob.getCronExpression())) {
-            trigger = (SimpleTrigger)scheduler.getTrigger(triggerKey);
-        }else{
-            trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+//        if (StringUtils.isBlank(scheduleJob.getCronExpression())) {
+//            trigger = (SimpleTrigger)scheduler.getTrigger(triggerKey);
+//        }else{
+//            trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+//        }
+        trigger = scheduler.getTrigger(triggerKey);
+        //如果不存在trigger(可能是从数据源读取出来的信息，而调度器中并不存在)，则新增调度信息
+        if(trigger == null) {
+            addJob(scheduleJob, true);
+            return;
         }
         //优先执行有表达式的job，没有表达多则使用简单调度器，间隔调度
         if (StringUtils.isBlank(scheduleJob.getCronExpression())) {

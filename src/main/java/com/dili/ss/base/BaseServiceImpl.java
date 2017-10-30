@@ -6,12 +6,14 @@ import com.dili.ss.domain.BasePage;
 import com.dili.ss.domain.EasyuiPageOutput;
 import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
+import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.metadata.ValueProviderUtils;
 import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -337,6 +339,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 	 */
 	private void buildExampleByGetterMethods(T domain, Class tClazz, Example example){
 		Example.Criteria criteria = example.createCriteria();
+		tClazz = DTOUtils.getDTOClass(domain);
 		List<Method> methods = new ArrayList<>();
 		getDeclaredMethod(tClazz, methods);
 		for(Method method : methods){
@@ -380,6 +383,9 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 				}
 			}else if(operator != null){
 				if(operator.value().equals(Operator.IN)){
+					if(value instanceof List && CollectionUtils.isEmpty((List)value)){
+						continue;
+					}
 					StringBuilder sb = new StringBuilder();
 					if(Collection.class.isAssignableFrom(fieldType)){
 						for(Object o : (Collection)value){
@@ -392,7 +398,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 					}else{
 						sb.append(", ").append(value);
 					}
-					criteria = criteria.andCondition(columnName + " " + operator.value() + "("+sb.substring(1)+")");
+					criteria = criteria.andCondition(columnName + " " + operator.value() + "(" + sb.substring(1) + ")");
 				}else {
 					criteria = criteria.andCondition(columnName + " " + operator.value() + " '" + value + "' ");
 				}
