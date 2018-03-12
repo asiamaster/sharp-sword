@@ -24,7 +24,7 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
  * Created by asiamastor on 2017/1/3.
  */
 @Configuration
-@ConfigurationProperties(prefix = "spring.data.mongodb", ignoreInvalidFields=true)
+@ConfigurationProperties(prefix = "spring.data.mongodb")
 @ConditionalOnExpression("'${mongodb.enable}'=='true'")
 public class SpringMongoConfig extends AbstractMongoConfiguration {
 

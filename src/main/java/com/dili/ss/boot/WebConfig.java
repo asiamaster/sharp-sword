@@ -38,25 +38,6 @@ import java.util.List;
 public class WebConfig extends WebMvcConfigurerAdapter {
 //	public class CSRFInterceptorConfig extends WebMvcConfigurationSupport {
 
-	@Autowired
-	private CSRFInterceptorProperties csrfInterceptorProperties;
-	@Resource
-	private CSRFInterceptor csrfInterceptor;
-
-	/**
-	 * 配置拦截器
-	 *
-	 * @param registry
-	 */
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		if (csrfInterceptorProperties.getEnable()) {
-			registry.addInterceptor(csrfInterceptor)
-					.addPathPatterns(csrfInterceptorProperties.getPaths().toArray(new String[csrfInterceptorProperties.getPaths().size()]))
-					.excludePathPatterns(csrfInterceptorProperties.getExcludePaths().toArray(new String[csrfInterceptorProperties.getExcludePaths().size()]));
-		}
-	}
-
 	@Bean
 	public Converter<String, Date> addDateConvert() {
 		return new Converter<String, Date>() {
