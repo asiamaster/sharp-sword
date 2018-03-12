@@ -57,7 +57,7 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
     }
 
     @Override
-    public Mongo mongo() throws Exception {
+    public MongoClient mongo() {
         if(StringUtils.isBlank(password) || StringUtils.isBlank(username)){
             return new MongoClient(host, port);
         }else {
@@ -65,6 +65,7 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
         }
     }
 
+    @Override
     @Bean
     public MongoTemplate mongoTemplate() {
         // overwrite type mbg to get rid of the _class column

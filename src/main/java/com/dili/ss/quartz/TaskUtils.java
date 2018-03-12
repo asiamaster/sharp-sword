@@ -14,7 +14,8 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * @Description: 调用任务方法
  */
 public class TaskUtils {
-	public final static Logger log = Logger.getLogger(TaskUtils.class);
+	public final static Logger log = LoggerFactory.getLogger(TaskUtils.class);
 	static OkHttpClient okHttpClient = null;
 	static{
 		okHttpClient = new OkHttpClient.Builder()
@@ -95,7 +96,7 @@ public class TaskUtils {
 				method.invoke(targetObj, scheduleMessage);
 			}
 		} catch (Exception e) {
-			log.error("任务名称 = [" + scheduleJob.getJobName() + "]---------------未启动成功，调度参数设置错误！！！");
+			log.error("任务名称 = [" + scheduleJob.getJobName() + "]---------------未启动成功，调度参数设置错误！异常:"+e.getMessage());
 		}
 
 	}

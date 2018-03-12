@@ -15,5 +15,5 @@ public @interface Like {
     public static final String LEFT="LEFT";
     public static final String RIGHT="RIGHT";
     public static final String BOTH="BOTH";
-    String value() default "";
+    String value() default BOTH;
 }

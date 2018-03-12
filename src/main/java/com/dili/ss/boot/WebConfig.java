@@ -2,6 +2,7 @@ package com.dili.ss.boot;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.dili.ss.servlet.CSRFInterceptor;
+import com.dili.ss.util.SystemConfigUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
@@ -10,10 +11,9 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
@@ -26,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 配置csrfInterceptor.enable=true启用CSRF攻击拦截<br></>
@@ -36,26 +37,6 @@ import java.util.List;
 @ConditionalOnExpression("'${web.enable}'=='true'")
 //@EnableWebMvc //不能使用@EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
-//	public class CSRFInterceptorConfig extends WebMvcConfigurationSupport {
-
-	@Autowired
-	private CSRFInterceptorProperties csrfInterceptorProperties;
-	@Resource
-	private CSRFInterceptor csrfInterceptor;
-
-	/**
-	 * 配置拦截器
-	 *
-	 * @param registry
-	 */
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		if (csrfInterceptorProperties.getEnable()) {
-			registry.addInterceptor(csrfInterceptor)
-					.addPathPatterns(csrfInterceptorProperties.getPaths().toArray(new String[csrfInterceptorProperties.getPaths().size()]))
-					.excludePathPatterns(csrfInterceptorProperties.getExcludePaths().toArray(new String[csrfInterceptorProperties.getExcludePaths().size()]));
-		}
-	}
 
 	@Bean
 	public Converter<String, Date> addDateConvert() {
@@ -154,5 +135,28 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		argumentResolvers.add(new DTOArgumentResolver());
 	}
 
+
+	/**
+	 * 统一错误页面处理
+	 * 配置:
+	 * error.page.default=error/default (错误页面的controller返回地址)
+	 * error.page.indexPage=http://crm.diligrp.com:8085/crm/index.html (返回首页地址)
+	 *
+	 */
+	@Bean
+	public SimpleMappingExceptionResolver simpleMappingExceptionResolver(){
+		SimpleMappingExceptionResolver simpleMappingExceptionResolver = new SimpleMappingExceptionResolver();
+//		定义默认的异常处理页面
+		simpleMappingExceptionResolver.setDefaultErrorView("error/default");
+//		定义异常处理页面用来获取异常信息的变量名，如果不添加exceptionAttribute属性，则默认为exception
+		simpleMappingExceptionResolver.setExceptionAttribute("exception");
+//		定义需要特殊处理的异常，用类名或完全路径名作为key，异常页面名作为值
+		Properties mappings = new Properties();
+		mappings.put("java.lang.RuntimeException", SystemConfigUtils.getProperty("error.page.default", "error/default"));
+		mappings.put("java.lang.Exception", SystemConfigUtils.getProperty("error.page.default", "error/default"));
+		mappings.put("java.lang.Throwable", SystemConfigUtils.getProperty("error.page.default", "error/default"));
+		simpleMappingExceptionResolver.setExceptionMappings(mappings);
+		return simpleMappingExceptionResolver;
+	}
 
 }

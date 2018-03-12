@@ -9,6 +9,7 @@ import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,7 +102,8 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
      * @throws SchedulerException
      */
     public void addJob(ScheduleJob job, boolean overwrite) throws SchedulerException {
-        if (job == null || QuartzConstants.JobStatus.PAUSED.getCode().equals(job.getJobStatus())) {
+//        if (job == null || QuartzConstants.JobStatus.PAUSED.getCode().equals(job.getJobStatus())) {
+        if (job == null) {
             return;
         }
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -116,7 +118,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
             ScheduleBuilder scheduleBuilder = null;
             //优先执行有表达式的job，没有表达式则使用简单调度器，间隔调度
             if (StringUtils.isBlank(job.getCronExpression())) {
-                scheduleBuilder = SimpleScheduleBuilder.simpleSchedule().repeatSecondlyForever(job.getRepeatInterval());
+                scheduleBuilder = SimpleScheduleBuilder.repeatSecondlyForever(job.getRepeatInterval());
             } else {
                 scheduleBuilder = CronScheduleBuilder.cronSchedule(job.getCronExpression());
             }
@@ -131,7 +133,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
             //优先执行有表达式的job，没有表达式则使用简单调度器，间隔调度
             if (StringUtils.isBlank(job.getCronExpression())) {
                 //按新的间隔构建trigger
-                SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule().repeatSecondlyForever(job.getRepeatInterval());
+                SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.repeatSecondlyForever(job.getRepeatInterval());
                 SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
                 trigger = simpleTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
             } else {
@@ -274,25 +276,40 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
         Set<JobKey> jobKeys = scheduler.getJobKeys(matcher);
         List<ScheduleJob> jobList = new ArrayList<ScheduleJob>();
         for (JobKey jobKey : jobKeys) {
+            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+            ScheduleJob scheduleJob = (ScheduleJob) jobDetail.getJobDataMap().get(QuartzConstants.jobDataMapScheduleJobKey);
             List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
             for (Trigger trigger : triggers) {
-                ScheduleJob job = DTOUtils.newDTO(ScheduleJob.class);
-                job.setJobName(jobKey.getName());
-                job.setJobGroup(jobKey.getGroup());
-                job.setDescription("触发器:" + trigger.getKey());
-                Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
-//                QuartzConstants.JobStatus的code和triggerState.ordinal()完成对应
-                job.setJobStatus(triggerState.ordinal());
-
-                if (trigger instanceof CronTrigger) {
-                    CronTrigger cronTrigger = (CronTrigger) trigger;
-                    String cronExpression = cronTrigger.getCronExpression();
-                    job.setCronExpression(cronExpression);
+                if(jobKey.equals(trigger.getJobKey())){
+                    scheduleJob.setJobStatus(scheduler.getTriggerState(trigger.getKey()).ordinal());
                 }
-                jobList.add(job);
             }
+            jobList.add(scheduleJob);
         }
         return jobList;
+//        for (JobKey jobKey : jobKeys) {
+//            List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
+//            for (Trigger trigger : triggers) {
+//                ScheduleJob job = DTOUtils.newDTO(ScheduleJob.class);
+//                job.setJobName(jobKey.getName());
+//                job.setJobGroup(jobKey.getGroup());
+//                job.setDescription("触发器:" + trigger.getKey());
+//                Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
+////                QuartzConstants.JobStatus的code和triggerState.ordinal()完成对应
+//                job.setJobStatus(triggerState.ordinal());
+//
+//                if (trigger instanceof CronTrigger) {
+//                    CronTrigger cronTrigger = (CronTrigger) trigger;
+//                    String cronExpression = cronTrigger.getCronExpression();
+//                    job.setCronExpression(cronExpression);
+//                } else if(trigger instanceof SimpleTrigger){
+//                    SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
+//                    job.setRepeatInterval(new Long(simpleTrigger.getRepeatInterval()/1000L).intValue());
+//                }
+//                jobList.add(job);
+//            }
+//        }
+//        return jobList;
     }
 
     /**
@@ -331,15 +348,17 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
         //优先执行有表达式的job，没有表达多则使用简单调度器，间隔调度
         if (StringUtils.isBlank(scheduleJob.getCronExpression())) {
             //按新的间隔构建trigger
-            SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule().repeatSecondlyForever(scheduleJob.getRepeatInterval());
-            SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
-            trigger = simpleTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+            SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.repeatSecondlyForever(scheduleJob.getRepeatInterval());
+//            SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
+//            trigger = simpleTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+            trigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(scheduleBuilder).forJob(scheduleJob.getJobName(), scheduleJob.getJobGroup()).build();
         } else {
             // Trigger已存在，那么更新相应的定时设置
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression());
-            CronTrigger cronTrigger = (CronTrigger) trigger;
-            // 按新的cronExpression表达式重新构建trigger
-            trigger = cronTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+//            CronTrigger cronTrigger = (CronTrigger) trigger;
+//            // 按新的cronExpression表达式重新构建trigger
+//            trigger = cronTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).forJob(scheduleJob.getJobName(), scheduleJob.getJobGroup()).build();
+            trigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(scheduleBuilder).forJob(scheduleJob.getJobName(), scheduleJob.getJobGroup()).build();
         }
         scheduler.rescheduleJob(triggerKey, trigger);
     }

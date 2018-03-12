@@ -3,6 +3,7 @@ package com.dili.ss.util;
 
 import com.dili.ss.domain.BasePage;
 import com.dili.ss.domain.BaseQuery;
+import com.dili.ss.dto.DTOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.beanutils.BeanUtils;
@@ -249,15 +250,18 @@ public class BeanConver {
     }
 
     /**
-     * 把javaBean对象转换为Map键值对
+     * 把javaBean或dto对象转换为Map键值对
      *
-     * @param bean
+     * @param bean or dto
      * @return
      * @throws Exception
      */
     public static Map<String, Object> transformObjectToMap(Object bean) throws Exception {
         if(bean instanceof Map){
             return (Map) bean;
+        }
+        if(DTOUtils.isDTOProxy(bean)){
+            return DTOUtils.go(bean);
         }
         Class<?> type = bean.getClass();
         Map<String, Object> returnMap = new HashMap<String, Object>();

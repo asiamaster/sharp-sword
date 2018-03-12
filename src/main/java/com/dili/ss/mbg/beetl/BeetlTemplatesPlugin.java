@@ -33,6 +33,22 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
     private ShellCallback shellCallback = null;
     private boolean overwrite = false;
     private GroupTemplate groupTemplate;
+    //被替换的分隔
+    private static final String replaceFromSeparator;
+    //替换的分隔
+    private static final String replaceToSeparator;
+
+    static {
+        //如果是windows
+        if(System.getProperty("os.name").toLowerCase().startsWith("win")){
+            replaceFromSeparator = "/";
+            replaceToSeparator = "\\\\";
+        }else{
+            replaceFromSeparator = "\\\\";
+            replaceToSeparator = "/";
+        }
+
+    }
     public BeetlTemplatesPlugin() {}
 
     @Override
@@ -120,7 +136,7 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
     private String getDirRelativePath(String fileName, IntrospectedTable introspectedTable){
         String className = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
         String classNameFirstLower = StringUtils.uncapitalize(className);
-        String finalName = targetDir.replaceAll("/","\\\\")+fileName.substring(fileName.indexOf(templateRootDir.replaceAll("/","\\\\"))+templateRootDir.length());
+        String finalName = targetDir.replaceAll(replaceFromSeparator, replaceToSeparator)+fileName.substring(fileName.indexOf(templateRootDir.replaceAll(replaceFromSeparator, replaceToSeparator))+templateRootDir.length());
         finalName = finalName.replaceAll("\\$\\{classNameFirstLower\\}", classNameFirstLower).replaceAll("\\$\\{className\\}", className);
         return replaceAllProperties(finalName);
     }
@@ -129,7 +145,7 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
     private String getFileRelativePath(String fileName, IntrospectedTable introspectedTable){
         String className = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
         String classNameFirstLower = StringUtils.uncapitalize(className);
-        String finalName = fileName.substring(fileName.indexOf(templateRootDir.replaceAll("/","\\\\"))+templateRootDir.length(), fileName.lastIndexOf(".btl"));
+        String finalName = fileName.substring(fileName.indexOf(templateRootDir.replaceAll(replaceFromSeparator, replaceToSeparator))+templateRootDir.length(), fileName.lastIndexOf(".btl"));
         finalName = finalName.replaceAll("\\$\\{classNameFirstLower\\}", classNameFirstLower).replaceAll("\\$\\{className\\}", className);
         return replaceAllProperties(finalName);
     }
@@ -145,7 +161,7 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
     //getFileBeetlGroupTemplate().getTemplate时获取模板文件相对路径
     @org.jetbrains.annotations.NotNull
     private String getFileRelativePath(String fileName){
-        return fileName.substring(fileName.indexOf(templateRootDir.replaceAll("/","\\\\"))+templateRootDir.length());
+        return fileName.substring(fileName.indexOf(templateRootDir.replaceAll(replaceFromSeparator, replaceToSeparator))+templateRootDir.length());
     }
 
     //根据字符串写入文件

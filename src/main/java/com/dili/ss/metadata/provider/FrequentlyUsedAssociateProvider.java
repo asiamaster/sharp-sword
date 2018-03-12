@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -49,6 +50,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Created by asiamaster on 2017/8/30 0022.
  */
 @Component("fuaProvider")
+@ConditionalOnExpression("'${fuaProvider.enable}'=='true'")
 @ConfigurationProperties(prefix = "fuaProvider")
 public class FrequentlyUsedAssociateProvider implements ApplicationListener<ContextRefreshedEvent>, ValueProvider {
 

@@ -34,7 +34,7 @@ public class ProviderController {
         Map<String, Object> queryMap = parseQuery(queryParams);
         String provider = queryMap.get(PROVIDER_KEY).toString();
         queryMap.remove(PROVIDER_KEY);
-        //这里查下拉不需要提供当前字段的值
+        //这里查下拉不需要提供当前字段的值,这里只能取到value属性中的值，而无法取到combobox的当前值，因为还没有渲染，渲染以后应该使用getValue方法取值
         return valueProviderUtils.getLookupList(provider, queryMap.get("value"), queryMap);
     }
 

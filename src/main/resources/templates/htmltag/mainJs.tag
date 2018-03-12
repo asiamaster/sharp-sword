@@ -14,6 +14,13 @@ if (typeof String.prototype.endWith != 'function') {
     };
 }
 
+// 清除两边的空格
+if (typeof String.prototype.trim != 'function') {
+    String.prototype.trim = function () {
+        return this.replace(/(^\s*)|(\s*$)/g, '');
+    };
+}
+
 //删除json对象key中的开始字符串,
 // 如var json = {_id:1, _name:"value"};
 // 调用removeByStart(json, "_")
@@ -53,20 +60,27 @@ function addKeyStartWith(json, startStr) {
     return json;
 }
 //表单jquery对象获取提交字段的json信息
-//表单jquery对象获取提交字段的json信息
-$.fn.serializeObject = function () {
+$.fn.serializeObject = function (containsNull) {
     var o = {};
     var a = this.serializeArray();
     $.each(a, function () {
         if (o[this.name] !== undefined) {
             if (!o[this.name].push && o[this.name] != null && o[this.name] != "") {
                 o[this.name] = [o[this.name]];
-            }else if(this.value != null && this.value != ""){
+            }else if(this.value != null){
                 o[this.name].push(this.value || '');
+            }else{
+                if(containsNull && containsNull == true){
+                    o[this.name].push('');
+                }
             }
         } else {
             if(this.value != null && this.value != ""){
                 o[this.name] = this.value || '';
+            }else{
+                if(containsNull && containsNull == true) {
+                    o[this.name] = '';
+                }
             }
         }
     });

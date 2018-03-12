@@ -25,6 +25,7 @@
     </script>
 </head>
 <body>
+${"<#"}loadingProgress/>
 \${tag.body}
 </body>
 </html>

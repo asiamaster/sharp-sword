@@ -32,7 +32,7 @@ public class DynamicRoutingDataSourceContextHolder {
 	 * @return
 	 */
 	public static String peek() {
-		if(contextHolder.get() == null){
+		if(contextHolder.get() == null || contextHolder.get().isEmpty()){
 			return null;
 		}
 		return contextHolder.get().peek();
@@ -54,10 +54,7 @@ public class DynamicRoutingDataSourceContextHolder {
 	 * @return
 	 */
 	public static String pop() {
-		if(contextHolder.get() == null){
-			return null;
-		}
-		if(contextHolder.get().isEmpty()){
+		if(contextHolder.get() == null || contextHolder.get().isEmpty()){
 			return null;
 		}
 		return contextHolder.get().pop();

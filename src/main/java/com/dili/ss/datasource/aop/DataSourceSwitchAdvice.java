@@ -34,8 +34,9 @@ public class DataSourceSwitchAdvice implements MethodInterceptor {
 	private void before(MethodInvocation invocation) {
 		Method method = invocation.getMethod();
 		// omit the private method
-		if (method.getModifiers() == Modifier.PRIVATE)
+		if (method.getModifiers() == Modifier.PRIVATE){
 			return;
+		}
 		Class<?> declaringType = null;
 		try {
 			//由于TargetDataSource可能在类上，并且调用了父类的方法，所以这里只能强取targetClass，方法上的getDeclaringClass()只能取到父类
@@ -51,6 +52,7 @@ public class DataSourceSwitchAdvice implements MethodInterceptor {
 		SwitchDataSource targetDataSource = method.getAnnotation(SwitchDataSource.class);
 		targetDataSource = targetDataSource == null ? declaringType.getAnnotation(SwitchDataSource.class) : targetDataSource;
 		if (!DynamicRoutingDataSourceContextHolder.containsDataSource(targetDataSource.value())) {
+//			DynamicRoutingDataSourceContextHolder.push(SwitchDataSource.DEFAULT_DATASOURCE);
 			logger.error("数据源[{}]不存在，使用默认数据源 > {}", targetDataSource.value(), declaringType.getTypeName());
 		} else {
 			logger.debug("Use DataSource : {} > {}", targetDataSource.value(), declaringType.getTypeName());

@@ -1,5 +1,8 @@
 package com.dili.ss.constant;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by asiamaster on 2017/7/25 0025.
  */
@@ -9,4 +12,10 @@ public class SsConstants {
 	public static final String COLON_ENCODE = "#@#@";
 
 	public static final String ENCRYPT_PROPERTY_PASSWORD = "security";
+
+	//导出限流数
+	public static final int LIMIT = 4;
+	//导出标识，key为js生成的唯一码， value为导出完成时间
+	public static final Map<String, Long> EXPORT_FLAG = new HashMap<>(LIMIT);
+
 }

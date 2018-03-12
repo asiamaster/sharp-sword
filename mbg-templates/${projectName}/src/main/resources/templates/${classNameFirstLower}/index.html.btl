@@ -53,7 +53,7 @@
                                     var orderByClause = jsonObject["orderByClause"];
                                     var queryParams = jsonObject["queryParams"];
                                     %>
-                                    <input name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%;" panelWidth="auto" panelHeight="auto" label="${fieldName!}:"/>
+                                    <input name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%;" editable="false" labelAlign="right" panelWidth="auto" panelHeight="auto" label="${fieldName!}:"/>
                                     <%
                                     //优先解析provider，如果有data，则会在provider插件中生成后台的Provider类
                                     if(provider != null && provider!=""){
@@ -73,16 +73,16 @@
                                 }else{ //没有JSON参数则直接按字段类型来显示控件
                                     if(field.jdbcTypeName=="TIMESTAMP"){
                                     %>
-                                <input class="easyui-datetimebox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:'" />
+                                <input class="easyui-datetimebox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:'" />
                                     <%}else if(field.jdbcTypeName=="DATE"){%>
-                                <input class="easyui-datebox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:'" />
+                                <input class="easyui-datebox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:'" />
                                     <%}else if(field.jdbcTypeName=="INTEGER" || field.jdbcTypeName=="BIGINT"){%>
-                                <input class="easyui-numberbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" />
+                                <input class="easyui-numberbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" />
                                     <%}else if(field.jdbcTypeName=="BIT"){%>
-                                <input class="easyui-numberbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,1]'" <% if(field.nullable == false){ %>
+                                <input class="easyui-numberbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:', validType:'length[0,1]'" <% if(field.nullable == false){ %>
                                     required="true" <%}%>/>
                                     <%}else{%>
-                                <input class="easyui-textbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" />
+                                <input class="easyui-textbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" />
                                     <%}%>
                                 <%}%>
 
@@ -94,10 +94,10 @@
                         columnIndex++;
                         } //for end%>
                         <tr>
-                            <td>
+                            <td style="padding-left:28px;padding-top: 10px; padding-bottom: 10px;">
                                 <a href="#" class="easyui-linkbutton" iconCls="icon-search" id="queryBtn"
-                                   onclick="queryGrid()">查询</a>
-                                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">清除</a>
+                                   onclick="queryGrid()">查询</a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-clear" onclick="clearForm()">清除</a>
                             </td>
                         </tr>
                     </table>
@@ -110,8 +110,8 @@
         <!-- 表格 -->
         <div region="center" style="width:100%;" height="auto">
             <!-- =========================================================表格========================================================= -->
-            <table class="easyui-datagrid" title="${className}列表" id="grid" fitColumns="true"
-                   pagination="true" pageSize="30" pageNumber="1" pagePosition="both" rownumbers="true" remoteSort="false"
+            <table class="easyui-datagrid" title="${className}列表" id="grid" fitColumns="true" noheader="true"
+                   pagination="true" pageSize="30" pageNumber="1" pagePosition="top" rownumbers="true" remoteSort="false"
                    loadMsg="数据加载中..." singleSelect="true" method="post" multiSort="false" sortName="${firstField.javaProperty}"
                    align="center" fit="true" striped="true" toolbar="#toolbar" idField="id" data-options="onDblClickRow:openUpdate, onHeaderContextMenu:headerContextMenu">
                 <thead>
@@ -152,7 +152,7 @@
                                 }
                           }
                     %>
-                        <th data-options="field:'${field.javaProperty}', ${attr} <%if(provider!=null){%>_provider:'${provider}',<%}%> sortable:'true', order:'asc', align:'center', resizable:'true', fixed:'false'">
+                        <th data-options="field:'${field.javaProperty}', ${attr} <%if(provider!=null){%>_provider:'${provider}',<%}%> sortable:true, order:'asc', align:'center', resizable:'true', fixed:'false'">
                             ${fieldName}
                         </th>
                     <%
@@ -184,11 +184,12 @@
 				iconCls: 'icon-save',
 				height: 480,
 				buttons: [{
-					text:'Ok',
+					text:'确认',
 					iconCls:'icon-ok',
 					handler:saveOrUpdate
 				},{
 					text:'取消',
+					iconCls:'icon-cancel',
 					handler:function(){
 						$('#dlg').dialog('close');
 					}
@@ -229,7 +230,7 @@
                         var orderByClause = jsonObject["orderByClause"];
                         var queryParams = jsonObject["queryParams"];
                        %>
-                       <input name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%;" panelWidth="auto" panelHeight="auto" label="${fieldName!}:" <% if(field.nullable == false){ %> required="true" <%}%>/>
+                       <input name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%;" editable="false" panelWidth="auto" panelHeight="auto" label="${fieldName!}:" <% if(field.nullable == false){ %> required="true" <%}%>/>
                        <%
                        //优先解析provider，如果有data，则会在provider插件中生成后台的Provider类
                        if(provider != null && provider!=""){
@@ -249,10 +250,10 @@
                     }else{ //没有JSON参数则直接按字段类型来显示控件
                         if(field.jdbcTypeName=="TIMESTAMP"){
                         %>
-                    <input class="easyui-datetimebox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
+                    <input class="easyui-datetimebox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" editable="false" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
                         required="true" <%}%>/>
                         <%}else if(field.jdbcTypeName=="DATE"){%>
-                    <input class="easyui-datebox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
+                    <input class="easyui-datebox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" editable="false" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
                         required="true" <%}%>/>
                         <%}else if(field.jdbcTypeName=="INTEGER" || field.jdbcTypeName=="BIGINT"){%>
                     <input class="easyui-numberbox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
@@ -379,10 +380,7 @@
             if(!$('#form').form("validate")){
                 return;
             }
-            var param = bindMetadata("grid", true);
-            var formData = $("#form").serializeObject();
-            $.extend(param, formData);
-            $("#grid").datagrid("load", param);
+            $("#grid").datagrid("load", bindGridMeta2Form("grid", "form"));
         }
 
 
@@ -403,16 +401,6 @@
             });
         }
 
-        $.messager.progress({
-            title:"提示",
-            msg:"加载中,请稍候...",
-            value : '10',
-            text: '{value}%',
-            interval:200
-        });
-        $.parser.onComplete = function(){
-            $.messager.progress("close");
-        }
         //全局按键事件
         function getKey(e){
             e = e || window.event;
@@ -444,6 +432,43 @@
             } else {
                 document.onkeyup = getKey;
             }
+            var pager = $('#grid').datagrid('getPager');    // get the pager of treegrid
+                pager.pagination({
+                    ${"<#"}controls_paginationOpts/>,
+                    buttons:[
+                    {
+                        iconCls:'icon-add',
+                        text:'新增',
+                        handler:function(){
+                            openInsert();
+                        }
+                    },
+                    {
+                        iconCls:'icon-edit',
+                        text:'修改',
+                        handler:function(){
+                            openUpdate();
+                        }
+                    },
+                    {
+                        iconCls:'icon-remove',
+                        text:'删除',
+                        handler:function(){
+                            del();
+                        }
+                    },
+                    {
+                        iconCls:'icon-export',
+                        text:'导出',
+                        handler:function(){
+                            doExport('grid');
+                        }
+                    }
+                ]
+            });
+            //表格仅显示下边框
+            $('#grid').datagrid('getPanel').removeClass('lines-both lines-no lines-right lines-bottom').addClass("lines-bottom");
+            queryGrid();
         })
     </script>
 ${"</#"}body>

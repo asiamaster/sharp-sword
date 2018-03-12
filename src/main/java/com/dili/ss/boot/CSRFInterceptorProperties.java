@@ -1,8 +1,10 @@
 package com.dili.ss.boot;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,8 @@ import java.util.List;
  * Created by asiamaster on 2017/6/19 0019.
  */
 @Component
-@ConfigurationProperties(prefix="web.CSRFInterceptor")
+@ConditionalOnExpression("'${CSRFInterceptor.enable}'=='true'")
+@ConfigurationProperties(prefix="web.CSRFInterceptor", ignoreInvalidFields=true)
 public class CSRFInterceptorProperties {
 
 	//初始化以避免空

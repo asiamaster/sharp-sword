@@ -20,8 +20,9 @@ public class IsConcurrentProvider implements ValueProvider {
 
     static {
         buffer = new ArrayList<ValuePair<?>>();
+        buffer.add(new ValuePairImpl(EMPTY_ITEM_TEXT, null));
         buffer.add(new ValuePairImpl("同步", "0"));
-        buffer.add(new ValuePairImpl("并发", "1"));
+        buffer.add(new ValuePairImpl("异步", "1"));
     }
 
     @Override
@@ -33,7 +34,7 @@ public class IsConcurrentProvider implements ValueProvider {
     public String getDisplayText(Object obj, Map metaMap, FieldMeta fieldMeta) {
         if(obj == null || obj.equals("")) return null;
         for(ValuePair<?> valuePair : buffer){
-            if(obj.equals(valuePair.getValue())){
+            if(obj.toString().equals(valuePair.getValue())){
                 return valuePair.getText();
             }
         }

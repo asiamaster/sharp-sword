@@ -61,11 +61,11 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
      *
      * @return
      */
-    @Bean
-    public CacheManager cacheManager(@Qualifier("redisTemplate") RedisTemplate<?, ?> redisTemplate) {
-        CacheManager cacheManager = new RedisCacheManager(redisTemplate);
-        return cacheManager;
-    }
+//    @Bean
+//    public CacheManager cacheManager(@Qualifier("redisTemplate") RedisTemplate<?, ?> redisTemplate) {
+//        CacheManager cacheManager = new RedisCacheManager(redisTemplate);
+//        return cacheManager;
+//    }
 
     /**
      * KEY生成器用法:

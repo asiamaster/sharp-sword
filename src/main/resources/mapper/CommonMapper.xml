@@ -11,6 +11,14 @@
     ${value}
   </select>
 
+  <select id="selectMap" parameterType="String" resultType="java.util.HashMap">
+    ${value}
+  </select>
+
+  <select id="selectDto" parameterType="map" resultType="map" >
+    ${value}
+  </select>
+
   <select id="execute" parameterType="String">
     ${value}
   </select>

@@ -41,8 +41,6 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-
-//        TODO 从@RestfulServiceScan注解中获取
         Set<String> basePackages = getBasePackages(annotationMetadata);
         for (String basePackage : basePackages) {
             Resource rootResource = getRootResource(basePackage);
@@ -58,7 +56,6 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
                         continue;
                     }
 //                System.out.println("jar包里面的类:"+ClassUtils.convertResourcePathToClassName(result));
-                    logger.info("classFullName:" + classFullName + ", defaultBeanName:" + buildDefaultBeanName(classFullName));
 
                     //类的全路径
 //                    BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(intfClass);
@@ -70,9 +67,12 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
                     beanDefinition.setSynthetic(true);
                     //注册Bean
                     beanDefinitionRegistry.registerBeanDefinition(buildDefaultBeanName(classFullName), beanDefinition);
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
+                    logger.error(e.getMessage());
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
+                    logger.error(e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -91,7 +91,6 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
         //Bean构建  BeanService.class 要创建的Bean的Class对象
         BeanDefinitionBuilder dataSourceBuider = BeanDefinitionBuilder.genericBeanDefinition(BaseDomain.class);
         dbf.registerBeanDefinition("baseDomain", dataSourceBuider.getBeanDefinition());
-        System.out.println("configurableApplicationContext:" + configurableApplicationContext);
     }
 
     protected Set<String> getBasePackages(AnnotationMetadata importingClassMetadata) {
@@ -193,9 +192,7 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
                 String rootDirPath = rootDirURL.getPath();
                 String path = resourcePath.substring(resourcePath.lastIndexOf(rootDirPath) + rootDirPath.length() - basePackage.length() - 1);
                 String classFullPath = path.substring(0, path.length() - ".class".length());
-                String classFullName = ClassUtils.convertResourcePathToClassName(classFullPath);
-//                System.out.println("当前项目的类:"+classFullName);
-                return classFullName;
+                return ClassUtils.convertResourcePathToClassName(classFullPath);
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -46,6 +46,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         }
     }
 
+    @Override
     public void render() {
         if (status == RUN) {
             //渲染逻辑交给beetl脚本
@@ -135,6 +136,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         return map.get(attr);
     }
 
+    @Override
     public void init(Context ctx, Object[] args, Statement st) {
         super.init(ctx, args, st);
         request = (HttpServletRequest) this.ctx.getGlobal("request");
@@ -217,6 +219,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         }
     }
 
+    @Override
     public String toString() {
         return this.args[0] + ":" + super.toString();
     }
@@ -226,6 +229,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         return mobile != null;
     }
 
+    @Override
     protected String getHtmlTagResourceId(String child) {
         String path = child.replace(':', File.separatorChar);
         StringBuilder sb = new StringBuilder("/");

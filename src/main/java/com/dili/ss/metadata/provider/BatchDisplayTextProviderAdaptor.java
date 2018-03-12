@@ -1,0 +1,231 @@
+package com.dili.ss.metadata.provider;
+
+import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.base.BaseServiceImpl;
+import com.dili.ss.dto.DTOUtils;
+import com.dili.ss.dto.IDTO;
+import com.dili.ss.metadata.*;
+import com.dili.ss.service.CommonService;
+import com.dili.ss.util.BeanConver;
+import com.dili.ss.util.POJOUtils;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.util.*;
+
+/**
+ * 批量提供者适配器
+ */
+@Component
+public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvider {
+    protected static final Logger log = LoggerFactory.getLogger(BatchDisplayTextProviderAdaptor.class);
+//    转义字段json，如果为string，则key为filed属性
+    protected static final String ESCAPE_FILEDS_KEY = "_escapeFileds";
+//    关联(数据库)表的主键名
+    protected static final String RELATION_TABLE_PK_FIELD_KEY = "_relationTablePkField";
+//    关联(数据库)表名
+    protected static final String RELATION_TABLE_KEY = "_relationTable";
+//    主DTO与关联DTO的关联(java bean)属性，即外键
+    protected static final String FK_FILED_KEY = "_fkField";
+//    查询参数json
+    protected static final String QUERY_PARAMS_KEY = "queryParams";
+    @Autowired
+    protected CommonService commonService;
+
+    //不提供下拉数据
+    @Override
+    public List<ValuePair<?>> getLookupList(Object val, Map metaMap, FieldMeta fieldMeta) {
+        return null;
+    }
+
+    @Override
+    public String getDisplayText(Object obj, Map metaMap, FieldMeta fieldMeta) {
+        return null;
+    }
+
+    @Override
+    public void setDisplayList(List list, Map metaMap, ObjectMeta fieldMeta) {
+        if (CollectionUtils.isEmpty(metaMap) || CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        //列头上必须要有field字段
+        if (metaMap.containsKey(FIELD_KEY)){
+            String field = (String)metaMap.get(FIELD_KEY);
+            //只要第一个字段匹配就统一转换所有的字段，再次进来就不转换了，因为一次批量转换只关联一张表
+            for(Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()){
+                if(entry.getKey().equals(field)){
+                    int size = list.size();
+                    int capacity = size/2 < 10 ? size : size/2;
+                    //收集所有的需要转义的id，不重复
+                    List<String> relationIds = new ArrayList(capacity);
+                    if(list.get(0) instanceof IDTO) {
+                        for(Object obj : list) {
+                            IDTO dto = (IDTO) obj;
+                            Object fkValue = dto.aget(getFkField(metaMap));
+                            if(fkValue == null){
+                                continue;
+                            }
+                            if (!relationIds.contains(fkValue)) {
+                                relationIds.add(fkValue.toString());
+                            }
+                        }
+                    }else if(list.get(0) instanceof Map) {
+                        for(Object obj : list) {
+                            Map map = (Map) obj;
+                            Object fkValue = map.get(getFkField(metaMap));
+                            if(fkValue == null){
+                                continue;
+                            }
+                            if (!relationIds.contains(fkValue)) {
+                                relationIds.add(fkValue.toString());
+                            }
+                        }
+                    }else{
+                        for(Object obj : list) {
+                            Object fkValue = POJOUtils.getProperty(obj, getFkField(metaMap));
+                            if(null == fkValue){
+                                continue;
+                            }
+                            if (!relationIds.contains(fkValue)) {
+                                relationIds.add(fkValue.toString());
+                            }
+                        }
+                    }
+                    if(relationIds.isEmpty()){
+                        break;
+                    }
+                    //从外键关联表获取数据
+                    List relationDatas = getFkList(relationIds, metaMap);
+                    if(relationDatas == null || relationDatas.isEmpty()){
+                        break;
+                    }
+                    //缓存key为id，value为关联DTO
+                    Map<String, Map> id2RelTable = new HashMap<>(relationDatas.size());
+                    for(Object obj : relationDatas){
+                        try {
+                            Map map = BeanConver.transformObjectToMap(obj);
+                            id2RelTable.put(map.get(getRelationTablePkField(metaMap)).toString(), map);
+                        } catch (Exception e) {
+                            log.error("批量提供者转换(getFkList方法的结果)失败:"+e.getLocalizedMessage());
+                            break;
+                        }
+                    }
+                    //设置转义值
+                    setDtoData(list, id2RelTable, metaMap);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置转义值，支持dto,map和javaBean
+     * @param list
+     * @param id2RelTable
+     */
+    private void setDtoData(List list, Map<String, Map> id2RelTable, Map metaMap){
+        if(list.get(0) instanceof IDTO) {
+            for (Object obj : list) {
+                IDTO dto = (IDTO) obj;
+                //记录要转义的字段，避免被覆盖
+                Object keyObj = dto.aget(getFkField(metaMap));
+                //判断如果主表的外键没值就跳过
+                if(keyObj == null){
+                    continue;
+                }
+                String key = keyObj.toString();
+                for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
+                    //有可能外键有值，但是关联表没数据，即是左关联为空的场景
+                    if(id2RelTable.get(key) == null){
+                        continue;
+                    }
+                    //记录原始值
+                    dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX+entry.getKey(), key);
+                    dto.aset(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
+                }
+            }
+        }else if(list.get(0) instanceof Map) {
+            for (Object obj : list) {
+                Map map = (Map) obj;
+                Object keyObj = map.get(getFkField(metaMap));
+                //判断如果主表的外键没值就跳过
+                if(keyObj == null){
+                    continue;
+                }
+                //记录要转义的字段，避免被覆盖
+                String key = keyObj.toString();
+                for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
+                    //有可能外键有值，但是关联表没数据，即是左关联为空的场景
+                    if(id2RelTable.get(key) == null){
+                        continue;
+                    }
+                    //记录原始值
+                    map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX+entry.getKey(), key);
+                    map.put(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
+                }
+            }
+        }else{//java bean
+            //注意java bean如果没有关联属性可能报错，而且非字符串和字符串转换也可能报错，所以不建议使用javaBean
+            for (Object obj : list) {
+                Object key = POJOUtils.getProperty(obj, getFkField(metaMap));
+                //判断如果主表的外键没值就跳过
+                if(key == null){
+                    continue;
+                }
+                for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
+                    //有可能外键有值，但是关联表没数据，即是左关联为空的场景
+                    if(id2RelTable.get(key) == null){
+                        continue;
+                    }
+                    //java bean无法记录原始值，而且设置转义值也可能因为类型转换报错
+                    POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key.toString()).get(entry.getValue()));
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取关联表数据
+     * @return 可能返回DTO, Map或JavaBean的列表
+     */
+    protected abstract List getFkList(List<String> relationIds, Map metaMap);
+
+    /**
+     * 返回主DTO和关联DTO需要转义的字段名
+     * Map中key为主DTO在页面(datagrid)渲染时需要的字段名， value为关联DTO中对应的字段名
+     * @return
+     */
+    protected abstract Map<String, String> getEscapeFileds(Map metaMap);
+//    {
+//        Map<String, String> excapeFields = new HashMap<>();
+//        excapeFields.put("customerName", "name");
+//        excapeFields.put("customerPhone", "phone");
+//        return excapeFields;
+//    }
+
+    /**
+     * 主DTO与关联DTO的关联(java bean)属性(外键)
+     * 先从field属性取，没取到再取_fkField属性
+     * 子类可自行实现
+     * @return
+     */
+    protected String getFkField(Map metaMap) {
+        String field = (String)metaMap.get(FIELD_KEY);
+        String fkField = (String)metaMap.get(FK_FILED_KEY);
+        return fkField == null ? field : fkField;
+    }
+
+    /**
+     * 关联(数据库)表的主键的字段名
+     * 默认取id，子类可自行实现
+     * @return
+     */
+    protected String getRelationTablePkField(Map metaMap) {
+        return "id";
+    }
+}

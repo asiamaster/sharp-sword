@@ -12,6 +12,10 @@ public class CompileUtil {
 	}
 
 	public static Class<?> compile(String c, String clz) throws Exception {
+		System.out.println("========================================================");
+		System.out.println("clz:"+clz);
+		System.out.println("compile:"+c);
+		System.out.println("========================================================");
 		String cn = clz.substring(clz.lastIndexOf(".")+1);
 		Map<String, byte[]> results = compiler.compile(cn+".java", c);
 		return compiler.loadClass(clz, results);

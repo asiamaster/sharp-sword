@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,36 +36,43 @@ public class SimpleValueProvider implements ValueProvider {
     //    查询参数
     private Map<String, Object> queryParams = new HashedMap();
 
-    private static final String TABLE_KEY = "table";
-    private static final String VALUEFIELD_KEY = "valueField";
-    private static final String TEXTFIELD_KEY = "textField";
-    private static final String VALUE_KEY = "value";
-    private static final String ORDER_BY_CLAUSE_KEY = "orderByClause";
-    private static final String QUERY_PARAMS_KEY = "queryParams";
+    protected static final String TABLE_KEY = "table";
+    protected static final String VALUEFIELD_KEY = "valueField";
+    protected static final String TEXTFIELD_KEY = "textField";
+    protected static final String VALUE_KEY = "value";
+    protected static final String ORDER_BY_CLAUSE_KEY = "orderByClause";
+    protected static final String QUERY_PARAMS_KEY = "queryParams";
 
     @Autowired
-    private CommonMapper commonMapper;
+    protected CommonMapper commonMapper;
 
     public SimpleValueProvider(){}
 
-    private void buildParam(Map paramMap){
-        setTable(paramMap.get(TABLE_KEY).toString());
-        setValueField(paramMap.get(VALUEFIELD_KEY).toString());
-        setTextField(paramMap.get(TEXTFIELD_KEY).toString());
-        Object orderByClause = paramMap.get(ORDER_BY_CLAUSE_KEY);
-        setValue(paramMap.get(VALUE_KEY));
-        paramMap.remove(TABLE_KEY);
-        paramMap.remove(VALUEFIELD_KEY);
-        paramMap.remove(TEXTFIELD_KEY);
-        paramMap.remove(VALUE_KEY);
-        if(orderByClause != null) {
-            setOrderByClause(orderByClause.toString());
+    protected void buildParam(Map paramMap){
+        if(paramMap.get(TABLE_KEY) != null) {
+            setTable(paramMap.get(TABLE_KEY).toString());
+            paramMap.remove(TABLE_KEY);
+        }
+        if(paramMap.get(VALUEFIELD_KEY) != null) {
+            setValueField(paramMap.get(VALUEFIELD_KEY).toString());
+            paramMap.remove(VALUEFIELD_KEY);
+        }
+        if(paramMap.get(TEXTFIELD_KEY) != null) {
+            setTextField(paramMap.get(TEXTFIELD_KEY).toString());
+            paramMap.remove(TEXTFIELD_KEY);
+        }
+        if(paramMap.get(VALUE_KEY) != null) {
+            setValue(paramMap.get(VALUE_KEY));
+            paramMap.remove(VALUE_KEY);
+        }
+        if(paramMap.get(ORDER_BY_CLAUSE_KEY) != null) {
+            setOrderByClause(paramMap.get(ORDER_BY_CLAUSE_KEY).toString());
             paramMap.remove(ORDER_BY_CLAUSE_KEY);
         }
         //清空缓存
-        queryParams.clear();
         Object queryParams = paramMap.get(QUERY_PARAMS_KEY);
         if(queryParams != null) {
+            getQueryParams().clear();
             setQueryParams(JSONObject.parseObject(queryParams.toString()));
         }
     }
@@ -76,6 +84,7 @@ public class SimpleValueProvider implements ValueProvider {
      * @param fieldMeta
      * @return
      */
+    @Override
     public List<ValuePair<?>> getLookupList(Object value, Map paramMap, FieldMeta fieldMeta){
         buildParam(paramMap);
         List<ValuePair<?>> data = commonMapper.selectValuePair(buildSql());
@@ -85,18 +94,18 @@ public class SimpleValueProvider implements ValueProvider {
 
     private String buildSql(){
         StringBuffer sql = new StringBuffer();
-        sql.append("select ").append(valueField).append(" value, ").append(textField).append(" text from ").append(table);
-        if(queryParams!= null && !queryParams.isEmpty()) {
+        sql.append("select ").append(getValueField()).append(" value, ").append(getTextField()).append(" text from ").append(getTable());
+        if(getQueryParams()!= null && !getQueryParams().isEmpty()) {
             sql.append(" where 1=1 ");
-            for(Map.Entry<String, Object> entry : queryParams.entrySet()){
+            for(Map.Entry<String, Object> entry : Collections.unmodifiableMap(getQueryParams()).entrySet()){
                 sql.append("and ").append(entry.getKey()).append("='").append(entry.getValue()).append("' ");
             }
         }
         if(value != null){
-           sql.append("and "+ getValueField()+"='"+value+"' ");
+           sql.append("and "+ getValueField()+"='"+getValue()+"' ");
         }
-        if(StringUtils.isNoneBlank(orderByClause)){
-            sql.append(orderByClause);
+        if(StringUtils.isNoneBlank(getOrderByClause())){
+            sql.append("order by "+getOrderByClause());
         }
         return sql.toString();
     }
@@ -108,6 +117,7 @@ public class SimpleValueProvider implements ValueProvider {
      * @param fieldMeta
      * @return
      */
+    @Override
     public String getDisplayText(Object value, Map paramMap, FieldMeta fieldMeta){
         if(value == null || value.equals("")){
             return "";
@@ -115,7 +125,9 @@ public class SimpleValueProvider implements ValueProvider {
         paramMap.put(VALUE_KEY, value);
         buildParam(paramMap);
         List<ValuePair<?>> data = SpringUtil.getBean(CommonMapper.class).selectValuePair(buildSql());
-        if(data.isEmpty()) return "";
+        if(data.isEmpty()) {
+            return "";
+        }
         return data.get(0).getText();
     }
 

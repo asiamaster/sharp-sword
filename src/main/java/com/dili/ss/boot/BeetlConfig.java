@@ -1,5 +1,7 @@
 package com.dili.ss.boot;
 
+import com.dili.http.okhttp.utils.B;
+import com.dili.http.okhttp.utils.DESEncryptUtil;
 import com.dili.ss.beetl.CommonTagFactory;
 import org.beetl.core.*;
 import org.beetl.core.resource.ClasspathResourceLoader;
@@ -46,7 +48,7 @@ public class BeetlConfig  {
     public BeetlGroupUtilConfiguration getBeetlGroupUtilConfiguration() {
 
         BeetlGroupUtilConfiguration beetlGroupUtilConfiguration = new BeetlGroupUtilConfiguration();
-        ResourcePatternResolver patternResolver = ResourcePatternUtils.getResourcePatternResolver(new DefaultResourceLoader());
+
 //        try {
 //            // WebAppResourceLoader ����root·���ǹؼ�
 //            WebAppResourceLoader webAppResourceLoader = new WebAppResourceLoader();
@@ -60,10 +62,9 @@ public class BeetlConfig  {
 //        String root =  patternResolver.getResource("classpath:").getFile().toString();
 //        WebAppResourceLoader webAppResourceLoader = new WebAppResourceLoader(root);
 //        beetlGroupUtilConfiguration.setResourceLoader(webAppResourceLoader);
-        //解决部署后找不到模板问题,但是要在下面的beetlViewResolver中配置beetlSpringViewResolver.setPrefix("/templates/");
-        //并且在beetl.properties中改为RESOURCE.tagRoot =templates/htmltag,不然找不到html标签
-        ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader("/");
-        beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
+
+        ResourcePatternResolver patternResolver = ResourcePatternUtils.getResourcePatternResolver(new DefaultResourceLoader());
+        beetlGroupUtilConfiguration.setConfigFileResource(patternResolver.getResource("classpath:conf/beetl.properties"));
         InputStream inputStream = BeetlConfig.class.getResourceAsStream("/conf/beetlSharedVars.properties");
         Properties p = new Properties();
         try {
@@ -80,7 +81,20 @@ public class BeetlConfig  {
         beetlGroupUtilConfiguration.setFunctions(functions);
         beetlGroupUtilConfiguration.setFormats(formats);
         beetlGroupUtilConfiguration.setTagFactorys(getTagFactoryMaps());
-        beetlGroupUtilConfiguration.setConfigFileResource(patternResolver.getResource("classpath:conf/beetl.properties"));
+
+        //配置加载loader
+        //获取Spring Boot 的ClassLoader
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if(loader==null){
+            loader = BeetlConfig.class.getClassLoader();
+        }
+        //解决部署后找不到模板问题,但是要在下面的beetlViewResolver中配置beetlSpringViewResolver.setPrefix("/templates/");
+        //并且在beetl.properties中改为RESOURCE.tagRoot =templates/htmltag,不然找不到html标签
+        ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader(loader,"");
+        beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
+        beetlGroupUtilConfiguration.init();
+        //如果使用了优化编译器，涉及到字节码操作，需要添加ClassLoader
+        beetlGroupUtilConfiguration.getGroupTemplate().setClassLoader(loader);
         return beetlGroupUtilConfiguration;
     }
 
