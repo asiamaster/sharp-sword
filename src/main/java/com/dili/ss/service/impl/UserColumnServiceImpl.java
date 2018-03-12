@@ -49,5 +49,4 @@ public class UserColumnServiceImpl implements UserColumnService {
 		return (String[])redisUtil.getRedisTemplate().boundHashOps(tableKey).get(fieldKey);
 	}
 
-
 }

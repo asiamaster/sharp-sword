@@ -12,6 +12,7 @@ import com.dili.ss.util.POJOUtils;
 import com.dili.ss.util.ReflectionUtils;
 import com.github.pagehelper.Page;
 import io.swagger.annotations.Api;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +96,9 @@ public class CommonController {
         }else {
             stringBuilder = new StringBuilder();
             for (String str : conditionItems.getConditionItems()) {
+                if(StringUtils.isBlank(str)){
+                    continue;
+                }
                 String[] condition = str.split(":");
                 String conditionField = condition[0];
                 String relationField = condition[1];

@@ -224,7 +224,7 @@ public class ExportUtils {
 				Object value = rowDataMap.get(headerMap.get("field"));
 				//判断是否有值提供者需要转义(此功能已经在datagrid的查询中封装，这里不需要处理了)
 //                if(headerMap.containsKey("provider")){
-//                    value = valueProviderUtils.getDisplayText(headerMap.get("provider").toString(), value, null);
+//                    value = valueProviderUtils.setDisplayText(headerMap.get("provider").toString(), value, null);
 //                }
 				cell.setCellValue(value == null ? null : value.toString());
 				index++;
@@ -388,12 +388,20 @@ public class ExportUtils {
 //                        .mediaType(MediaType.parse("application/json; charset=utf-8"))
 //                        .mediaType(MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8"))
                         .build()
+		                //3小时过期
+		                .connTimeOut(1000L*60L*60L*3)
+		                .readTimeOut(1000L*60L*60L*3)
+		                .writeTimeOut(1000L*60L*60L*3)
                         .execute();
             }else{ //GET方式
                 resp = OkHttpUtils
                         .get().headers(headersMap)
                         .url(url).params((Map)JSON.toJSON(paramObj))
                         .build()
+		                //3小时过期
+		                .connTimeOut(1000L*60L*60L*3)
+		                .readTimeOut(1000L*60L*60L*3)
+		                .writeTimeOut(1000L*60L*60L*3)
                         .execute();
             }
             if(resp.isSuccessful()){

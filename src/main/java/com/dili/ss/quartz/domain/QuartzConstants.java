@@ -12,7 +12,7 @@ public class QuartzConstants {
     public static final String jobDataMapScheduleJobKey = "JOB_DATA_MAPSCHEDULE_JOB_KEY";
 
 
-    public static enum Concurrent {
+    public enum Concurrent {
         Sync(0,"同步"),
         Async(1,"异步");
 

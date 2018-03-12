@@ -37,6 +37,9 @@ public class MenubuttonTag extends Tag {
 	private final String METHOD = "_method";
 	private final String QUERYPARAMS = "_queryParams";
 	private final String DIV_ID = "_divId";
+	private final String MENU_WIDTH = "_menuWidth";
+	private final String MENU_HEIGHT = "_menuHeight";
+	private final String PANEL_ALIGN = "_panelAlign";
 
 	//标签默认值
 	private final String ID_FIELD_DEFAULT = "id";
@@ -45,10 +48,14 @@ public class MenubuttonTag extends Tag {
 	private final String ICON_CLS_FIELD_DEFAULT = "iconCls";
 	private final String DISABLED_FIELD_DEFAULT = "disabled";
 	private final String DIV_ID_DEFAULT = "_menubuttonDiv";
+	private final String MENU_WIDTH_DEFAULT = "80";
+	private final String MENU_HEIGHT_DEFAULT = "30";
+	private final String PANEL_ALIGN_DEFAULT = "left";
 
 	//easyui menubutton和menu属性，用于在menubutton标签上使用
 	private final String ALIGN = "align";
 	private final String MIN_WIDTH = "minWidth";
+	private final String ITEM_WIDTH = "itemWidth";
 	private final String ITEM_HEIGHT = "itemHeight";
 	private final String DURATION = "duration";
 	private final String HIDE_ON_UNHOVER = "hideOnUnhover";
@@ -111,14 +118,18 @@ public class MenubuttonTag extends Tag {
 		String iconClsField = argsMap.get(ICON_CLS_FIELD) == null ? ICON_CLS_FIELD_DEFAULT : argsMap.get(ICON_CLS_FIELD).toString();
 		String disabledField = argsMap.get(DISABLED_FIELD) == null ? DISABLED_FIELD_DEFAULT : argsMap.get(DISABLED_FIELD).toString();
 		String divId = argsMap.get(DIV_ID) == null ? DIV_ID_DEFAULT : argsMap.get(DIV_ID).toString();
-
+		String menuWidth = argsMap.get(MENU_WIDTH) == null ? MENU_WIDTH_DEFAULT : argsMap.get(MENU_WIDTH).toString();
+		String menuHeight = argsMap.get(MENU_HEIGHT) == null ? MENU_HEIGHT_DEFAULT : argsMap.get(MENU_HEIGHT).toString();
+		String panelAlign = argsMap.get(PANEL_ALIGN) == null ? PANEL_ALIGN_DEFAULT : argsMap.get(PANEL_ALIGN).toString();
 		if(Map.class.isAssignableFrom(list.get(0).getClass())){
 			rootList = getMapRoots(list, parentIdField);
 			isMap = true;
 		}else{
 			rootList = getBeanRoots(list, parentIdField);
 		}
-		StringBuilder stringBuilder = new StringBuilder("<div id=\""+divId+"\" class=\"easyui-panel\" style=\"padding:5px;\">"+ LINE_SEPARATOR);
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("<div id=\""+divId+"\" class=\"easyui-panel\" align=\""+panelAlign+"\" style=\"padding-left:10px;\">"+ LINE_SEPARATOR);
 		for(Object root : rootList) {
 			//校验text和id必须有
 			if(getData(root, textField, isMap) == null || getData(root, idField, isMap) == null) {
@@ -129,9 +140,9 @@ public class MenubuttonTag extends Tag {
 			String disabled = getData(root, disabledField, isMap);
 			//没有子的根节点的class为easyui-linkbutton
 			if(!hasChild(list, id, isMap, parentIdField)){
-				stringBuilder.append("<a id=\"menubutton_" + id + "\" href=\"#\" class=\"easyui-linkbutton\" data-options=\"blankKey:''");
+				stringBuilder.append("<a id=\"menubutton_" + id + "\" href=\"#\" class=\"easyui-linkbutton\"  data-options=\"width:"+menuWidth+", height:"+menuHeight+", blankKey:''");
 			}else{
-				stringBuilder.append("<a id=\"menubutton_" + id + "\" href=\"#\" class=\"easyui-menubutton\" data-options=\"menu:'#menu_" + id + "'");
+				stringBuilder.append("<a id=\"menubutton_" + id + "\" href=\"#\" class=\"easyui-menubutton\"  data-options=\"width:"+menuWidth+", height:"+menuHeight+", menu:'#menu_" + id + "'");
 			}
 			//添加menubutton属性
 			if (argsMap.containsKey(PLAIN)) {
@@ -146,12 +157,16 @@ public class MenubuttonTag extends Tag {
 			if (argsMap.containsKey(HAS_DOWN_ARROW)) {
 				stringBuilder.append(", hasDownArrow:" + argsMap.get(HAS_DOWN_ARROW) );
 			}
+			if(argsMap.containsKey(ON_CLICK)){
+				stringBuilder.append(", onClick:"+argsMap.get(ON_CLICK));
+			}
 			if (StringUtils.isNotBlank(iconCls)) {
 				stringBuilder.append(", iconCls:'" + iconCls + "'");
 			}
 			if (StringUtils.isNotBlank(disabled)) {
 				stringBuilder.append(", disabled:" + disabled);
 			}
+			stringBuilder.append("," + getDataOptions(root, Map.class.isAssignableFrom(root.getClass())));
 			stringBuilder.append("\">" + getData(root, textField, isMap) + "</a>"+ LINE_SEPARATOR);
 		}
 		stringBuilder.append("</div>"+ LINE_SEPARATOR);
@@ -173,7 +188,9 @@ public class MenubuttonTag extends Tag {
 	 */
 	private void writeMenu(List list, List rootList) throws IOException {
 		//排除只有根节点没有子节点的情况
-		if(list.isEmpty()) return;
+		if(list.isEmpty()) {
+			return;
+		}
 		Map<String, String> argsMap = (Map)this.args[1];
 		//获取对应字段名称，默认为常量值
 		String textField = argsMap.get(TEXT_FIELD) == null ? TEXT_FIELD_DEFAULT : argsMap.get(TEXT_FIELD).toString();
@@ -181,7 +198,6 @@ public class MenubuttonTag extends Tag {
 		String parentIdField = argsMap.get(PARENT_ID_FIELD) == null ? PARENT_ID_FIELD_DEFAULT : argsMap.get(PARENT_ID_FIELD).toString();
 		String iconClsField = argsMap.get(ICON_CLS_FIELD) == null ? ICON_CLS_FIELD_DEFAULT : argsMap.get(ICON_CLS_FIELD).toString();
 		String disabledField = argsMap.get(DISABLED_FIELD) == null ? DISABLED_FIELD_DEFAULT : argsMap.get(DISABLED_FIELD).toString();
-
 		StringBuilder stringBuilder = new StringBuilder();
 		boolean isMap = false;
 		if(Map.class.isAssignableFrom(list.get(0).getClass())){
@@ -194,7 +210,11 @@ public class MenubuttonTag extends Tag {
 				continue;
 			}
 			//构建菜单, zIndex:110000是默认值，暂且写死
-			stringBuilder.append("<div id=\"menu_"+rootId+"\" data-options=\"zIndex:'110000' ");
+			if(argsMap.containsKey(ITEM_WIDTH)){
+				stringBuilder.append("<div id=\"menu_" + rootId + "\" style=\"width:"+argsMap.get(ITEM_WIDTH)+"px;\" data-options=\"zIndex:'110000' ");
+			}else {
+				stringBuilder.append("<div id=\"menu_" + rootId + "\" data-options=\"zIndex:'110000' ");
+			}
 			//添加所有menu公用属性
 			if(argsMap.containsKey(ALIGN)) {
 				stringBuilder.append(", align:'" + argsMap.get(ALIGN) + "'");
@@ -237,7 +257,7 @@ public class MenubuttonTag extends Tag {
 				Object parentId = getData(row, parentIdField, isMap);
 				//parentId有可能为空，所以在右侧
 				if (rootId.equals(parentId)) {
-					appendMenuItem(stringBuilder, list, parentId, isMap, textField, idField, parentIdField, iconClsField, disabledField,  "");
+					appendMenuItem(stringBuilder, list, parentId, isMap, textField, idField, parentIdField, iconClsField, disabledField,  "", argsMap);
 				}
 
 			}
@@ -257,7 +277,7 @@ public class MenubuttonTag extends Tag {
 	 * @param parentIdField
 	 * @param tab
 	 */
-	public void appendMenuItem(StringBuilder stringBuilder, List list, Object parentId, boolean isMap, String textField, String idField, String parentIdField, String iconClsField, String disabledField, String tab){
+	public void appendMenuItem(StringBuilder stringBuilder, List list, Object parentId, boolean isMap, String textField, String idField, String parentIdField, String iconClsField, String disabledField, String tab, Map<String, String> argsMap){
 		Iterator it =list.listIterator();
 		//构建子菜单
 		while(it.hasNext()) {
@@ -273,7 +293,13 @@ public class MenubuttonTag extends Tag {
 			//currentParentId有可能为空，所以在右侧
 			if (parentId.equals(currentParentId)) {
 				//选拼接<div>开始标签MenuItem属性和内容
-				stringBuilder.append(tab).append(TAB).append("<div parentId=\""+parentId+"\" id=\""+id+"\" data-options=\"blankKey:''");
+				if(argsMap.containsKey(ITEM_WIDTH)){
+					//-3个像素，避免菜单之间的间隔
+					Integer itemWidth = Integer.parseInt(argsMap.get(ITEM_WIDTH)) - 3;
+					stringBuilder.append(tab).append(TAB).append("<div parentId=\""+parentId+"\" style=\"width:" + itemWidth + "px;\" id=\""+id+"\" data-options=\"blankKey:''");
+				}else {
+					stringBuilder.append(tab).append(TAB).append("<div parentId=\""+parentId+"\" id=\""+id+"\" data-options=\"blankKey:''");
+				}
 				stringBuilder.append("," + getDataOptions(row, isMap));
 				if (iconCls != null) {
 					stringBuilder.append(", iconCls:'" + iconCls + "'");
@@ -285,11 +311,17 @@ public class MenubuttonTag extends Tag {
 				stringBuilder.append(tab).append(TAB).append(TAB).append(getData(row, textField, isMap)).append(LINE_SEPARATOR);
 				//如果有子节点，就拼接子的<div>开始，然后再递归
 				if (hasChild(list, id, isMap, parentIdField)) {
-					stringBuilder.append(tab).append(TAB).append(TAB).append("<div>").append(LINE_SEPARATOR);
-					appendMenuItem(stringBuilder, list, id, isMap, textField, idField, parentIdField, iconClsField, disabledField, tab + TAB + TAB);
+					if(argsMap.containsKey(ITEM_WIDTH)){
+						stringBuilder.append(tab).append(TAB).append(TAB).append("<div style=\"width:" + argsMap.get(ITEM_WIDTH) + "px;\">").append(LINE_SEPARATOR);
+					}else{
+						stringBuilder.append(tab).append(TAB).append(TAB).append("<div>").append(LINE_SEPARATOR);
+					}
+
+					appendMenuItem(stringBuilder, list, id, isMap, textField, idField, parentIdField, iconClsField, disabledField, tab + TAB + TAB, argsMap);
 					//递归子节点完了关闭</div>
 					stringBuilder.append(tab).append(TAB).append(TAB).append("</div>").append(LINE_SEPARATOR);
 					stringBuilder.append(tab).append(TAB).append("</div>").append(LINE_SEPARATOR);
+					setData(row, "id", null , isMap);
 				} else {
 					//如果没有子标签就直接关闭</div>
 					stringBuilder.append(tab).append(TAB).append("</div>").append(LINE_SEPARATOR);

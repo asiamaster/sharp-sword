@@ -13,6 +13,7 @@ public class CommonTagFactory implements TagFactory {
         this.tag = tag;
     }
 
+    @Override
     public Tag createTag(){
         return tag;
     }

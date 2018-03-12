@@ -54,7 +54,7 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 	 * 进行代理调用<br>
 	 * 当前没有进行类型转换，估计需要进行类型转换
 	 */
-	@SuppressWarnings("unchecked")
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		// 是Bean的Get或Set方法时
 		if (POJOUtils.isBeanMethod(method)) {

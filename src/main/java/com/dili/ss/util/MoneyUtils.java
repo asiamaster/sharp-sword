@@ -26,9 +26,10 @@ public class MoneyUtils {
     }
 
     public static String centToYuan(Long cent) {
-        if(cent != null && cent.longValue() > 0L) {
+        if(cent != null){
+//        if(cent != null && cent.longValue() > 0L) {
             long yuan = cent.longValue() / 100L;
-            long mod = cent.longValue() % 100L;
+            long mod = Math.abs(cent.longValue() % 100L);
             long jiao = mod / 10L;
             long fen = mod % 10L;
             return yuan + "." + jiao + "" + fen;

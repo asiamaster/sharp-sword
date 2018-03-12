@@ -2,8 +2,11 @@ package com.dili.ss.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.constant.SsConstants;
 import com.dili.ss.domain.ExportParam;
+import com.dili.ss.util.DateUtils;
 import com.dili.ss.util.ExportUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,15 @@ public class ExportController {
     ExportUtils exportUtils;
 
 
+    @RequestMapping("/isFinished")
+    public @ResponseBody String isFinished(HttpServletRequest request, HttpServletResponse response, @RequestParam("token") String token) throws InterruptedException {
+        while(!SsConstants.EXPORT_FLAG.containsKey(token)){
+            Thread.sleep(1000L);
+        }
+        log.info("export token["+token+"] finished at:"+ DateUtils.dateFormat(SsConstants.EXPORT_FLAG.get(token)));
+        SsConstants.EXPORT_FLAG.remove(token);
+        return "true";
+    }
     /**
      * 服务端导出
      *
@@ -41,16 +53,27 @@ public class ExportController {
      * @param title
      */
     @RequestMapping("/serverExport")
-    public @ResponseBody void serverExport(HttpServletRequest request, HttpServletResponse response,
-                      @RequestParam("columns") String columns,
-                      @RequestParam("queryParams") String queryParams,
-                      @RequestParam("title") String title,
-                      @RequestParam("url") String url) {
+    public @ResponseBody String serverExport(HttpServletRequest request, HttpServletResponse response,
+                                             @RequestParam("columns") String columns,
+                                             @RequestParam("queryParams") String queryParams,
+                                             @RequestParam("title") String title,
+                                             @RequestParam("url") String url,
+                                             @RequestParam("token") String token) {
         try {
+            if(StringUtils.isBlank(token)){
+                SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
+                return "令牌不存在";
+            }
+            if(SsConstants.EXPORT_FLAG.size()>=SsConstants.LIMIT){
+                SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
+                return "服务器忙，请稍候再试";
+            }
             exportUtils.export(request, response, buildExportParam(columns, queryParams, title, url));
+            SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     private ExportParam buildExportParam(String columns, String queryParams, String title, String url){

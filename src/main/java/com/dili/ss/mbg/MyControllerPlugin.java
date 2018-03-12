@@ -179,7 +179,7 @@ public class MyControllerPlugin extends PluginAdapter {
         listMethod.addBodyLines(bodyLines);
 
         listMethod.addAnnotation("@ApiOperation(\"跳转到" + unit.getType().getShortName() + "页面\")");
-        listMethod.addAnnotation("@RequestMapping(value=\"/index\", method = RequestMethod.GET)");
+        listMethod.addAnnotation("@RequestMapping(value=\"/index.html\", method = RequestMethod.GET)");
         clazz.addMethod(listMethod);
     }
 

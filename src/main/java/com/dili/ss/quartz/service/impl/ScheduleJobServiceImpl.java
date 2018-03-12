@@ -9,6 +9,7 @@ import com.dili.ss.quartz.service.JobTaskService;
 import com.dili.ss.quartz.service.ScheduleJobService;
 import com.dili.ss.util.CronDateUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,10 +38,14 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 	public void addJob(ScheduleJob scheduleJob, boolean overwrite) {
 		try {
 			try {
-				//解析成功的话就是个固定的时间，需要判断当前cron表达式是否超时，超时就不添加调度任务，避免报错
-				Date date = CronDateUtils.getDate(scheduleJob.getCronExpression());
-				if (date.getTime() >= System.currentTimeMillis() + 5000) {
+				if(StringUtils.isBlank(scheduleJob.getCronExpression())){
 					jobTaskService.addJob(scheduleJob, overwrite);
+				}else {
+					//解析成功的话就是个固定的时间，需要判断当前cron表达式是否超时，超时就不添加调度任务，避免报错
+					Date date = CronDateUtils.getDate(scheduleJob.getCronExpression());
+					if (date.getTime() >= System.currentTimeMillis() + 5000) {
+						jobTaskService.addJob(scheduleJob, overwrite);
+					}
 				}
 			} catch (ParseException e) {
 				//解析出错就不解析，继续添加调度任务
@@ -53,66 +58,63 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 	}
 
 	@Override
-	public int insert(ScheduleJob scheduleJob) {
-		try {
-			jobTaskService.addJob(scheduleJob, true);
-			scheduleJob.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
-		} catch (SchedulerException e) {
-			handleSchedulerException(e, scheduleJob);
+	public int insert(ScheduleJob scheduleJob, boolean schedule) {
+		if(!checkRepeat(scheduleJob.getJobGroup(), scheduleJob.getJobName())){
+			return 0;
+		}
+		if(schedule) {
+			try {
+				jobTaskService.addJob(scheduleJob, true);
+				scheduleJob.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
+			} catch (SchedulerException e) {
+				handleSchedulerException(e, scheduleJob);
+			}
 		}
 		return super.insert(scheduleJob);
 	}
 
 	@Override
-	public int insertSelective(ScheduleJob scheduleJob) {
-		try {
-			jobTaskService.addJob(scheduleJob, true);
-			scheduleJob.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
-		} catch (SchedulerException e) {
-			handleSchedulerException(e, scheduleJob);
+	public int insertSelective(ScheduleJob scheduleJob, boolean schedule) {
+		if(!checkRepeat(scheduleJob.getJobGroup(), scheduleJob.getJobName())){
+			return 0;
+		}
+		if(schedule) {
+			try {
+				jobTaskService.addJob(scheduleJob, true);
+				scheduleJob.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
+			} catch (SchedulerException e) {
+				handleSchedulerException(e, scheduleJob);
+			}
 		}
 		return super.insertSelective(scheduleJob);
 	}
 
-
 	@Override
-	public int batchInsert(List<ScheduleJob> list) {
+	public int batchInsert(List<ScheduleJob> list, boolean schedule) {
 		for (ScheduleJob job : list) {
-			try {
-				jobTaskService.addJob(job, true);
-				job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
-			} catch (SchedulerException e) {
-				handleSchedulerException(e, job);
+			if (!checkRepeat(job.getJobGroup(), job.getJobName())) {
+				return 0;
+			}
+		}
+		if(schedule) {
+			for (ScheduleJob job : list) {
+				try {
+					jobTaskService.addJob(job, true);
+					job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
+				} catch (SchedulerException e) {
+					handleSchedulerException(e, job);
+				}
 			}
 		}
 		return super.batchInsert(list);
 	}
 
 	@Override
-	public int update(ScheduleJob job) {
-		try {
-			jobTaskService.updateJob(job);
-			job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
-		} catch (SchedulerException e) {
-			handleSchedulerException(e, job);
+	public int update(ScheduleJob job, boolean schedule) {
+		if (!checkUpdateRepeat(job.getId(), job.getJobGroup(), job.getJobName())) {
+			return 0;
 		}
-		return super.update(job);
-	}
-
-	@Override
-	public int updateSelective(ScheduleJob job) {
-		try {
-			jobTaskService.updateJob(job);
-			job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
-		} catch (SchedulerException e) {
-			handleSchedulerException(e, job);
-		}
-		return super.updateSelective(job);
-	}
-
-	@Override
-	public int batchUpdateSelective(List<ScheduleJob> list) {
-		for (ScheduleJob job : list) {
+		if(schedule) {
 			try {
 				jobTaskService.updateJob(job);
 				job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
@@ -120,29 +122,64 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				handleSchedulerException(e, job);
 			}
 		}
+		return super.update(job);
+	}
+
+	@Override
+	public int updateSelective(ScheduleJob job, boolean schedule) {
+		if (!checkUpdateRepeat(job.getId(), job.getJobGroup(), job.getJobName())) {
+			return 0;
+		}
+		if(schedule) {
+			try {
+				jobTaskService.updateJob(job);
+				job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
+			} catch (SchedulerException e) {
+				handleSchedulerException(e, job);
+			}
+		}
+		return super.updateExactSimple(job);
+	}
+
+	@Override
+	public int batchUpdateSelective(List<ScheduleJob> list, boolean schedule) {
+		if(schedule) {
+			for (ScheduleJob job : list) {
+				try {
+					jobTaskService.updateJob(job);
+					job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
+				} catch (SchedulerException e) {
+					handleSchedulerException(e, job);
+				}
+			}
+		}
 		return super.batchUpdateSelective(list);
 	}
 
 	@Override
-	public int delete(List<Long> ids) {
-		try {
-			for (Long id : ids) {
-				jobTaskService.deleteJob(get(id));
+	public int delete(List<Long> ids, boolean schedule) {
+		if(schedule) {
+			try {
+				for (Long id : ids) {
+					jobTaskService.deleteJob(get(id));
+				}
+			} catch (SchedulerException e) {
+				LOGGER.error(e.getMessage());
+				throw new RuntimeException(e);
 			}
-		} catch (SchedulerException e) {
-			LOGGER.error(e.getMessage());
-			throw new RuntimeException(e);
 		}
 		return super.delete(ids);
 	}
 
 	@Override
-	public int delete(Long id) {
-		try {
-			jobTaskService.deleteJob(get(id));
-		} catch (SchedulerException e) {
-			LOGGER.error(e.getMessage());
-			throw new RuntimeException(e);
+	public int delete(Long id, boolean schedule) {
+		if(schedule) {
+			try {
+				jobTaskService.deleteJob(get(id));
+			} catch (SchedulerException e) {
+				LOGGER.error(e.getMessage());
+				throw new RuntimeException(e);
+			}
 		}
 		return super.delete(id);
 	}
@@ -221,6 +258,16 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 		}
 	}
 
+	@Override
+	public List<ScheduleJob> getAllJob() throws SchedulerException {
+		return jobTaskService.getAllJob();
+	}
+
+	@Override
+	public List<ScheduleJob> getRunningJob() throws SchedulerException {
+		return jobTaskService.getRunningJob();
+	}
+
 	/**
 	 * 统一处理调度异常
 	 *
@@ -236,4 +283,50 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 			scheduleJob.setJobStatus(QuartzConstants.JobStatus.ERROR.getCode());
 		}
 	}
+
+	/**
+	 * 调度删除一个job
+	 *
+	 * @param scheduleJob
+	 * @throws SchedulerException
+	 */
+	@Override
+	public void deleteJob(ScheduleJob scheduleJob) throws SchedulerException{
+		jobTaskService.deleteJob(scheduleJob);
+	}
+
+	/**
+	 * 检查调度器名称和组名不重复, 重复返回false
+	 * @param group
+	 * @param name
+	 * @return
+	 */
+	private boolean checkRepeat(String group, String name){
+		ScheduleJob scheduleJob = DTOUtils.newDTO(ScheduleJob.class);
+		scheduleJob.setJobName(name);
+		scheduleJob.setJobGroup(group);
+		return getActualDao().select(scheduleJob).size() > 0 ? false: true;
+	}
+
+	/**
+	 * 检查修改调度器时，名称和组名除当前名称外，不重复, 重复返回false
+	 * @param group
+	 * @param name
+	 * @return
+	 */
+	private boolean checkUpdateRepeat(Long id, String group, String name){
+		ScheduleJob scheduleJob = DTOUtils.newDTO(ScheduleJob.class);
+		scheduleJob.setJobName(name);
+		scheduleJob.setJobGroup(group);
+		List<ScheduleJob> scheduleJobs = getActualDao().select(scheduleJob);
+		if(scheduleJobs.isEmpty()){
+			return true;
+		}
+		//如果名称没有变动
+		if(id.equals(scheduleJobs.get(0).getId())){
+			return true;
+		}
+		return false;
+	}
+
 }

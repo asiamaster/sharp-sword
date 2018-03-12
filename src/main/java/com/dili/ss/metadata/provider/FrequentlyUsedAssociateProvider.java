@@ -50,8 +50,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Created by asiamaster on 2017/8/30 0022.
  */
 @Component("fuaProvider")
-@ConfigurationProperties(prefix = "fuaProvider")
 @ConditionalOnExpression("'${fuaProvider.enable}'=='true'")
+@ConfigurationProperties(prefix = "fuaProvider")
 public class FrequentlyUsedAssociateProvider implements ApplicationListener<ContextRefreshedEvent>, ValueProvider {
 
 	protected static final Logger LOGGER = LoggerFactory.getLogger(FrequentlyUsedAssociateProvider.class);

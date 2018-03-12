@@ -2,14 +2,13 @@ package com.dili.http.okhttp.request;
 
 import com.dili.http.okhttp.OkHttpUtils;
 import com.dili.http.okhttp.callback.Callback;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by wm on 17/3/9.
@@ -17,6 +16,7 @@ import okhttp3.Response;
  */
 public class RequestCall
 {
+//    protected static final Logger logger = LoggerFactory.getLogger(RequestCall.class);
     private OkHttpRequest okHttpRequest;
     private Request request;
     private Call call;
@@ -65,7 +65,6 @@ public class RequestCall
                     .writeTimeout(writeTimeOut, TimeUnit.MILLISECONDS)
                     .connectTimeout(connTimeOut, TimeUnit.MILLISECONDS)
                     .build();
-
             call = clone.newCall(request);
         } else
         {

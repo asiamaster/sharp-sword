@@ -9,7 +9,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 /**
- * hibernate-validator配置
  * Created by asiam on 2018/3/9 0009.
  */
 @Configuration

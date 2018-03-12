@@ -1,6 +1,7 @@
 package com.dili.ss.quartz.domain;
 
 import com.dili.ss.dto.IBaseDomain;
+import com.dili.ss.dto.IMybatisForceParams;
 import com.dili.ss.metadata.FieldEditor;
 import com.dili.ss.metadata.annotation.EditMode;
 import com.dili.ss.metadata.annotation.FieldDef;
@@ -14,7 +15,7 @@ import java.util.Date;
  * This file was generated on 2017-10-24 09:32:32.
  */
 @Table(name = "`schedule_job`")
-public interface ScheduleJob extends IBaseDomain {
+public interface ScheduleJob extends IBaseDomain, IMybatisForceParams {
 //    //无
 //    public static final Integer STATUS_NONE = 0;
 //    //正常

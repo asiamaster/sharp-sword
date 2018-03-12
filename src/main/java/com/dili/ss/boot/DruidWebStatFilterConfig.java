@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnExpression("'${druidFilter.enable}'=='true'")
-@ConfigurationProperties(prefix="druidFilter")
+@ConfigurationProperties(prefix="druidFilter", ignoreInvalidFields=true)
 public class DruidWebStatFilterConfig {
 
     @Value("${loginUsername:admin}")
