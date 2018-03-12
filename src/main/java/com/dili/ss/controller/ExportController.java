@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.ExportParam;
 import com.dili.ss.util.ExportUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,7 @@ import java.util.Map;
 @RequestMapping("/export")
 public class ExportController {
 
-    public final static Logger log = Logger.getLogger(ExportController.class);
+    public final static Logger log = LoggerFactory.getLogger(ExportController.class);
 
     @Autowired
     ExportUtils exportUtils;

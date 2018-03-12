@@ -7,7 +7,6 @@ package com.dili.ss.boot;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.cache.CacheManager;
@@ -24,6 +23,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -61,11 +62,21 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
      *
      * @return
      */
+//    @Bean
+//    public CacheManager cacheManager(@Qualifier("redisTemplate") RedisTemplate<?, ?> redisTemplate) {
+//        CacheManager cacheManager = new RedisCacheManager(redisTemplate);
+//        return cacheManager;
+//    }
     @Bean
-    public CacheManager cacheManager(@Qualifier("redisTemplate") RedisTemplate<?, ?> redisTemplate) {
-        CacheManager cacheManager = new RedisCacheManager(redisTemplate);
-        return cacheManager;
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheManager.RedisCacheManagerBuilder builder = RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory);
+        Set<String> cacheNames = new HashSet<String>() {{
+            add("codeNameCache");
+        }};
+        builder.initialCacheNames(cacheNames);
+        return builder.build();
     }
+
 
     /**
      * KEY生成器用法:

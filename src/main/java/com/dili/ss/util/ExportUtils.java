@@ -9,11 +9,12 @@ import com.dili.ss.domain.TableHeader;
 import com.dili.ss.metadata.ValueProvider;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
-import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ExportUtils {
 
-    public final static Logger log = Logger.getLogger(ExportUtils.class);
+    public final static Logger log = LoggerFactory.getLogger(ExportUtils.class);
 
     //每次去后台获取条数
     private final static int FETCH_COUNT = 20000;
