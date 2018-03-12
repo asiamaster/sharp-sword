@@ -10,6 +10,16 @@ Array.prototype.contains = function(val){
 
 //============================  方法定义  ============================
 
+/**
+ * 判断对象是否是JSON
+ * @param obj
+ * @returns {boolean}
+ */
+var isJson = function(obj){
+    var isjson = typeof(obj) == "object" && Object.prototype.toString.call(obj).toLowerCase() == "[object object]" && !obj.length;
+    return isjson;
+}
+
 //textbox有数据修改时也要显示清空按钮
 function _changeTextboxShowClear(newValue, oldValue) {
     var icon = $(this).textbox('getIcon',0);
@@ -17,6 +27,10 @@ function _changeTextboxShowClear(newValue, oldValue) {
         icon.css('visibility','hidden');
     } else {
         icon.css('visibility','visible');
+    }
+    if(newValue == $(this).textbox("getText")){
+        $(this).textbox("initValue", oldValue);
+        $(this).textbox("setText", newValue);
     }
 }
 //判断textbox中icons对象数组中是否存在iconCls
@@ -83,6 +97,8 @@ function bindMetadata(gridId, isClearQueryParams){
     //获取最后一行的列(可能是多表头)
     var lastColumns = opts.columns[opts.columns.length-1];
     params["metadata"] = {};
+    //提供者的默认排序索引
+    var index = 1;
     for(var column in lastColumns){
         var _provider = lastColumns[column]["_provider"];
         var _data = lastColumns[column]["_data"];
@@ -97,25 +113,58 @@ function bindMetadata(gridId, isClearQueryParams){
         }
         //没有_data属性，则解析_table,_valueField和_textField等其它属性
         var _table = lastColumns[column]["_table"];
-        var _valueField = lastColumns[column]["_valueField"];
-        var _textField = lastColumns[column]["_textField"];
-        var _queryParams = lastColumns[column]["_queryParams"];
-        //如果有表信息，则使用simpleValueProvider
+        //如果有_table属性，则按simpleValueProvider处理
         if(_table != null){
             _provider = "simpleValueProvider";
         }
         if(_provider != null){
+            //设值
             var field = lastColumns[column]["field"];
             var fieldMetadata = {};
             fieldMetadata["provider"] = _provider;
             fieldMetadata["table"] = _table;
-            fieldMetadata["valueField"] = _valueField;
-            fieldMetadata["textField"] = _textField;
-            fieldMetadata["queryParams"] = _queryParams;
+            fieldMetadata["valueField"] = lastColumns[column]["_valueField"];
+            fieldMetadata["textField"] = lastColumns[column]["_textField"];
+            fieldMetadata["queryParams"] = lastColumns[column]["_queryParams"];
+            fieldMetadata["index"] = lastColumns[column]["_index"] == null ? index : lastColumns[column]["_index"];
+            fieldMetadata["field"] = field;
+            //设置通用批量提供者参数
+            fieldMetadata["_escapeFileds"] = lastColumns[column]["_escapeFileds"];
+            fieldMetadata["_relationTablePkField"] = lastColumns[column]["_relationTablePkField"];
+            fieldMetadata["_relationTable"] = lastColumns[column]["_relationTable"];
+            fieldMetadata["_fkField"] = lastColumns[column]["_fkField"];
             params["metadata"][field] = JSON.stringify(fieldMetadata);
+            index++;
         }
     }
     return params;
+}
+
+/**
+ * 为表单绑定表格的metadata，保持原有的meta信息
+ * 返回绑定好的对象
+ * @param gridId
+ * @param formId
+ * @returns {*}
+ */
+function bindGridMeta2Form(gridId, formId, containsNull){
+    var param = bindMetadata(gridId, true);
+    if(!formId || formId == null || formId === "") return param;
+    var formData = $("#"+formId).serializeObject(containsNull);
+    return $.extend({}, param, formData);
+}
+
+/**
+ * 为一个JSON对象绑定表格的metadata，保持原有的meta信息
+ * 返回绑定好的对象
+ * @param gridId
+ * @param formId
+ * @returns {*}
+ */
+function bindGridMeta2Data(gridId, json){
+    var param = bindMetadata(gridId, true);
+    if(!json || json == null || json === "" || !isJson(json)) return param;
+    return $.extend({}, param, json);
 }
 
 //树的转换加载
@@ -186,16 +235,42 @@ var treeLoadFilter = function(data,parent){
 }
 
 //树表加载过滤器
-var treegridLoadFilter = function(data,parent){
+var treegridLoadFilter = function(data){
     var parentIdField = $(this).treegrid("options")["_parentIdField"];
+    var idField = $(this).treegrid("options")["idField"];
     if(parentIdField && parentIdField != null && parentIdField != ""){
         if(data.rows){
             modifyJsonKey(data.rows,parentIdField,"_parentId");
+            introspect(data.rows, idField);
         }else{
             modifyJsonKey(data,parentIdField,"_parentId");
+            introspect(data, idField);
         }
     }
     return data;
+}
+//内省，将没有id对应的parentId删除掉
+function introspect(rows, idField){
+    for(var r in rows){
+        var row = rows[r];
+        if(undefined == row["_parentId"] || row["_parentId"] == null || row["_parentId"] === ""){
+            continue;
+        }
+        if(!findParentIdFromId(rows, row["_parentId"], idField)){
+            delete row["_parentId"];
+        }
+    }
+}
+//判断当前行的parentId是否有对应的id
+function findParentIdFromId(rows, parentId, idField){
+    for(var r in rows){
+        var row = rows[r];
+//                parentId找到对应的id
+        if(row[idField] && row[idField] == parentId){
+            return true;
+        }
+    }
+    return false;
 }
 
 //修改json对象或数组中的key
@@ -275,6 +350,8 @@ $(function() {
                     opts.icons.unshift({
                         iconCls: iconCls,
                         handler: function(e){
+                            //针对textbox with button清除不掉，这里强制清除
+                            $(e.data.target).textbox('initValue', "");
                             $(e.data.target).textbox('clear').textbox('textbox').focus();
                             $(this).css('visibility','hidden');
                         }
@@ -454,4 +531,36 @@ function _doComboboxEnter(target){
     if (!opts.multiple){
         t.combobox('hidePanel');
     }
+}
+
+//combobox的onLoadSuccess事件，加载成功后默认选中第一项或第二项(第一项是请选择且value为null)
+function onComboLoadSuccessSelectOne() {
+    var data = $(this).combobox("getData");
+    if(data == null || data.length<=0) return;
+    if(data[0]["value"] == null || data[0]["value"] === ""){
+        if(data == null || data.length<=1) return;
+        $(this).combobox("select", data[1]["value"]);
+    }else{
+        $(this).combobox("select", data[0]["value"]);
+    }
+}
+
+/**
+ * 判断面板是否折叠
+ * @param panelId
+ * @returns {boolean}
+ */
+function isCollapse(panelId){
+    return $("#"+panelId)[0].clientWidth <= 0;
+}
+/**
+ * 清除表单值，主要针对easyui form的clear方法无法清除textbox with button的问题
+ * @param formId 表单id，必填
+ */
+function clearEasyuiForm(formId){
+    $(':input','#'+formId)
+        .not(':button, :submit, :reset')
+        .val('')
+        .removeAttr('checked')
+        .removeAttr('selected');
 }

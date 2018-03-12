@@ -216,10 +216,10 @@
                     <input name="conditionField" id="conditionField" data-options="onChange:onChangeCondition, editable:false, width:250" panelWidth="auto" panelHeight="auto" label="条件项:" />
                     <#comboProvider _id="conditionField" _provider="beanFieldProvider" _queryParams='${dtoClass}' />
                 </td>
-                <td width="60">
-                    <a id="addBtn" width="120" href="#" onClick="addConditionItem()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>
+                <td width="40">
+                    <a id="addBtn" width="40" href="#" onClick="addConditionItem()" class="easyui-linkbutton" data-options="iconCls:'icon-add'"></a>
                 </td>
-                <td rowspan="4" width="260">
+                <td rowspan="4" width="280">
                     <ul class="easyui-datalist" id="conditionItemsList" data-options="onDblClickRow:conditionItemsListDblClickRow" lines="true" style="width:255px;height:160px">
                     </ul>
                 </td>
@@ -230,7 +230,7 @@
                     <#comboProvider _id="relationField" _data='[{"text":"等于","value":"Equal"}, {"text":"不等于","value":"NotEqual"}, {"text":"大于","value":"GreatThan"}, {"text":"大于等于","value":"GreatEqualThan"}, {"text":"小于","value":"LittleThan"}, {"text":"小于等于","value":"LittleEqualThan"}, {"text":"匹配","value":"Match"}, {"text":"不匹配","value":"NotMatch"}, {"text":"是","value":"Is"}, {"text":"非","value":"IsNot"}]' />
                 </td>
                 <td>
-                    <a id="deleteBtn" width="120" href="#" onclick="removeConditionItem()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除</a>
+                    <a id="deleteBtn" width="40" href="#" onclick="removeConditionItem()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'"></a>
                 </td>
             </tr>
             <tr>
@@ -241,7 +241,7 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    条件项关系:&nbsp;&nbsp;&nbsp;
+                    <p style="font-size: 14px;">条件项关系:</p>&nbsp;&nbsp;&nbsp;
                     <input type="radio" id="conditionRelationFieldAnd" name="conditionRelationField" value="and" checked="checked" > 全部"与" </input>
                     <input type="radio" id="conditionRelationFieldOr" name="conditionRelationField" value="or"> 全部"或" </input>
                     <input type="radio" id="conditionRelationFieldNone" name="conditionRelationField" value="none"> 无条件 </input>

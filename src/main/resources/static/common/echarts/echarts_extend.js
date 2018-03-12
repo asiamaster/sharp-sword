@@ -1,80 +1,80 @@
 //各种图形需要的数据结构：
 /*
  pie图：
-    [
-    { name: 'Firefox', value: 45.0 },
-    { name: 'IE', value: 26.8 },
-    { name: 'Safari', value: 8.5 },
-    { name: 'Opera', value: 6.2 },
-    { name: '其他', value: 0.7 }];
+ [
+ { name: 'Firefox', value: 45.0 },
+ { name: 'IE', value: 26.8 },
+ { name: 'Safari', value: 8.5 },
+ { name: 'Opera', value: 6.2 },
+ { name: '其他', value: 0.7 }];
 
-  Line图、Bar图：
-[
-    { group: 'Beijing', name: '1月', value: 10 },
-    { group: 'Beijing', name: '2月', value: 15 },
-    { group: 'Beijing', name: '3月', value: 12 },
-    { group: 'Beijing', name: '4月', value: 14 },
-    { group: 'Tokyo', name: '1月', value: 12 },
-    { group: 'Tokyo', name: '2月', value: 15 },
-    { group: 'Tokyo', name: '3月', value: 2 },
-    { group: 'Tokyo', name: '4月', value: 14 }];
+ Line图、Bar图：
+ [
+ { group: 'Beijing', name: '1月', value: 10 },
+ { group: 'Beijing', name: '2月', value: 15 },
+ { group: 'Beijing', name: '3月', value: 12 },
+ { group: 'Beijing', name: '4月', value: 14 },
+ { group: 'Tokyo', name: '1月', value: 12 },
+ { group: 'Tokyo', name: '2月', value: 15 },
+ { group: 'Tokyo', name: '3月', value: 2 },
+ { group: 'Tokyo', name: '4月', value: 14 }];
 
-//散点图
-        var dataAll = [
-        [
-            [10.0, 8.04],
-            [8.0, 6.95],
-            [13.0, 7.58],
-            [9.0, 8.81],
-            [11.0, 8.33],
-            [14.0, 9.96],
-            [6.0, 7.24],
-            [4.0, 4.26],
-            [12.0, 10.84],
-            [7.0, 4.82],
-            [5.0, 5.68]
-        ],
-        [
-            [10.0, 9.14],
-            [8.0, 8.14],
-            [13.0, 8.74],
-            [9.0, 8.77],
-            [11.0, 9.26],
-            [14.0, 8.10],
-            [6.0, 6.13],
-            [4.0, 3.10],
-            [12.0, 9.13],
-            [7.0, 7.26],
-            [5.0, 4.74]
-        ],
-        [
-            [10.0, 7.46],
-            [8.0, 6.77],
-            [13.0, 12.74],
-            [9.0, 7.11],
-            [11.0, 7.81],
-            [14.0, 8.84],
-            [6.0, 6.08],
-            [4.0, 5.39],
-            [12.0, 8.15],
-            [7.0, 6.42],
-            [5.0, 5.73]
-        ],
-        [
-            [8.0, 6.58],
-            [8.0, 5.76],
-            [8.0, 7.71],
-            [8.0, 8.84],
-            [8.0, 8.47],
-            [8.0, 7.04],
-            [8.0, 5.25],
-            [19.0, 12.50],
-            [8.0, 5.56],
-            [8.0, 7.91],
-            [8.0, 6.89]
-        ]
-        ];
-    */
+ //散点图
+ var dataAll = [
+ [
+ [10.0, 8.04],
+ [8.0, 6.95],
+ [13.0, 7.58],
+ [9.0, 8.81],
+ [11.0, 8.33],
+ [14.0, 9.96],
+ [6.0, 7.24],
+ [4.0, 4.26],
+ [12.0, 10.84],
+ [7.0, 4.82],
+ [5.0, 5.68]
+ ],
+ [
+ [10.0, 9.14],
+ [8.0, 8.14],
+ [13.0, 8.74],
+ [9.0, 8.77],
+ [11.0, 9.26],
+ [14.0, 8.10],
+ [6.0, 6.13],
+ [4.0, 3.10],
+ [12.0, 9.13],
+ [7.0, 7.26],
+ [5.0, 4.74]
+ ],
+ [
+ [10.0, 7.46],
+ [8.0, 6.77],
+ [13.0, 12.74],
+ [9.0, 7.11],
+ [11.0, 7.81],
+ [14.0, 8.84],
+ [6.0, 6.08],
+ [4.0, 5.39],
+ [12.0, 8.15],
+ [7.0, 6.42],
+ [5.0, 5.73]
+ ],
+ [
+ [8.0, 6.58],
+ [8.0, 5.76],
+ [8.0, 7.71],
+ [8.0, 8.84],
+ [8.0, 8.47],
+ [8.0, 7.04],
+ [8.0, 5.25],
+ [19.0, 12.50],
+ [8.0, 5.56],
+ [8.0, 7.91],
+ [8.0, 6.89]
+ ]
+ ];
+ */
 
 //判断数组中是否包含某个元素
 Array.prototype.contains = function (obj) {
@@ -122,22 +122,32 @@ var MyECharts = {
             for (var i = 0; i < groups.length; i++) {
                 var temp_series = {};
                 var temp_data = new Array();
-                for (var j = 0; j < data.length; j++) {
-                    for (var k = 0; k < names.length; k++)
-                        if (groups[i] == data[j][groupField] && data[j][nameField] == names[k])
+                temp_series = { name: groups[i], type: type, data: temp_data, smooth:true };
+                for (var k = 0; k < names.length; k++){
+                    //判断datas中是否包含name
+                    var containsName = false;
+                    for (var j = 0; j < data.length; j++) {
+                        if (groups[i] == data[j][groupField] && data[j][nameField] == names[k]){
+                            containsName = true;
                             temp_data.push(data[j][valueField]);
+                        }
                     }
-                    temp_series = { name: groups[i], type: type, data: temp_data, smooth:true };
-                    series.push(temp_series);
+                    //不包含则默认填0
+                    if(!containsName){
+                        temp_data.push(0);
+                    }
                 }
-                return { legend: groups,category: names, series: series };
+                series.push(temp_series);
             }
-        },
+            return { legend: groups,category: names, series: series };
+        }
+    },
     //生成图形
     ChartOptionTemplates: {
         //柱状图
         Bar: function (title, subtext, data, nameField, valueField, groupField, opts) {
             var datas = MyECharts.ChartDataFormat.FormatGroupData(data, 'bar', nameField, valueField, groupField);
+//                alert(JSON.stringify(datas));
             var option = {
                 title: {
                     text: title || '',
@@ -147,7 +157,7 @@ var MyECharts = {
                     data:datas.legend
                 },
                 tooltip: {
-                	 trigger: 'axis'
+                    trigger: 'axis'
                 },
                 calculable : true,
                 toolbox: {
@@ -161,19 +171,19 @@ var MyECharts = {
                     }
                 },
                 xAxis: [
-                {
-                    type: 'category',
-                    data: datas.category
-                }
+                    {
+                        type: 'category',
+                        data: datas.category
+                    }
                 ],
                 yAxis: [
-                {
-                    type: 'value'
-                }
+                    {
+                        type: 'value'
+                    }
                 ],
                 series: datas.series
             };
-            $.extend(option, opts);
+            $.extend(true, option, opts);
             return option;
         },
         //折线图
@@ -201,19 +211,19 @@ var MyECharts = {
                     }
                 },
                 xAxis: [
-                {
-                    type: 'category',
-                    data: datas.category
-                }
+                    {
+                        type: 'category',
+                        data: datas.category
+                    }
                 ],
                 yAxis: [
-                {
-                    type: 'value'
-                }
+                    {
+                        type: 'value'
+                    }
                 ],
                 series: datas.series
             };
-            $.extend(option, opts);
+            $.extend(true, option, opts);
             return option;
         },
         //饼图
@@ -246,23 +256,23 @@ var MyECharts = {
                     data: datas.category
                 },
                 series: [
-                {
-                    name: title,
-                    type: 'pie',
-                    radius: '55%',
-                    center: ['50%', '60%'],
-                    data: datas.data,
-                    itemStyle: {
-                        emphasis: {
-                            shadowBlur: 10,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    {
+                        name: title,
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        data: datas.data,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
                         }
                     }
-                }
                 ]
             };
-            $.extend(option, opts);
+            $.extend(true, option, opts);
             return option;
         },
         //散点图
@@ -301,10 +311,10 @@ var MyECharts = {
                     y: 0
                 },
                 grid: [
-                {x: '7%', y: '7%', width: '38%', height: '38%'},
-                {x2: '7%', y: '7%', width: '38%', height: '38%'},
-                {x: '7%', y2: '7%', width: '38%', height: '38%'},
-                {x2: '7%', y2: '7%', width: '38%', height: '38%'}
+                    {x: '7%', y: '7%', width: '38%', height: '38%'},
+                    {x2: '7%', y: '7%', width: '38%', height: '38%'},
+                    {x: '7%', y2: '7%', width: '38%', height: '38%'},
+                    {x2: '7%', y2: '7%', width: '38%', height: '38%'}
                 ],
                 tooltip: {
                     formatter: 'Group {a}: ({c})'
@@ -322,41 +332,41 @@ var MyECharts = {
                     {gridIndex: 3, min: 0, max: 15}
                 ],
                 series: [
-                {
-                    name: 'I',
-                    type: 'scatter',
-                    xAxisIndex: 0,
-                    yAxisIndex: 0,
-                    data: data[0],
-                    markLine: markLineOpt
-                },
-                {
-                    name: 'II',
-                    type: 'scatter',
-                    xAxisIndex: 1,
-                    yAxisIndex: 1,
-                    data: data[1],
-                    markLine: markLineOpt
-                },
-                {
-                    name: 'III',
-                    type: 'scatter',
-                    xAxisIndex: 2,
-                    yAxisIndex: 2,
-                    data: data[2],
-                    markLine: markLineOpt
-                },
-                {
-                    name: 'IV',
-                    type: 'scatter',
-                    xAxisIndex: 3,
-                    yAxisIndex: 3,
-                    data: data[3],
-                    markLine: markLineOpt
-                }
+                    {
+                        name: 'I',
+                        type: 'scatter',
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        data: data[0],
+                        markLine: markLineOpt
+                    },
+                    {
+                        name: 'II',
+                        type: 'scatter',
+                        xAxisIndex: 1,
+                        yAxisIndex: 1,
+                        data: data[1],
+                        markLine: markLineOpt
+                    },
+                    {
+                        name: 'III',
+                        type: 'scatter',
+                        xAxisIndex: 2,
+                        yAxisIndex: 2,
+                        data: data[2],
+                        markLine: markLineOpt
+                    },
+                    {
+                        name: 'IV',
+                        type: 'scatter',
+                        xAxisIndex: 3,
+                        yAxisIndex: 3,
+                        data: data[3],
+                        markLine: markLineOpt
+                    }
                 ]
             };
-            $.extend(option, opts);
+            $.extend(true, option, opts);
             return option;
         }
     },

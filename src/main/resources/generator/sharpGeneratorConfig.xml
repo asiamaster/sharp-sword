@@ -97,12 +97,12 @@
         <!--<sqlMapGenerator targetPackage="mapper"  targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources"/>-->
         <!--<javaClientGenerator targetPackage="com.dili.ss" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java" type="XMLMAPPER" />-->
 
-        <!--<table tableName="%" >-->
-            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
-        <!--</table>-->
-        <table domainObjectName="ScheduleJob" tableName="mbg_provider">
+        <table tableName="project" >
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
+        <!--<table domainObjectName="ScheduleJob" tableName="mbg_provider">-->
+            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
+        <!--</table>-->
         <!--<table domainObjectName="Person" tableName="person">-->
             <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
         <!--</table>-->
