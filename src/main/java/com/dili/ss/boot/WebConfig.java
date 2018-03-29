@@ -1,21 +1,21 @@
 package com.dili.ss.boot;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
-import com.dili.ss.servlet.CSRFInterceptor;
+import com.dili.ss.converter.JsonHttpMessageConverter;
 import com.dili.ss.util.SystemConfigUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
-import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -37,6 +37,9 @@ import java.util.Properties;
 @ConditionalOnExpression("'${web.enable}'=='true'")
 //@EnableWebMvc //不能使用@EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
+
+	@Autowired
+	public Environment env;
 
 	@Bean
 	public Converter<String, Date> addDateConvert() {
@@ -119,13 +122,18 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 				tmp++;
 			}
 		}
+		JsonHttpMessageConverter fastJsonHttpMessageConverter = new JsonHttpMessageConverter();
+//		String dateFormat = env.getProperty("spring.fastjson.date-format");
+//		if(StringUtils.isNotBlank(dateFormat)){
+//			fastJsonHttpMessageConverter.setDateFormat(dateFormat);
+//		}
 		//将FastJsonHttpMessageConverter加在MappingJackson2HttpMessageConverter的位置，比xml解析器靠前，以提升性能
 		if(index != -1){
-			converters.add(index, new FastJsonHttpMessageConverter());
+			converters.add(index, fastJsonHttpMessageConverter);
 		}
 		//如果没有MappingJackson2HttpMessageConverter，还是要在最后加上FastJsonHttpMessageConverter
 		else {
-			converters.add(new FastJsonHttpMessageConverter());
+			converters.add(fastJsonHttpMessageConverter);
 		}
 	}
 
@@ -134,6 +142,15 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		super.addArgumentResolvers(argumentResolvers);
 		argumentResolvers.add(new DTOArgumentResolver());
 	}
+
+	/**
+	 * 自定义返回类型
+	 * @return
+	 */
+//	@Bean
+//	public ResponseBodyWrapFactoryBean getResponseBodyWrap() {
+//		return new ResponseBodyWrapFactoryBean();
+//	}
 
 
 	/**

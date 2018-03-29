@@ -521,14 +521,22 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                     StringBuilder sb = new StringBuilder();
                     if(Collection.class.isAssignableFrom(fieldType)){
                         for(Object o : (Collection)value){
-                            sb.append(", ").append(o);
+							if(o instanceof String){
+								sb.append(", '").append(o).append("'");
+							}else {
+								sb.append(", ").append(o);
+							}
                         }
                     }else if(fieldType.isArray()){
                         for(Object o : ( (Object[])value)){
-                            sb.append(", ").append(o);
+							if(o instanceof String){
+								sb.append(", '").append(o).append("'");
+							}else {
+								sb.append(", ").append(o);
+							}
                         }
                     }else{
-                        sb.append(", ").append(value);
+						sb.append(", '").append(value).append("'");
                     }
                     criteria = criteria.andCondition(columnName + " " + operator.value() + "("+sb.substring(1)+")");
                 }else {
@@ -641,20 +649,29 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                 }
             }else if(operator != null){
                 if(operator.value().equals(Operator.IN) || operator.value().equals(Operator.NOT_IN)){
-                    if(value instanceof List && CollectionUtils.isEmpty((List)value)){
+                    if(value instanceof Collection && CollectionUtils.isEmpty((Collection)value)){
                         continue;
                     }
                     StringBuilder sb = new StringBuilder();
+                    boolean isString = false;
                     if(Collection.class.isAssignableFrom(fieldType)){
                         for(Object o : (Collection)value){
-                            sb.append(", ").append(o);
+							if(o instanceof String){
+								sb.append(", '").append(o).append("'");
+							}else {
+								sb.append(", ").append(o);
+							}
                         }
                     }else if(fieldType.isArray()){
                         for(Object o : ( (Object[])value)){
-                            sb.append(", ").append(o);
+							if(o instanceof String){
+								sb.append(", '").append(o).append("'");
+							}else {
+								sb.append(", ").append(o);
+							}
                         }
                     }else{
-                        sb.append(", ").append(value);
+						sb.append(", '").append(value).append("'");
                     }
                     criteria = criteria.andCondition(columnName + " " + operator.value() + "(" + sb.substring(1) + ")");
                 }else {

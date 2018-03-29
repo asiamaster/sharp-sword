@@ -191,6 +191,8 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
 
     /**
      * 获取关联表数据
+     * @param relationIds 根据主DTO的外键字典(FkField)中的值列表
+     * @param metaMap meta信息
      * @return 可能返回DTO, Map或JavaBean的列表
      */
     protected abstract List getFkList(List<String> relationIds, Map metaMap);

@@ -1,5 +1,8 @@
 package com.dili.ss.dto;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -178,5 +181,25 @@ public class DTO extends HashMap<String, Object> {
 		} catch (Exception ex) {
 		}
 		return super.clone();
+	}
+
+//	private int hash; // Default to 0
+//	@Override
+//	public int hashCode() {
+//		int h = hash;
+//		String value = toString();
+//		if (h == 0 && value.length() > 0) {
+//			char val[] = value.toCharArray();
+//			for (int i = 0; i < value.length(); i++) {
+//				h = 31 * h + val[i];
+//			}
+//			hash = h;
+//		}
+//		return h;
+//	}
+
+	@Override
+	public String toString() {
+		return JSONObject.toJSONString(this);
 	}
 }

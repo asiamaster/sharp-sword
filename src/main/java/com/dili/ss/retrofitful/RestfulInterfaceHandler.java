@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.http.okhttp.OkHttpUtils;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.dto.DTOUtils;
+import com.dili.ss.dto.IDTO;
 import com.dili.ss.retrofitful.annotation.*;
 import com.dili.ss.util.SystemConfigUtils;
 import okhttp3.MediaType;
@@ -212,7 +214,22 @@ public class RestfulInterfaceHandler<T> implements InvocationHandler, Serializab
                 headersMap.put("Content-Type", "application/json;charset=utf-8");
 
                 if("POST".equalsIgnoreCase(httpMethod)){
-                    String json = paramObj instanceof String ? (String)paramObj : JSON.toJSONString(paramObj);
+                    String json = null;
+                    //如果是DTO对象，还需要设置metadata
+                    if(paramObj == null){
+                        json = "";
+                    }else if(DTOUtils.isDTOProxy(paramObj)){
+                        JSONObject paramJo = new JSONObject();
+                        Map<String, Object> metadata = ((IDTO)paramObj).mget();
+                        for(Map.Entry<String, Object> entry : metadata.entrySet()){
+                            paramJo.put("metadata["+entry.getKey()+"]", entry.getValue());
+                        }
+                        paramJo.putAll(DTOUtils.go(paramObj));
+                        json = JSON.toJSONString(paramJo);
+                    }else {
+                        json = paramObj instanceof String ? (String) paramObj : JSON.toJSONString(paramObj);
+                    }
+
 //                    logger.info("RestfulInterfaceHandler.DelegateService.execute, url:"+url+", 返回类型type:+"+type+",json:" + json);
                     resp = okHttpUtils
                             .postString().headers(headersMap)

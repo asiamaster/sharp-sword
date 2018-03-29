@@ -98,7 +98,7 @@ function bindMetadata(gridId, isClearQueryParams){
     var lastColumns = opts.columns[opts.columns.length-1];
     params["metadata"] = {};
     //提供者的默认排序索引
-    var index = 1;
+    var index = 10;
     for(var column in lastColumns){
         var _provider = lastColumns[column]["_provider"];
         var _data = lastColumns[column]["_data"];
@@ -134,7 +134,7 @@ function bindMetadata(gridId, isClearQueryParams){
             fieldMetadata["_relationTable"] = lastColumns[column]["_relationTable"];
             fieldMetadata["_fkField"] = lastColumns[column]["_fkField"];
             params["metadata"][field] = JSON.stringify(fieldMetadata);
-            index++;
+            index+=10;
         }
     }
     return params;
@@ -564,3 +564,23 @@ function clearEasyuiForm(formId){
         .removeAttr('checked')
         .removeAttr('selected');
 }
+//数据表格的页脚视图
+var footerView = $.extend({}, $.fn.datagrid.defaults.view, {
+    renderFooter: function(target, container, frozen){
+        var opts = $.data(target, 'datagrid').options;
+        var rows = $.data(target, 'datagrid').footer || [];
+        var fields = $(target).datagrid('getColumnFields', frozen);
+        var table = ['<table class="datagrid-ftable" cellspacing="0" cellpadding="0" border="0"><tbody>'];
+
+        for(var i=0; i<rows.length; i++){
+            var styleValue = opts.rowStyler ? opts.rowStyler.call(target, i, rows[i]) : '';
+            var style = styleValue ? 'style="' + styleValue + '"' : '';
+            table.push('<tr class="datagrid-row" datagrid-row-index="' + i + '"' + style + '>');
+            table.push(this.renderRow.call(this, target, fields, frozen, i, rows[i]));
+            table.push('</tr>');
+        }
+
+        table.push('</tbody></table>');
+        $(container).html(table.join(''));
+    }
+});

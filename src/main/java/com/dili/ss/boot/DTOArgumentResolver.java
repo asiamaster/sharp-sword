@@ -1,8 +1,10 @@
 package com.dili.ss.boot;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.dto.DTO;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -10,6 +12,11 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import javax.servlet.ServletInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.web.bind.support.WebArgumentResolver.UNRESOLVED;
@@ -49,6 +56,27 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	protected <T extends IDTO> T getDTO(Class<T> clazz, NativeWebRequest webRequest) {
 		// 实例化一个DTO数据对象
 		DTO dto = new DTO();
+		//处理restful调用时，传入的参数不在getParameterMap，而在getInputStream中的情况
+		if(webRequest.getParameterMap().isEmpty()){
+			try {
+				ServletInputStream servletInputStream = ((RequestFacade)webRequest.getNativeRequest()).getInputStream();
+				String inputString = InputStream2String(servletInputStream, "UTF-8");
+				if(StringUtils.isNotBlank(inputString)) {
+					JSONObject jsonObject = JSONObject.parseObject(inputString);
+					for(Map.Entry<String, Object> entry : jsonObject.entrySet()){
+						//单独处理metadata
+						if(entry.getKey().startsWith("metadata[") && entry.getKey().endsWith("]")){
+							dto.setMetadata(entry.getKey().substring(9, entry.getKey().length()-1), entry.getValue());
+						}else{
+							dto.put(entry.getKey(), entry.getValue());
+						}
+					}
+					return DTOUtils.proxy(dto, clazz);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		// 填充值
 		for (Map.Entry<String, String[]> entry : webRequest.getParameterMap().entrySet()) {
 			String attrName = entry.getKey();
@@ -83,6 +111,26 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 */
 	private String getParamValue(Object obj) {
 		return (String) (obj == null ? null : obj.getClass().isArray() ? java.io.File.class.isAssignableFrom(((Object[]) obj)[0].getClass()) ? null  : ((Object[]) obj)[0] : obj);
+	}
+
+	final static int BUFFER_SIZE = 4096;
+	/**
+	 * 将InputStream转换成某种字符编码的String
+	 * @param in
+	 * @param encoding
+	 * @return
+	 * @throws Exception
+	 */
+	public static String InputStream2String(InputStream in, String encoding) throws IOException {
+
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		byte[] data = new byte[BUFFER_SIZE];
+		int count = -1;
+		while((count = in.read(data,0,BUFFER_SIZE)) != -1) {
+			outStream.write(data, 0, count);
+		}
+		data = null;
+		return new String(outStream.toByteArray(), encoding);
 	}
 
 }
