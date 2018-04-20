@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.dto.DTO;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
+import com.dili.ss.util.POJOUtils;
+import com.google.common.collect.Lists;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
@@ -16,7 +18,9 @@ import javax.servlet.ServletInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.web.bind.support.WebArgumentResolver.UNRESOLVED;
@@ -83,7 +87,29 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 			if(attrName.startsWith("metadata[") && attrName.endsWith("]")){
 				dto.setMetadata(attrName.substring(9, attrName.length()-1), getParamValueByForce(entry.getValue()));
 			}else if (Character.isLowerCase(attrName.charAt(0))) {
-				String paramValue = getParamValueByForce(entry.getValue());
+				Object paramValue = null;
+				//前台传入的多个相同name的value是数组，这里key以[]结尾
+				if(attrName.endsWith("[]")){
+					//去掉属性名后面的[]
+					attrName = attrName.substring(0, attrName.length()-2);
+					try {
+						//有get方法的属性，需要判断返回值如果是Array或List，需要转换前台传的有多个相同name的value数组。
+						Method getMethod = clazz.getMethod("get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
+						Class<?> returnType = getMethod.getReturnType();
+						//List需要转换数组
+						//这里entry.getValue()肯定是String[]
+						if(List.class.isAssignableFrom(returnType)){
+							paramValue = Lists.newArrayList((Object[])getParamObjValue(entry.getValue()));
+						}else if(returnType.isArray()){
+							paramValue = getParamObjValue(entry.getValue());
+						}
+					} catch (NoSuchMethodException e) {
+						//没get方法的属性不处理
+					}
+				}
+				if(paramValue == null) {
+					paramValue = getParamValueByForce(entry.getValue());
+				}
 				dto.put(attrName, paramValue);
 			}
 		}
@@ -100,6 +126,15 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	private String getParamValueByForce(Object obj) {
 		String val = getParamValue(obj);
 		return val == null ? null : StringUtils.isBlank(val) ? null : val;
+	}
+
+	/**
+	 * 取参数的对象值
+	 * @param obj
+	 * @return
+	 */
+	private Object getParamObjValue(Object obj) {
+		return obj == null ? null : obj.getClass().isArray() ? java.io.File.class.isAssignableFrom(((Object[]) obj)[0].getClass()) ? null  : obj : obj;
 	}
 
 	/**

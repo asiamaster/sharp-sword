@@ -1,4 +1,4 @@
-package com.dili.ss.base;
+package com.dili.ss.mapper;
 
 /**
  * 精确更新

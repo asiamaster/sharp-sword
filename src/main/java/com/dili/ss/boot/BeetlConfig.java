@@ -41,7 +41,7 @@ public class BeetlConfig  {
     @Autowired
     Map<String, Format> formats;
 
-    @Value("${server.context-path:}")
+    @Value("${server.servlet.context-path:}")
     private String contextPath;
 
     @Bean(initMethod = "init", name = "beetlGroupUtilConfiguration")
@@ -75,7 +75,7 @@ public class BeetlConfig  {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        p.put("contextPath",contextPath.equals("${server.context-path}")?"":contextPath);
+        p.put("contextPath",contextPath.equals("${server.servlet.context-path}")?"":contextPath);
         beetlGroupUtilConfiguration.setSharedVars((Map)p);
         beetlGroupUtilConfiguration.setVirtualAttributeEvals(virtualAttributeEval);
         beetlGroupUtilConfiguration.setFunctions(functions);

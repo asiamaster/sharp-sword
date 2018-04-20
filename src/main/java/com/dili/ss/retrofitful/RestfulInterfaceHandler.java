@@ -188,8 +188,9 @@ public class RestfulInterfaceHandler<T> implements InvocationHandler, Serializab
             okHttpClient = new OkHttpClient.Builder()
                     .retryOnConnectionFailure(false)
 //                .addInterceptor(new LoggerInterceptor("TAG"))
-                    .connectTimeout(10000L, TimeUnit.MILLISECONDS)
-                    .readTimeout(10000L, TimeUnit.MILLISECONDS)
+                    .connectTimeout(60L, TimeUnit.SECONDS)
+                    .readTimeout(60L, TimeUnit.SECONDS)
+                    .writeTimeout(60L, TimeUnit.SECONDS)
                     //其他配置
                     .build();
             okHttpUtils = OkHttpUtils.initClient(okHttpClient);
@@ -231,18 +232,24 @@ public class RestfulInterfaceHandler<T> implements InvocationHandler, Serializab
                     }
 
 //                    logger.info("RestfulInterfaceHandler.DelegateService.execute, url:"+url+", 返回类型type:+"+type+",json:" + json);
-                    resp = okHttpUtils
+                    resp = OkHttpUtils
                             .postString().headers(headersMap)
                             .url(url).content(json)
                             .mediaType(MediaType.parse("application/json; charset=utf-8"))
                             .build()
+                            .connTimeOut(60000L)
+                            .readTimeOut(120000L)
+                            .writeTimeOut(60000L)
                             .execute();
 //                    httpResponse = HttpRequester.sendPost(Constants.FUNDS_BASE_URL + url, null, JSON.toJSONString(paramObj));
                 }else{
-                    resp = okHttpUtils
+                    resp = OkHttpUtils
                             .get()
                             .url(url).params((Map)JSON.toJSON(paramObj))
                             .build()
+                            .connTimeOut(60000L)
+                            .readTimeOut(120000L)
+                            .writeTimeOut(60000L)
                             .execute();
 //                    httpResponse = HttpRequester.sendGet(Constants.FUNDS_BASE_URL + url, null);
                 }

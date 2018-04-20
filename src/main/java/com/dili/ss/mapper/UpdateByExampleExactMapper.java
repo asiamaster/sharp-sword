@@ -1,4 +1,4 @@
-package com.dili.ss.base;
+package com.dili.ss.mapper;
 
 import com.dili.ss.dao.ExactProvider;
 import org.apache.ibatis.annotations.Options;

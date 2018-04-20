@@ -87,10 +87,11 @@ function datetimeFormatter (value) {
  * 绑定实体的metadata信息，用于提供者转换
  * @param gridId    datagrid Id
  * @param isClearQueryParams    是否清空datagrid中原有的queryParams, 默认为false,不清空
+ * @param isTreegrid 是否树表，默认false
  * @returns {queryParams|{provider}|*|string|{}}
  */
-function bindMetadata(gridId, isClearQueryParams){
-    var opts=$("#"+gridId).datagrid("options");
+function bindMetadata(gridId, isClearQueryParams, isTreegrid){
+    var opts = isTreegrid == null ? $("#"+gridId).datagrid("options") : $("#"+gridId).treegrid("options");
     //赋默认值
     isClearQueryParams = isClearQueryParams || false;
     var params = isClearQueryParams ? {} : opts.queryParams || {};
@@ -152,6 +153,33 @@ function bindGridMeta2Form(gridId, formId, containsNull){
     if(!formId || formId == null || formId === "") return param;
     var formData = $("#"+formId).serializeObject(containsNull);
     return $.extend({}, param, formData);
+}
+
+/**
+ * 为表单绑定树型表格的metadata，保持原有的meta信息
+ * 返回绑定好的对象
+ * @param gridId
+ * @param formId
+ * @returns {*}
+ */
+function bindTreegridMeta2Form(gridId, formId, containsNull){
+    var param = bindMetadata(gridId, true, true);
+    if(!formId || formId == null || formId === "") return param;
+    var formData = $("#"+formId).serializeObject(containsNull);
+    return $.extend({}, param, formData);
+}
+
+/**
+ * 为一个JSON对象绑定树型表格的metadata，保持原有的meta信息
+ * 返回绑定好的对象
+ * @param gridId
+ * @param formId
+ * @returns {*}
+ */
+function bindTreegridMeta2Data(gridId, json){
+    var param = bindMetadata(gridId, true, true);
+    if(!json || json == null || json === "" || !isJson(json)) return param;
+    return $.extend({}, param, json);
 }
 
 /**
@@ -341,32 +369,33 @@ $(function() {
 
     //文本框添加清空按钮
     $.extend($.fn.textbox.methods, {
-        addClearBtn: function(jq, iconCls){
-            return jq.each(function(){
-                var t = $(this);
+        addClearBtn: function (jq, iconCls) {
+            return jq.each(function () {
+                var t = jq;
                 var opts = t.textbox('options');
-                opts.icons = opts.icons || [];
-                if(!_containsIconCls(opts.icons, iconCls)){
+                //使用深复制，解决有多个textbox时，调用一次addClearBtn可能或为其它文本框添加cleaBtn的问题
+                opts.icons = opts.icons ? opts.icons.slice() : [];
+                if (!_containsIconCls(opts.icons, iconCls)) {
                     opts.icons.unshift({
                         iconCls: iconCls,
-                        handler: function(e){
+                        handler: function (e) {
                             //针对textbox with button清除不掉，这里强制清除
                             $(e.data.target).textbox('initValue', "");
                             $(e.data.target).textbox('clear').textbox('textbox').focus();
-                            $(this).css('visibility','hidden');
+                            $(this).css('visibility', 'hidden');
                         }
                     });
                 }
                 t.textbox();
-                if (!t.textbox('getText') || t.textbox('getText') == ""){
-                    t.textbox('getIcon',0).css('visibility','hidden');
+                if (!t.textbox('getText') || t.textbox('getText') == "") {
+                    t.textbox('getIcon', 0).css('visibility', 'hidden');
                 }
-                t.textbox('textbox').bind('keyup', function(){
-                    var icon = t.textbox('getIcon',0);
-                    if ($(this).val()){
-                        icon.css('visibility','visible');
+                t.textbox('textbox').bind('keyup', function () {
+                    var icon = t.textbox('getIcon', 0);
+                    if ($(this).val()) {
+                        icon.css('visibility', 'visible');
                     } else {
-                        icon.css('visibility','hidden');
+                        icon.css('visibility', 'hidden');
                     }
                 });
             });
@@ -583,4 +612,68 @@ var footerView = $.extend({}, $.fn.datagrid.defaults.view, {
         table.push('</tbody></table>');
         $(container).html(table.join(''));
     }
+});
+//格式化数字，去掉最后的0
+function cutZeroFormatter(value) {
+    if(value == null || value == ""){
+        return null;
+    }
+    //如果有多个小数点，返回0
+    if(value.lastIndexOf(".") != value.indexOf(".")){
+        return 0;
+    }
+    //去掉开头的0
+    if(!value.startWith("0.")){
+        while (value.startWith("0")){
+            value = value.substring(1, value.length);
+        }
+    }
+    //如果有小数点，去掉末尾的0
+    if(value.lastIndexOf(".") != -1){
+        for(var i = value.length; i > 0; i--){
+            if(value.lastIndexOf("0") == i-1){
+                value = value.substring(0, i-1);
+            }else{
+                break;
+            }
+        }
+    }
+    //获取精度，easyui默认值为0
+    var precision = $(this).numberbox("options").precision;
+    var indexOfDot = value.indexOf(".");
+    //根据精度，截断后面的位数
+    if( value.lastIndexOf(".") != -1 &&  value.length - indexOfDot - 1 > precision){
+        value = value.substring(0, indexOfDot+precision+1);
+    }
+    //如果value是以.结尾，则去掉最后的.
+    if(value.lastIndexOf(".") != -1 && value.lastIndexOf(".") == value.length-1){
+        value = value.substring(0, value.length-1);
+    }
+    return value;
+}
+$(function () {
+    //日期和时间控件添加清空
+    var d_buttons = $.extend([], $.fn.datebox.defaults.buttons);
+    d_buttons.splice(1, 0, {
+        text: '清空',
+        handler: function (target) {
+            $(target).datebox('setValue', '');
+        }
+    });
+    $('.easyui-datebox').datebox({
+        buttons: d_buttons,
+        editable: false
+    });
+
+    var dt_buttons = $.extend([], $.fn.datetimebox.defaults.buttons);
+    dt_buttons.splice(2, 0, {
+        text: '清空',
+        handler: function (target) {
+            $(target).datetimebox('setValue', '');
+        }
+    });
+    $('.easyui-datetimebox').datetimebox({
+        buttons: dt_buttons,
+        editable: false
+    });
 });

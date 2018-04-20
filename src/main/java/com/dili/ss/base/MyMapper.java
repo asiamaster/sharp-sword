@@ -24,6 +24,7 @@
 
 package com.dili.ss.base;
 
+import com.dili.ss.mapper.SsCustomMapper;
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.common.MySqlMapper;
 
@@ -33,7 +34,7 @@ import tk.mybatis.mapper.common.MySqlMapper;
  * @author asiamastor
  * @since 2017-01-04 15:57
  */
-public interface MyMapper<T> extends Mapper<T>, MySqlMapper<T>, UpdateExactMapper<T>, InsertExactMapper<T> {
+public interface MyMapper<T> extends Mapper<T>, MySqlMapper<T>, SsCustomMapper<T> {
     //TODO
     //FIXME 特别注意，该接口不能被扫描到，否则会出错
 }

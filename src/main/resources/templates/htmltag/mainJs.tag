@@ -67,6 +67,7 @@ $.fn.serializeObject = function (containsNull) {
         if (o[this.name] !== undefined) {
             if (!o[this.name].push && o[this.name] != null && o[this.name] != "") {
                 o[this.name] = [o[this.name]];
+                o[this.name].push(this.value || '');
             }else if(this.value != null){
                 o[this.name].push(this.value || '');
             }else{

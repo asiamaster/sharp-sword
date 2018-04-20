@@ -50,7 +50,7 @@
         return flag;
     }
     //导出excel
-    function doExport(gridId, isTreegrid){
+    function doExport(gridId, isTreegrid, exportUrl){
         var opts;
         if(isTreegrid){
             opts=$("#"+gridId).treegrid("options");
@@ -62,7 +62,7 @@
             return;
         var param = {};
         param.columns = JSON.stringify(opts.columns);
-        var _gridExportQueryParams = bindMetadata(gridId);
+        var _gridExportQueryParams = bindMetadata(gridId, false, isTreegrid);
         _gridExportQueryParams["sort"] = opts.sortName;
         _gridExportQueryParams["order"] = opts.sortOrder;
         param.queryParams = JSON.stringify(_gridExportQueryParams);
@@ -88,9 +88,12 @@
 //            interval : 300
 //        });
         load();
+        if(!exportUrl){
+            exportUrl = "${contextPath}/export/serverExport";
+        }
         $('#_exportForm').form("load", param);
         $('#_exportForm').form("submit",{
-            url:"${contextPath}/export/serverExport",
+            url: exportUrl,
             onSubmit: function(formParam) {
                 //定时查看是否导出完成
                 timeoutId = window.setTimeout(checkFinished, 1);
