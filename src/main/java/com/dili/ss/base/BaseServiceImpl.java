@@ -2,6 +2,7 @@ package com.dili.ss.base;
 
 
 import com.dili.ss.constant.SsConstants;
+import com.dili.ss.dao.ExampleExpand;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.BasePage;
 import com.dili.ss.domain.EasyuiPageOutput;
@@ -29,7 +30,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.MapperException;
+import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -325,6 +329,53 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 	}
 
 	/**
+	 * 指定要查询的属性列 - 这里会自动映射到表字段
+	 *
+	 * @param domain
+	 * @param entityClass
+	 * @return
+	 */
+	public ExampleExpand getExample(T domain, Class<?> entityClass) {
+		ExampleExpand exampleExpand = ExampleExpand.of(entityClass);
+		if(!(domain instanceof IMybatisForceParams)){
+			return exampleExpand;
+		}
+		IMybatisForceParams iMybatisForceParams =((IMybatisForceParams) domain);
+		//这里构建Example，并设置selectColumns
+		Set<String> columnsSet = iMybatisForceParams.getSelectColumns();
+		if(columnsSet == null|| columnsSet.isEmpty()){
+			return exampleExpand;
+		}
+		Boolean checkInjection = iMybatisForceParams.getCheckInjection();
+		//如果不检查，则用反射强制注入
+		if (checkInjection == null || !checkInjection) {
+			//设置WhereSuffixSql
+			if(StringUtils.isNotBlank(iMybatisForceParams.getWhereSuffixSql())){
+				exampleExpand.setWhereSuffixSql(iMybatisForceParams.getWhereSuffixSql());
+			}
+			try {
+				Field selectColumnsField = Example.class.getDeclaredField("selectColumns");
+				selectColumnsField.setAccessible(true);
+				selectColumnsField.set(exampleExpand, columnsSet);
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+			return exampleExpand;
+		} else {//如果要检查字段(防止注入)
+			ExampleExpand.Builder builder = new Example.Builder(entityClass);
+			builder.select(columnsSet.toArray(new String[]{}));
+			ExampleExpand exampleExpand1 = ExampleExpand.of(entityClass, builder);
+			//设置WhereSuffixSql
+			if(StringUtils.isNotBlank(iMybatisForceParams.getWhereSuffixSql())){
+				exampleExpand1.setWhereSuffixSql(iMybatisForceParams.getWhereSuffixSql());
+			}
+			return exampleExpand1;
+		}
+	}
+
+	/**
 	 * 用于支持like, order by 的查询，支持分页
 	 * @param domain
 	 * @return
@@ -335,7 +386,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 		if(null == domain) {
 			domain = getDefaultBean (tClazz);
 		}
-		Example example = new Example(tClazz);
+		ExampleExpand example = getExample(domain, tClazz);
 		//接口只取getter方法
 		if(tClazz.isInterface()) {
 			buildExampleByGetterMethods(domain, example);
@@ -349,7 +400,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 			//为了线程安全,请勿改动下面两行代码的顺序
 			PageHelper.startPage(page, domain.getRows());
 		}
-		return mapper.selectByExample(example);
+		return mapper.selectByExampleExpand(example);
 	}
 
 	/**
@@ -596,9 +647,10 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
     protected void buildExampleByGetterMethods(T domain, Example example){
         Example.Criteria criteria = example.createCriteria();
         Class tClazz = DTOUtils.getDTOClass(domain);
-        //解析空值字段
+        //解析空值字段(where xxx is null)
         parseNullField(domain, criteria);
         List<Method> methods = new ArrayList<>();
+        //设置子类和所有超类的方法
         getDeclaredMethod(tClazz, methods);
         for(Method method : methods){
             if(excludeMethod(method)) {
@@ -809,8 +861,6 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 		return methods;
 	}
 
-
-
 	/**
 	 * 通过反射, 获得定义Class时声明的父类的泛型参数的类型. 如无法找到, 返回Object.class.
 	 *
@@ -844,11 +894,11 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
      * @param fieldName setForceParams或insertForceParams
 	 */
 	private void buildExactDomain(T domain, String fieldName) throws Exception {
-		//如果不是DTO接口，也不构建
+		//如果不是DTO接口，不构建
 		if(!DTOUtils.isDTOProxy(domain)){
 			return;
 		}
-		//如果未实现IMybatisForceParams接口则不构建
+		//如果未实现IMybatisForceParams接口不构建
 		if(!IMybatisForceParams.class.isAssignableFrom(DTOUtils.getDTOClass(domain))){
 			return;
 		}

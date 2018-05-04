@@ -1,9 +1,10 @@
 package com.dili.ss.mapper;
 
-import com.dili.ss.dao.ExactProvider;
+import com.dili.ss.dao.ExactUpdateProvider;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.UpdateProvider;
+import tk.mybatis.mapper.annotation.RegisterMapper;
 
 /**
  * 通用Mapper接口,精确更新，基于Selective设计
@@ -12,6 +13,7 @@ import org.apache.ibatis.annotations.UpdateProvider;
  * @param <T> 不能为空
  * @author wangmi
  */
+@RegisterMapper
 public interface UpdateByExampleExactMapper<T> {
 
     /**
@@ -25,7 +27,7 @@ public interface UpdateByExampleExactMapper<T> {
      * @param example
      * @return
      */
-    @UpdateProvider(type = ExactProvider.class, method = "dynamicSQL")
+    @UpdateProvider(type = ExactUpdateProvider.class, method = "dynamicSQL")
     @Options(useCache = false, useGeneratedKeys = false)
     int updateByExampleExact(@Param("record") T record, @Param("example") Object example);
 }

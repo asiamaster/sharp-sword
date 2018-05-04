@@ -1,7 +1,8 @@
-package com.dili.ss.base;
+package com.dili.ss.mapper;
 
-import com.dili.ss.dao.ExactProvider;
+import com.dili.ss.dao.ExactInsertProvider;
 import org.apache.ibatis.annotations.InsertProvider;
+import tk.mybatis.mapper.annotation.RegisterMapper;
 
 /**
  * 通用Mapper接口,插入
@@ -9,6 +10,7 @@ import org.apache.ibatis.annotations.InsertProvider;
  * @param <T> 不能为空
  * @author wm
  */
+@RegisterMapper
 public interface InsertExactMapper<T> {
     /**
      * 保存一个实体，null的属性不会保存，会使用数据库默认值<br/>
@@ -21,6 +23,6 @@ public interface InsertExactMapper<T> {
      * @param record
      * @return
      */
-    @InsertProvider(type = ExactProvider.class, method = "dynamicSQL")
+    @InsertProvider(type = ExactInsertProvider.class, method = "dynamicSQL")
     int insertExact(T record);
 }
