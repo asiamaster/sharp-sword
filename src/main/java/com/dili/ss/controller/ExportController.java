@@ -36,6 +36,7 @@ public class ExportController {
 
     @RequestMapping("/isFinished")
     public @ResponseBody String isFinished(HttpServletRequest request, HttpServletResponse response, @RequestParam("token") String token) throws InterruptedException {
+        //每秒去判断是否导出完成
         while(!SsConstants.EXPORT_FLAG.containsKey(token)){
             Thread.sleep(1000L);
         }

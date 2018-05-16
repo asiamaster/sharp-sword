@@ -43,8 +43,9 @@
                     flag = true;
                 }
             },
-            error: function(){
-                $.messager.alert('错误','远程访问失败',"error");
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+                $.messager.alert('导出错误','远程访问失败:'+XMLHttpRequest.status+XMLHttpRequest.statusText+","+textStatus,"error");
+                flag = true;
             }
         });
         return flag;
