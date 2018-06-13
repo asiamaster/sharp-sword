@@ -93,10 +93,11 @@ public class DTOUtils {
 		assert (dto != null);
 		if (Proxy.isProxyClass(dto.getClass())) {
 			InvocationHandler handler = Proxy.getInvocationHandler(dto);
-			if (handler instanceof DTOHandler)
+			if (handler instanceof DTOHandler) {
 				return ((DTOHandler<?>) handler).getProxyClazz();
-			else
+			} else {
 				throw new InternalException("当前代理对象不是DTOHandler能处理的对象!");
+			}
 		} else {
 			return dto.getClass();
 		}

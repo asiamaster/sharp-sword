@@ -1,6 +1,6 @@
 package com.dili.ss.mapper;
 
-import com.dili.ss.dao.ExpandSelectProvider;
+import com.dili.ss.dao.provider.ExpandSelectProvider;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.session.RowBounds;
 import tk.mybatis.mapper.annotation.RegisterMapper;

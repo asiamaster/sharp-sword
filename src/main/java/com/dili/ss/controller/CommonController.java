@@ -45,7 +45,7 @@ public class CommonController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value="/listEasyuiPageByConditionItems", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value="/listEasyuiPageByConditionItems.action", method = {RequestMethod.GET, RequestMethod.POST})
     public @ResponseBody String listEasyuiPageByConditionItems(@ModelAttribute ConditionItems conditionItems) throws Exception {
         if(conditionItems.getConditionRelationField() == null || conditionItems.getConditionItems() == null || conditionItems.getDtoClass() == null) {
             return null;

@@ -65,7 +65,7 @@
             data["userId"]='${userId}';
             $.ajax({
                 type: "POST",
-                url: "${contextPath}/userColumn/get",
+                url: "${contextPath}/userColumn/get.action",
                 dataType: "json",
                 data:data,
                 processData:true,
@@ -194,7 +194,7 @@
         data["userId"]='${userId}';
         $.ajax({
             type: "POST",
-            url: "${contextPath}/userColumn/save",
+            url: "${contextPath}/userColumn/save.action",
             data: data,
             processData:true,
             dataType: "json",

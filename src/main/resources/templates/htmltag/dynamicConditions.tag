@@ -47,7 +47,7 @@
             //如果没有初始化json参数，直接调用provider
             if(newValueFieldMeta["params"] == ""){
                 $("#conditionValueField").combobox({
-                    url:"${contextPath}/provider/getLookupList"
+                    url:"${contextPath}/provider/getLookupList.action"
                     , method : "POST"
                     , valueField : "value"
                     , textField : "text"
@@ -72,7 +72,7 @@
                     _comboProviderParamObj_conditionValueField.table = params["table"] || "";
                     _comboProviderParamObj_conditionValueField.provider = params["provider"] || "simpleValueProvider";
                     $("#conditionValueField").combobox({
-                        url:"${contextPath}/provider/getLookupList"
+                        url:"${contextPath}/provider/getLookupList.action"
                         ,method:"POST"
                         ,valueField:"value"
                         ,textField:"text"
@@ -83,7 +83,7 @@
                     //从meta中取当前下拉框字段的提供者
                     params["provider"] = newValueFieldMeta["provider"];
                     $("#conditionValueField").combobox({
-                        url:"${contextPath}/provider/getLookupList"
+                        url:"${contextPath}/provider/getLookupList.action"
                         , method : "POST"
                         , valueField : "value"
                         , textField : "text"
@@ -151,7 +151,7 @@
     function queryGridByConditionItems() {
         var opts = $("#${gridId}").datagrid("options");
 //        if (null == opts.url || "" == opts.url) {
-        opts.url = "${contextPath}/common/listEasyuiPageByConditionItems";
+        opts.url = "${contextPath}/common/listEasyuiPageByConditionItems.action";
 //        }
         var param = bindMetadata("${gridId}", true);
         //获取条件项关系

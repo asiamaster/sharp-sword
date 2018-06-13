@@ -1,4 +1,4 @@
-package com.dili.ss.dao;
+package com.dili.ss.dao.provider;
 
 import org.apache.ibatis.mapping.MappedStatement;
 import tk.mybatis.mapper.entity.EntityColumn;

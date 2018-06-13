@@ -1,6 +1,6 @@
 package com.dili.ss.mapper;
 
-import com.dili.ss.dao.ExactUpdateProvider;
+import com.dili.ss.dao.provider.ExactUpdateProvider;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.UpdateProvider;

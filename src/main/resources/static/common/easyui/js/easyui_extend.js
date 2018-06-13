@@ -213,6 +213,7 @@ function convertTree(rows){
                 id:row.id,
                 text:row.text,
                 state:row["state"],
+                checked: row["checked"],
                 attributes:row["attributes"]
             });
         }
@@ -232,6 +233,7 @@ function convertTree(rows){
                     id:row.id,
                     text:row.text,
                     state:row["state"],
+                    checked: row["checked"],
                     attributes:row["attributes"]
                 };
                 if (node.children){

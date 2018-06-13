@@ -34,7 +34,7 @@
         var flag = false;
         $.ajax({
             type: "POST",
-            url: "${contextPath}/export/isFinished?token="+token,
+            url: "${contextPath}/export/isFinished.action?token="+token,
             processData:true,
             dataType: "json",
             async : false,
@@ -90,7 +90,7 @@
 //        });
         load();
         if(!exportUrl){
-            exportUrl = "${contextPath}/export/serverExport";
+            exportUrl = "${contextPath}/export/serverExport.action";
         }
         $('#_exportForm').form("load", param);
         $('#_exportForm').form("submit",{
@@ -101,6 +101,9 @@
             },
             success: function(data){
 //                $.messager.progress('close');	// 如果提交成功则隐藏进度条
+                if(data != null && data != ''){
+                    $.messager.alert('导出错误', data, "error");
+                }
                 disLoad();
             }
         });
@@ -134,8 +137,11 @@
                 //定时查看是否导出完成
                 timeoutId = window.setTimeout(checkFinished, 1);
             },
-            success: function(){
+            success: function(data){
 //                $.messager.progress('close');	// 如果提交成功则隐藏进度条
+                if(data != null && data != ''){
+                    $.messager.alert('导出错误', data, "error");
+                }
                 disLoad();
             }
         });

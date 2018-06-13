@@ -27,7 +27,7 @@ public class ProviderController {
     @Autowired
     private ValueProviderUtils valueProviderUtils;
 
-    @RequestMapping("/getLookupList")
+    @RequestMapping("/getLookupList.action")
     public @ResponseBody
     List<ValuePair<?>> getLookupList(HttpServletRequest request, HttpServletResponse response, @RequestBody String queryParams) throws UnsupportedEncodingException {
         queryParams=java.net.URLDecoder.decode(queryParams,"UTF-8");

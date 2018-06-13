@@ -1,6 +1,6 @@
 package com.dili.ss.mapper;
 
-import com.dili.ss.dao.ExactInsertProvider;
+import com.dili.ss.dao.provider.ExactInsertProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import tk.mybatis.mapper.annotation.RegisterMapper;
 

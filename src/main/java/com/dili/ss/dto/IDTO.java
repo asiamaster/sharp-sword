@@ -63,4 +63,6 @@ public interface IDTO extends Serializable {
 	 * @return
 	 */
 	default void mset(Map<String, Object> metadata){};
+
+
 }

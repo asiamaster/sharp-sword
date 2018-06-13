@@ -1,14 +1,10 @@
-package com.dili.ss.dao;
+package com.dili.ss.dao.provider;
 
 import com.dili.ss.dto.IMybatisForceParams;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 import tk.mybatis.mapper.MapperException;
-import tk.mybatis.mapper.annotation.Version;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.mapperhelper.*;
-import tk.mybatis.mapper.util.StringUtil;
-import tk.mybatis.mapper.version.VersionException;
 
 import java.util.Set;
 

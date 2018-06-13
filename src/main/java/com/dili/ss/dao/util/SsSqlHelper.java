@@ -19,18 +19,20 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+import tk.mybatis.mapper.entity.EntityColumn;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Mybatis - 获取Mybatis查询sql工具
  *
  * @author asiamaster
  */
-public class SqlHelper {
+public class SsSqlHelper {
     private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
     private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
 
@@ -166,6 +168,29 @@ public class SqlHelper {
             }
         }
         return sql;
+    }
+
+    /**
+     * 不是所有参数都是 null 的检查
+     *
+     * @param parameterName 参数名
+     * @param columnSet     需要检查的列
+     * @return
+     */
+    public static String notAllNullParameterCheck(String parameterName, Set<EntityColumn> columnSet) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("<bind name=\"notAllNullParameterCheck\" value=\"@com.dili.ss.dao.util.OGNL@notAllNullParameterCheck(");
+        sql.append(parameterName).append(", '");
+        StringBuilder fields = new StringBuilder();
+        for (EntityColumn column : columnSet) {
+            if(fields.length() > 0){
+                fields.append(",");
+            }
+            fields.append(column.getProperty());
+        }
+        sql.append(fields);
+        sql.append("')\"/>");
+        return sql.toString();
     }
 
     /**

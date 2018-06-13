@@ -4,6 +4,7 @@ package com.dili.ss.dto;
  * Created by asiamaster on 2017/7/31 0031.
  */
 
+import com.alibaba.fastjson.JSON;
 import com.dili.ss.util.POJOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -163,7 +164,13 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 			}else {
 				return metadata.put(((String) args[0]), args[1]);
 			}
-		} else {
+		} else if ("toString".equals(method.getName()) && args == null) {
+			String data = delegate == null ? "" : JSON.toJSONString(delegate);
+			String meta = metadata == null ? "" : JSON.toJSONString(metadata);
+			StringBuilder stringBuilder = new StringBuilder(proxyClazz.getName());
+			stringBuilder.append("\r\ndata:").append(data).append("\r\nmeta:").append(meta);
+			return stringBuilder.toString();
+		}else {
 			return method.invoke(delegate, args);
 		}
 	}

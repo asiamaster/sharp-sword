@@ -1,4 +1,4 @@
-package com.dili.ss.dao;
+package com.dili.ss.dao.mapper;
 
 
 import com.alibaba.fastjson.JSONObject;
@@ -39,7 +39,7 @@ public interface CommonMapper {
      * @param sql
      * @return
      */
-    <T extends IDTO> List<T> selectDto(@Param("value") String sql, @Param("resultType")Class<T> resultType);
+    <T extends IDTO> List<T> selectDto(@Param("value") String sql, @Param("resultType") Class<T> resultType);
 
     /**
      * 执行脚本

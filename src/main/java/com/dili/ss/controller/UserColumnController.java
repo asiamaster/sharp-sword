@@ -23,14 +23,14 @@ public class UserColumnController {
 	@Autowired
 	UserColumnService userColumnService;
 
-	@RequestMapping(value = "/save", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(value = "/save.action", method = { RequestMethod.GET, RequestMethod.POST })
 	public @ResponseBody
 	BaseOutput save(@ModelAttribute UserColumn userColumn) throws Exception {
 		userColumnService.saveUserColumns(userColumn);
 		return BaseOutput.success("保存列成功");
 	}
 
-	@RequestMapping(value = "/get", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(value = "/get.action", method = { RequestMethod.GET, RequestMethod.POST })
 	public @ResponseBody
 	BaseOutput get(@ModelAttribute UserColumn userColumn) throws Exception {
 		return BaseOutput.success("获取成功").setData(userColumnService.getUserColumns(userColumn));

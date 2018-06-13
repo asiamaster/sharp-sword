@@ -1,7 +1,7 @@
 package com.dili.ss.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.dao.CommonMapper;
+import com.dili.ss.dao.mapper.CommonMapper;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.metadata.ValuePair;
 import com.dili.ss.service.CommonService;
