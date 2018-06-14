@@ -252,16 +252,21 @@ var treeLoadFilter = function(data,parent){
     var idField = $(this).tree("options")["_idField"];
     var textField = $(this).tree("options")["_textField"];
     var parentIdField = $(this).tree("options")["_parentIdField"];
+    var jsonData = $.isArray(data) ? data : data.rows;
+    //如果没数据或者已经有children属性，则不进行转换，主要用于拖动有子节点的场景
+    if(null == jsonData || (jsonData.length <=0 || jsonData[0].hasOwnProperty("children"))){
+        return data;
+    }
     if(idField && idField != null && idField != ""){
-        modifyJsonKey(data,idField,"id");
+        modifyJsonKey(jsonData,idField,"id");
     }
     if(textField && textField != null && textField != ""){
-        modifyJsonKey(data,textField,"text");
+        modifyJsonKey(jsonData,textField,"text");
     }
     if(parentIdField && parentIdField != null && parentIdField != ""){
-        modifyJsonKey(data,parentIdField,"parentId");
+        modifyJsonKey(jsonData,parentIdField,"parentId");
     }
-    return convertTree(data);
+    return convertTree(jsonData);
 }
 
 //树表加载过滤器
@@ -305,12 +310,19 @@ function findParentIdFromId(rows, parentId, idField){
 
 //修改json对象或数组中的key
 function modifyJsonKey(json,oldkey,newkey){
+    if(oldkey == newkey){
+        return;
+    }
     if(json instanceof Array){
         for(var i in json){
             var obj = json[i];
             modifyJsonKey(json[i],oldkey,newkey);
         }
     }else{
+        //没有指定的字段名则不进行key转换，这里主要用于节点拖动时，数据已经转换成标准的id,text和parentId了
+        if(!json.hasOwnProperty(oldkey)){
+            return;
+        }
         var val = json[oldkey];
         delete json[oldkey];
         json[newkey]=val;

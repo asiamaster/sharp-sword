@@ -31,8 +31,19 @@ public class ExactInsertProvider extends MapperTemplate {
         Set<EntityColumn> columnList = EntityHelper.getColumns(entityClass);
         processKey(sql, entityClass, ms, columnList);
         sql.append(SqlHelper.insertIntoTable(entityClass, tableName(entityClass)));
-        sql.append(insertColumns(entityClass, false, false, false));
+        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
+        for (EntityColumn column : columnList) {
+            if (!column.isInsertable()) {
+                continue;
+            }
+            if (column.isIdentity()) {
+                sql.append(column.getColumn() + ",");
+            } else {
+                sql.append(SqlHelper.getIfNotNull(column, column.getColumn() + ",", isNotEmpty()));
+            }
+        }
         sql.append(buildInsertForceParams(entityClass));
+        sql.append("</trim>");
         sql.append("<trim prefix=\"VALUES(\" suffix=\")\" suffixOverrides=\",\">");
         for (EntityColumn column : columnList) {
             if (!column.isInsertable()) {
@@ -47,11 +58,9 @@ public class ExactInsertProvider extends MapperTemplate {
                 sql.append(SqlHelper.getIfNotNull(column, column.getColumnHolder(null, null, ","), isNotEmpty()));
             }
             //当属性为null时，如果存在主键策略，会自动获取值，如果不存在，则使用null
+            //序列的情况
             if (column.isIdentity()) {
                 sql.append(SqlHelper.getIfCacheIsNull(column, column.getColumnHolder() + ","));
-            } else {
-                //当null的时候，如果不指定jdbcType，oracle可能会报异常，指定VARCHAR不影响其他
-                sql.append(SqlHelper.getIfIsNull(column, column.getColumnHolder(null, null, ","), isNotEmpty()));
             }
         }
         sql.append(buildValuesForceParams(entityClass));
@@ -160,7 +169,7 @@ public class ExactInsertProvider extends MapperTemplate {
         }
         StringBuilder sql = new StringBuilder();
         sql.append("<foreach collection=\"insertForceParams\" item=\"value\" index=\"key\" separator=\",\">");
-        sql.append("${value}");
+        sql.append("#{value}");
         sql.append("</foreach>");
         return sql.toString();
     }
