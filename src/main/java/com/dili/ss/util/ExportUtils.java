@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
@@ -142,7 +143,9 @@ public class ExportUtils {
         try {
 //            HSSFWorkbook workbook = new HSSFWorkbook();
             SXSSFWorkbook workbook = new SXSSFWorkbook(FETCH_COUNT);// 创建工作簿对象
-            Sheet sheet = workbook.createSheet(exportParam.getTitle());
+            SXSSFSheet sheet = workbook.createSheet(exportParam.getTitle());
+//            解决高版本poi autoSizeColumn方法异常的情况
+            sheet.trackAllColumnsForAutoSizing();
             //构建表头
             buildHeader(exportParam, workbook, sheet);
             //构建数据
@@ -294,13 +297,11 @@ public class ExportUtils {
      */
     private void buildHeader(ExportParam exportParam, SXSSFWorkbook workbook, Sheet sheet){
         CellStyle columnTopStyle = getHeaderColumnStyle(workbook);//获取列头样式对象
-
         //渲染复合表头列
         for (int i = 0; i < exportParam.getColumns().size(); i++) {
             //每行的列信息
             List<Map<String, Object>> rowColumns = exportParam.getColumns().get(i);
             Row row = sheet.createRow(i);
-
             int colspanAdd = 0;
             int index = 0;
             for (int j = 0; j < rowColumns.size(); j++) {
@@ -310,14 +311,20 @@ public class ExportUtils {
                 if(columnMap.get("hidden")!=null && columnMap.get("hidden").equals(true)){
                 	continue;
                 }
+                String headerTitle = columnMap.get("title").toString().replaceAll("\\n", "").trim();
+                //最后一行的列头，适应宽度
+                if( i == exportParam.getColumns().size() - 1){
+                    sheet.setColumnWidth(j, headerTitle.getBytes().length*2*256);
+//                    sheet.autoSizeColumn(j, true);
+                }
                 Cell cell = row.createCell(index+colspanAdd);               //创建列头对应个数的单元格
                 cell.setCellType(CellType.STRING);             //设置列头单元格的数据类型
-                RichTextString text = new XSSFRichTextString(columnMap.get("title").toString().replaceAll("\\n", "").trim());
+                RichTextString text = new XSSFRichTextString(headerTitle);
                 cell.setCellValue(text);                                 //设置列头单元格的值
                 cell.setCellStyle(columnTopStyle);                       //设置列头单元格样式
                 if(columnMap.get("colspan") != null) {
                     Integer colspan = Integer.class.isAssignableFrom(columnMap.get("colspan").getClass())? (Integer)columnMap.get("colspan") : Integer.parseInt(columnMap.get("colspan").toString());
-                    if(colspan>1) {
+                    if(colspan > 1) {
                         Cell tempCell = row.createCell(index + colspanAdd + colspan - 1);               //创建合并最后一列的列头，保证最后一列有右边框
                         tempCell.setCellStyle(columnTopStyle);
                         sheet.addMergedRegion(new CellRangeAddress(i, i, index + colspanAdd, index + colspanAdd + colspan - 1));

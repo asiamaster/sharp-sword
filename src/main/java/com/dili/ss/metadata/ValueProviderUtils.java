@@ -116,6 +116,9 @@ public class ValueProviderUtils {
 			} catch (JSONException e) {
 				continue;
 			}
+			if(jsonValue.get(ValueProvider.FIELD_KEY) == null){
+				jsonValue.put(ValueProvider.FIELD_KEY, key) ;
+			}
 			String providerBeanId = jsonValue.get("provider").toString();
 			if (bvpBuffer.containsKey(providerBeanId)) {
 				batchValueProvider = bvpBuffer.get(providerBeanId);
@@ -143,12 +146,13 @@ public class ValueProviderUtils {
 				//value是provider相关的json对象
 				JSONObject jsonValue = null;
 				try{
-
 					jsonValue = JSONObject.parseObject(entry.getValue().toString());
 				} catch (JSONException e) {
 					return;
 				}
 				String providerBeanId = jsonValue.get(ValueProvider.PROVIDER_KEY).toString();
+				jsonValue.put(ValueProvider.FIELD_KEY, key);
+				String field = key;
 //				jsonValue.remove("provider");
 				jsonValue.put(ValueProvider.ROW_DATA_KEY, t);
 				if (vpBuffer.containsKey(providerBeanId)) {
@@ -162,20 +166,20 @@ public class ValueProviderUtils {
 						return;
 					}
 				}
-				FieldMeta fieldMeta = objectMeta == null ? null : objectMeta.getFieldMetaById(key);
-				String text = valueProvider.getDisplayText(dataMap.get(key), jsonValue, fieldMeta);
+				FieldMeta fieldMeta = objectMeta == null ? null : objectMeta.getFieldMetaById(field);
+				String text = valueProvider.getDisplayText(dataMap.get(field), jsonValue, fieldMeta);
 				//保留原值，用于在修改时提取表单加载，但是需要过滤掉日期类型，
 				// 因为前台无法转换Long类型的日期格式,并且也没法判断是日期格式
 				// 配合批量提供者处理，如果转换后的显示值返回null，则不保留原值
-				if (text != null &&  !(dataMap.get(key) instanceof Date)) {
-					dataMap.put(ORIGINAL_KEY_PREFIX + key, dataMap.get(key));
+				if (text != null &&  !(dataMap.get(field) instanceof Date)) {
+					dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(field));
 				}
                 //批量提供者只put转换后不为null的值
 				if(text != null && valueProvider instanceof BatchValueProvider) {
-                    dataMap.put(key, text);
+                    dataMap.put(field, text);
                     //普通值提供者put所有转化后的值(无论是否为空)
                 }else if(!(valueProvider instanceof BatchValueProvider)){
-                    dataMap.put(key, text);
+                    dataMap.put(field, text);
                 }
 			});
 			results.add(dataMap);

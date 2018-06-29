@@ -6,6 +6,7 @@ import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.MetadataUtils;
 import com.dili.ss.metadata.ObjectMeta;
 import com.dili.ss.util.BeanConver;
+import com.dili.ss.util.CloneUtils;
 import com.dili.ss.util.POJOUtils;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -79,6 +80,22 @@ public class DTOUtils {
 		assert (proxyClazz != null);
 		return proxy((DTOHandler) Proxy.getInvocationHandler(source),
 				proxyClazz);
+	}
+
+	/**
+	 * 深克隆
+	 * @param obj
+	 * @param proxyClazz
+	 * @param <T>
+	 * @return
+	 */
+	public static <T extends IDTO> T clone(T obj, Class<T> proxyClazz){
+		assert (obj != null);
+		DTO dto = go(obj);
+		if(dto == null){
+			return null;
+		}
+		return DTOUtils.proxy(CloneUtils.clone(dto), proxyClazz);
 	}
 
 	/**

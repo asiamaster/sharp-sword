@@ -111,7 +111,7 @@
     <div id="dlg" class="easyui-dialog" resizable="false" constrain="true" shadow="true" draggable="false"
          title="调度器" style="padding:20px" modal="true" border="thin" closed="true"
          data-options="
-				height: 480,
+				height: 560,
 				buttons: [{
 					text:'确认',
 					iconCls:'icon-ok',
@@ -161,7 +161,7 @@
                 <tr>
                     <td style="padding:5px;">
                         <input class="easyui-textbox" name="_springId" id="_springId" style="width:100%"
-                               data-options="labelAlign:'right', label:'SpringBeanId:', validType:'length[0,40]'"/>
+                               data-options="labelAlign:'right', labelWidth:100, label:'SpringBeanId:', validType:'length[0,40]'"/>
                     </td>
                 </tr>
                 <tr>
@@ -215,7 +215,7 @@
                 if (r) {
                     $.ajax({
                         type: "POST",
-                        url: "${contextPath}/scheduleJob/pause",
+                        url: "${contextPath}/scheduleJob/pause.action",
                         data: {id: selected.id, jobName: selected.jobName, jobGroup: selected.jobGroup},
                         processData: true,
                         dataType: "json",
@@ -246,7 +246,7 @@
                 if (r) {
                     $.ajax({
                         type: "POST",
-                        url: "${contextPath}/scheduleJob/resume",
+                        url: "${contextPath}/scheduleJob/resume.action",
                         data: {id: selected.id, jobName: selected.jobName, jobGroup: selected.jobGroup},
                         processData: true,
                         dataType: "json",
@@ -299,9 +299,9 @@
             var _url = null;
             //没有id就新增
             if (_formData.id == null || _formData.id == "") {
-                _url = "${contextPath}/scheduleJob/insert";
+                _url = "${contextPath}/scheduleJob/insert.action";
             } else {//有id就修改
-                _url = "${contextPath}/scheduleJob/update";
+                _url = "${contextPath}/scheduleJob/update.action";
             }
             $.ajax({
                 type: "POST",
@@ -335,7 +335,7 @@
                 if (r) {
                     $.ajax({
                         type: "POST",
-                        url: "${contextPath}/scheduleJob/delete",
+                        url: "${contextPath}/scheduleJob/delete.action",
                         data: {id: selected.id},
                         processData: true,
                         dataType: "json",
@@ -359,7 +359,7 @@
         function queryGrid() {
             var opts = $("#grid").datagrid("options");
             if (null == opts.url || "" == opts.url) {
-                opts.url = "${contextPath}/scheduleJob/listPage";
+                opts.url = "${contextPath}/scheduleJob/listPage.action";
             }
             if (!$('#form').form("validate")) {
                 return;

@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.dto.DTO;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
+import com.dili.ss.util.BeanValidator;
 import com.dili.ss.util.POJOUtils;
 import com.google.common.collect.Lists;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -42,7 +44,7 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 		Class clazz = parameter.getParameterType();
 		if(clazz != null && IDTO.class.isAssignableFrom(clazz)){
-			return getDTO(clazz, webRequest);
+			return getDTO(clazz, webRequest, parameter);
 		}
 		return UNRESOLVED;
 	}
@@ -57,7 +59,7 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @return 正常情况下不可能为空，但如果程序内部有问题时只能以null返回
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T extends IDTO> T getDTO(Class<T> clazz, NativeWebRequest webRequest) {
+	protected <T extends IDTO> T getDTO(Class<T> clazz, NativeWebRequest webRequest, MethodParameter parameter) {
 		// 实例化一个DTO数据对象
 		DTO dto = new DTO();
 		//处理restful调用时，传入的参数不在getParameterMap，而在getInputStream中的情况
@@ -113,7 +115,13 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 				dto.put(attrName, paramValue);
 			}
 		}
-		return (T) DTOUtils.proxy(dto, (Class<IDTO>) clazz);
+		T t = (T) DTOUtils.proxy(dto, (Class<IDTO>) clazz);
+		Validated validated = parameter.getParameter().getAnnotation(Validated.class);
+		//有Validated注解则进行校验
+		if(validated != null) {
+			t.aset(IDTO.ERROR_MSG_KEY, BeanValidator.validator(t, validated.value()));
+		}
+		return t;
 	}
 
 	/**
@@ -157,7 +165,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @throws Exception
 	 */
 	public static String InputStream2String(InputStream in, String encoding) throws IOException {
-
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		byte[] data = new byte[BUFFER_SIZE];
 		int count = -1;

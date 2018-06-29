@@ -254,6 +254,7 @@ var treeLoadFilter = function(data,parent){
     var parentIdField = $(this).tree("options")["_parentIdField"];
     var jsonData = $.isArray(data) ? data : data.rows;
     //如果没数据或者已经有children属性，则不进行转换，主要用于拖动有子节点的场景
+    //这里不能返回jsonData，jsonData可能为null导致报错，只能返回data
     if(null == jsonData || (jsonData.length <=0 || jsonData[0].hasOwnProperty("children"))){
         return data;
     }

@@ -84,13 +84,17 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 					} // 如果是空就不处理
 					else if (retval == null){
 						return null;
-					} //如果是String型
+					} //如果是String型,直接toString()
 					else if(String.class.equals(returnType)){
-						return (String)retval;
+						return retval.toString();
 					}
 					//这里有可能不是String类型，但是通过aset方法传入一个空串，以下的类型都不接受空串，所以返回null
 					if(StringUtils.isBlank(retval.toString())){
 						return null;
+					}
+					//如果返回类型和取值对象的类型相同，则直接返回取值对象
+					if(returnType.getClass().isAssignableFrom(DTOUtils.getDTOClass(retval))){
+						return retval;
 					}
 					// 如果返回值要求是枚举，但是结果却是字符串是需在此进行转换
 					if (returnType.isEnum() && retval instanceof String) {

@@ -109,6 +109,6 @@ public class PerformanceInterceptor implements Interceptor {
         } else {
             result = "null";
         }
-        return sql.replaceFirst("\\?", result);
+        return sql.replaceFirst("\\?", java.util.regex.Matcher.quoteReplacement(result));
     }
 }
