@@ -27,6 +27,15 @@
         }
        
     </style>
+    <script type="text/javascript">
+        function toLogin(){
+            if(typeof callbackObj != "undefined"){
+                callbackObj.logout();
+            }else {
+                location.href = '<#config name="error.page.loginPage"/>'
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="error-page">
@@ -39,7 +48,7 @@
             &nbsp;&nbsp;&nbsp;&nbsp;
             <#config has="error.page.indexPage"><a href="#" onclick="location.href='<#config name="error.page.indexPage"/>'" class="primary-btn dili-btn">去网站首页</a></#config>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <#config has="error.page.loginPage"><a href="#" onclick="location.href='<#config name="error.page.loginPage"/>'" class="primary-btn dili-btn">重新登录</a></#config>
+            <#config has="error.page.loginPage"><a href="#" onclick="toLogin();" class="primary-btn dili-btn">重新登录</a></#config>
         </div>
     </div>
 </body>

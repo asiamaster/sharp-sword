@@ -135,7 +135,7 @@ public class TaskUtils {
 				log.error(String.format("远程调用["+url+"]发生失败,code:[%s], message:[%s]", resp.code(),resp.message()));
 			}
 		} catch (Exception e) {
-			log.error(String.format("远程调用["+url+"]发生异常,code:[%s], message:[%s]", resp.code(),resp.message()));
+			log.error(String.format("远程调用["+url+"]发生异常, message:[%s]", e.getMessage()));
 		}
 	}
 

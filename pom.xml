@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dili</groupId>
-    <version>2.0.10-SNAPSHOT</version>
+    <version>2.0.15-SNAPSHOT</version>
     <artifactId>sharp-sword</artifactId>
     <description>利刃</description>
     <packaging>jar</packaging>
@@ -305,7 +305,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.15</version>
+            <version>3.17</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.alibaba.rocketmq/rocketmq-client -->
         <dependency>

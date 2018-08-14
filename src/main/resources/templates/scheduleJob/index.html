@@ -45,11 +45,12 @@
         <!-- ====================================================================================================================== -->
         <!-- 表格 -->
         <div region="center" style="width:100%;border: 0px;" align="center" height="auto" border="false">
+            <!-- 两边留白 -->
             <div class="easyui-panel" align="center" style="width:96%;height:100%;" border="false">
             <!-- =========================================================表格========================================================= -->
             <table class="easyui-datagrid" title="调度器列表" id="grid" fitColumns="true" noheader="true"
                    pagination="true" pageSize="30" pageNumber="1" pagePosition="top"
-                   remoteSort="false"
+                   remoteSort="false" border="false"
                    loadMsg="数据加载中..." singleSelect="true" method="post" multiSort="false" sortName="created"
                    align="center" fit="true" striped="true" idField="id"
                    data-options="onDblClickRow:openUpdate, onHeaderContextMenu:headerContextMenu">
@@ -173,7 +174,7 @@
                 <tr>
                     <td style="padding:5px;">
                         <input class="easyui-textbox" name="_methodName" id="_methodName" style="width:100%"
-                               data-options="labelAlign:'right', label:'方法名:', required:true, validType:'length[0,40]'"/>
+                               data-options="labelAlign:'right', label:'方法名:', validType:'length[0,40]'"/>
                     </td>
                 </tr>
                 <tr>

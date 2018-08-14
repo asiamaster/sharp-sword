@@ -1,22 +1,20 @@
 package com.dili.ss.metadata.provider;
 
-import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.base.BaseServiceImpl;
-import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.metadata.*;
 import com.dili.ss.service.CommonService;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.POJOUtils;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 批量提供者适配器
@@ -109,7 +107,11 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                     for(Object obj : relationDatas){
                         try {
                             Map map = BeanConver.transformObjectToMap(obj);
-                            id2RelTable.put(map.get(getRelationTablePkField(metaMap)).toString(), map);
+                            //这里有可能关联表的字段为空
+                            Object relationTablePkFieldValue = map.get(getRelationTablePkField(metaMap));
+                            if(relationTablePkFieldValue != null) {
+                                id2RelTable.put(relationTablePkFieldValue.toString(), map);
+                            }
                         } catch (Exception e) {
                             log.error("批量提供者转换(getFkList方法的结果)失败:"+e.getLocalizedMessage());
                             break;

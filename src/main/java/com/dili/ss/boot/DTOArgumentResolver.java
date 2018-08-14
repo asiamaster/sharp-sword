@@ -104,6 +104,8 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 							paramValue = Lists.newArrayList((Object[])getParamObjValue(entry.getValue()));
 						}else if(returnType.isArray()){
 							paramValue = getParamObjValue(entry.getValue());
+						}else{//默认就是数组
+							paramValue = getParamObjValue(entry.getValue());
 						}
 					} catch (NoSuchMethodException e) {
 						//没get方法的属性不处理

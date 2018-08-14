@@ -40,9 +40,9 @@
 
         <!-- provider生成插件 -->
         <!--targetProject和targetPackage必填 -->
-        <!--<plugin type="${myProvider.Plugin}">-->
-            <!--<property name="targetProject" value="${targetJavaProject}"></property>-->
-            <!--<property name="targetPackage" value="${targetProviderPackage}"></property>-->
+        <!--<plugin type="\${myProvider.Plugin}">-->
+            <!--<property name="targetProject" value="\${targetJavaProject}"></property>-->
+            <!--<property name="targetPackage" value="\${targetProviderPackage}"></property>-->
         <!--</plugin>-->
 
         <!-- Controller生成插件 -->

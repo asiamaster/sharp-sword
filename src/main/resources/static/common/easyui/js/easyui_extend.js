@@ -580,12 +580,14 @@ function _doComboboxEnter(target){
 //combobox的onLoadSuccess事件，加载成功后默认选中第一项或第二项(第一项是请选择且value为null)
 function onComboLoadSuccessSelectOne() {
     var data = $(this).combobox("getData");
+    var opts = $(this).combobox("options");
+    var valueField = opts.valueField;
     if(data == null || data.length<=0) return;
-    if(data[0]["value"] == null || data[0]["value"] === ""){
+    if(data[0][valueField] == null || data[0][valueField] === ""){
         if(data == null || data.length<=1) return;
-        $(this).combobox("select", data[1]["value"]);
+        $(this).combobox("select", data[1][valueField]);
     }else{
-        $(this).combobox("select", data[0]["value"]);
+        $(this).combobox("select", data[0][valueField]);
     }
 }
 

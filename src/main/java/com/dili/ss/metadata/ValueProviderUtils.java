@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IBaseDomain;
+import com.dili.ss.dto.IDTO;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.SpringUtil;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class ValueProviderUtils {
 
 	//原始值保留前缀
 	public static final String ORIGINAL_KEY_PREFIX = "$_";
+
+	protected static final Logger LOGGER = LoggerFactory.getLogger(ValueProviderUtils.class);
 	@Autowired
 	private Map<String, ValueProvider> valueProviderMap;
 
@@ -78,6 +82,8 @@ public class ValueProviderUtils {
 		//复制一个出来，避免修改，这里用putAll进行简单的深拷贝就行了，因为只是删除元素进行性能优化
 		Map metadataCopy = new HashMap(medadata.size());
 		metadataCopy.putAll(medadata);
+//		构建metadata的字符串value
+		convertStringProvider(metadataCopy);
 		//将map.entrySet()转换成list，再进行排序
 		List<Map.Entry<String, Object>> metadataCopyList = new ArrayList<Map.Entry<String, Object>>(metadataCopy.entrySet());
 //		Collections.sort(metadataCopyList, new Comparator<Map.Entry<String, Long>>() {
@@ -112,7 +118,7 @@ public class ValueProviderUtils {
 			//value是provider相关的json对象
 			JSONObject jsonValue = null;
 			try {
-				jsonValue = entry.getValue() instanceof JSONObject ? (JSONObject)entry.getValue() : JSONObject.parseObject(entry.getValue().toString());
+				jsonValue = entry.getValue() instanceof String ? JSONObject.parseObject((String)entry.getValue()) : (JSONObject)JSONObject.toJSON(entry.getValue());
 			} catch (JSONException e) {
 				continue;
 			}
@@ -133,7 +139,13 @@ public class ValueProviderUtils {
 				}
 			}
 			//批量设置列表
-			batchValueProvider.setDisplayList(list, jsonValue, objectMeta);
+			try {
+				batchValueProvider.setDisplayList(list, jsonValue, objectMeta);
+			}catch (Exception e){
+				e.printStackTrace();
+				LOGGER.error("提供者报错:"+batchValueProvider.getClass().getName());
+			}
+
 		}
 		//仅用于下面for循环中缓存下提供者bean
 		Map<String, ValueProvider> vpBuffer = new HashMap<>();
@@ -146,8 +158,9 @@ public class ValueProviderUtils {
 				//value是provider相关的json对象
 				JSONObject jsonValue = null;
 				try{
-					jsonValue = JSONObject.parseObject(entry.getValue().toString());
+					jsonValue = entry.getValue() instanceof String ? JSONObject.parseObject((String)entry.getValue()) : (JSONObject)JSONObject.toJSON(entry.getValue());
 				} catch (JSONException e) {
+//					e.printStackTrace();
 					return;
 				}
 				String providerBeanId = jsonValue.get(ValueProvider.PROVIDER_KEY).toString();
@@ -167,20 +180,25 @@ public class ValueProviderUtils {
 					}
 				}
 				FieldMeta fieldMeta = objectMeta == null ? null : objectMeta.getFieldMetaById(field);
-				String text = valueProvider.getDisplayText(dataMap.get(field), jsonValue, fieldMeta);
-				//保留原值，用于在修改时提取表单加载，但是需要过滤掉日期类型，
-				// 因为前台无法转换Long类型的日期格式,并且也没法判断是日期格式
-				// 配合批量提供者处理，如果转换后的显示值返回null，则不保留原值
-				if (text != null &&  !(dataMap.get(field) instanceof Date)) {
-					dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(field));
+				try {
+					String text = valueProvider.getDisplayText(dataMap.get(field), jsonValue, fieldMeta);
+					//保留原值，用于在修改时提取表单加载，但是需要过滤掉日期类型，
+					// 因为前台无法转换Long类型的日期格式,并且也没法判断是日期格式
+					// 配合批量提供者处理，如果转换后的显示值返回null，则不保留原值
+					if (text != null &&  !(dataMap.get(field) instanceof Date)) {
+						dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(field));
+					}
+					//批量提供者只put转换后不为null的值
+					if(text != null && valueProvider instanceof BatchValueProvider) {
+						dataMap.put(field, text);
+						//普通值提供者put所有转化后的值(无论是否为空)
+					}else if(!(valueProvider instanceof BatchValueProvider)){
+						dataMap.put(field, text);
+					}
+				}catch (Exception e){
+					e.printStackTrace();
+					LOGGER.error("提供者报错:"+valueProvider.getClass().getName());
 				}
-                //批量提供者只put转换后不为null的值
-				if(text != null && valueProvider instanceof BatchValueProvider) {
-                    dataMap.put(field, text);
-                    //普通值提供者put所有转化后的值(无论是否为空)
-                }else if(!(valueProvider instanceof BatchValueProvider)){
-                    dataMap.put(field, text);
-                }
 			});
 			results.add(dataMap);
 		}
@@ -287,5 +305,38 @@ public class ValueProviderUtils {
 		}
 	}
 
+
+	/**
+	 * 构建metadata的字符串value
+	 * @param medadata
+	 */
+	private static void convertStringProvider(Map<String, Object> medadata){
+		if(medadata == null){
+			return;
+		}
+		Iterator<Map.Entry<String, Object>> it = medadata.entrySet().iterator();
+		while(it.hasNext()){
+			Map.Entry<String, Object> entry = it.next();
+			if(!isJson(entry.getValue().toString())){
+				if(entry.getKey().equals(IDTO.NULL_VALUE_FIELD) || entry.getKey().equals(IDTO.AND_CONDITION_EXPR)){
+					continue;
+				}
+				Map<String, Object> value = Maps.newHashMap();
+				value.put(ValueProvider.PROVIDER_KEY, entry.getValue());
+				value.put(ValueProvider.FIELD_KEY, entry.getKey());
+				value.put(ValueProvider.INDEX_KEY, 0);
+				entry.setValue(value);
+			}
+		}
+	}
+
+	private static boolean isJson(String content){
+		try {
+			JSONObject.parseObject(content);
+			return  true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 }

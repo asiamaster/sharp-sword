@@ -2,6 +2,7 @@ package com.dili.ss.converter;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Timestamp;
 import java.util.Date;
 
 import org.springframework.http.HttpOutputMessage;
@@ -25,6 +26,7 @@ public class JsonHttpMessageConverter extends FastJsonHttpMessageConverter{
     static {
         dateFormat = "yyyy-MM-dd HH:mm:ss";
         mapping.put(Date.class, new SimpleDateFormatSerializer(dateFormat));
+        mapping.put(Timestamp.class, new SimpleDateFormatSerializer(dateFormat));
     }
 
     @Override
