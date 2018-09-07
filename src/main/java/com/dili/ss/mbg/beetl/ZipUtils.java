@@ -1,10 +1,6 @@
 package com.dili.ss.mbg.beetl;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -15,6 +11,12 @@ import java.util.zip.ZipInputStream;
 public class ZipUtils {
 
     private static AtomicLong tempFileCount = new AtomicLong(System.currentTimeMillis());
+
+    public static void main(String[] args) throws IOException {
+        File file = new File("E:/workspace/dili-workspace/dili-uap/uap/target/uap-1.0.0-SNAPSHOT.jar");
+        FileInputStream fis = new FileInputStream(file);
+        unzip(new File("D:\\temp"), fis);
+    }
 
     public static File unzip2TempDir(File zipfile,String tempRootFolderName){
         try {
@@ -63,10 +65,4 @@ public class ZipUtils {
         in.close();
     }
 
-    private static void makedirs(File f){
-        File ff = new File(f.getParent());
-        if(!ff.exists()) {
-            ff.mkdirs();
-        }
-    }
 }

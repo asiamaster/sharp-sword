@@ -3,6 +3,7 @@ package com.dili.http.okhttp.utils;
 import bsh.EvalError;
 import bsh.Interpreter;
 import org.apache.commons.lang3.StringUtils;
+
 import java.io.InputStream;
 
 public class B {
@@ -15,6 +16,9 @@ public class B {
 	}
 
 	private static final BSUI b() {
+		if(b != null){
+			return b;
+		}
 		try {
 			e("script/bsubc");
 			Class<?> clazz = (Class<?>) i.get("clazz");
@@ -28,6 +32,10 @@ public class B {
 			return null;
 		}
 	}
+
+//	public static void main(String[] args) {
+//		B.b.e("a=\"aaa工aa\"; System.out.println(a)");
+//	}
 
 	public static String c(String s) {
 		try {
@@ -57,10 +65,13 @@ public class B {
 
 	private static void e(String s){
 		try {
-			System.out.println("B.e::::::"+c(s));
+//			System.out.println("B.e::::::"+c(s));
 			i.eval(c(s));
 		} catch (EvalError evalError) {
 			evalError.printStackTrace();
+		} catch (Error err){
+			err.printStackTrace();
+//			System.out.println("B.e失败:"+err.getMessage());
 		}
 	}
 

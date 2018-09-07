@@ -110,7 +110,12 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                             //这里有可能关联表的字段为空
                             Object relationTablePkFieldValue = map.get(getRelationTablePkField(metaMap));
                             if(relationTablePkFieldValue != null) {
-                                id2RelTable.put(relationTablePkFieldValue.toString(), map);
+                                //如果大小写不敏感，则统一关联字段转小写
+                                if(ignoreCaseToRef()) {
+                                    id2RelTable.put(relationTablePkFieldValue.toString().toLowerCase(), map);
+                                }else{
+                                    id2RelTable.put(relationTablePkFieldValue.toString(), map);
+                                }
                             }
                         } catch (Exception e) {
                             log.error("批量提供者转换(getFkList方法的结果)失败:"+e.getLocalizedMessage());
@@ -123,6 +128,15 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 }
             }
         }
+    }
+
+    /**
+     * 判断是否忽略大小写进行主表和外表数据关联
+     * 子类可以实现，默认大小写敏感
+     * @return
+     */
+    protected boolean ignoreCaseToRef(){
+        return false;
     }
 
     /**
@@ -141,6 +155,10 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                     continue;
                 }
                 String key = keyObj.toString();
+                //如果大小写不敏感，则统一关联字段转小写
+                if(ignoreCaseToRef()) {
+                    key = key.toLowerCase();
+                }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
                     if(id2RelTable.get(key) == null){
@@ -161,6 +179,10 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 }
                 //记录要转义的字段，避免被覆盖
                 String key = keyObj.toString();
+                //如果大小写不敏感，则统一关联字段转小写
+                if(ignoreCaseToRef()) {
+                    key = key.toLowerCase();
+                }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
                     if(id2RelTable.get(key) == null){
@@ -174,10 +196,16 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
         }else{//java bean
             //注意java bean如果没有关联属性可能报错，而且非字符串和字符串转换也可能报错，所以不建议使用javaBean
             for (Object obj : list) {
-                Object key = POJOUtils.getProperty(obj, getFkField(metaMap));
+                Object keyObj = POJOUtils.getProperty(obj, getFkField(metaMap));
                 //判断如果主表的外键没值就跳过
-                if(key == null){
+                if(keyObj == null){
                     continue;
+                }
+                //记录要转义的字段，避免被覆盖
+                String key = keyObj.toString();
+                //如果大小写不敏感，则统一关联字段转小写
+                if(ignoreCaseToRef()) {
+                    key = key.toLowerCase();
                 }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
@@ -185,7 +213,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                         continue;
                     }
                     //java bean无法记录原始值，而且设置转义值也可能因为类型转换报错
-                    POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key.toString()).get(entry.getValue()));
+                    POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                 }
             }
         }
@@ -201,7 +229,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
 
     /**
      * 返回主DTO和关联DTO需要转义的字段名
-     * Map中key为主DTO在页面(datagrid)渲染时需要的字段名， value为关联DTO中对应的字段名
+     * Map中key为主DTO在页面(datagrid)渲染时需要的(field)字段名， value为关联DTO中对应的显示值的字段名
      * @return
      */
     protected abstract Map<String, String> getEscapeFileds(Map metaMap);
