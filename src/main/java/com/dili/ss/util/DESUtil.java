@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * @author asiamaster
  */
-public class DESCoder {
+public class DESUtil {
     //DES密钥算法
     public static final String KEY_ALGORITHM = "DES";
 
@@ -109,7 +109,7 @@ public class DESCoder {
      * @param buf
      * @return
      */
-    private static String parseByte2HexStr(byte buf[]) {
+    public static String parseByte2HexStr(byte buf[]) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < buf.length; i++) {
             String hex = Integer.toHexString(buf[i] & 0xFF);
@@ -127,7 +127,7 @@ public class DESCoder {
      * @param hexStr
      * @return
      */
-    private static byte[] parseHexStr2Byte(String hexStr) {
+    public static byte[] parseHexStr2Byte(String hexStr) {
         if (hexStr.length() < 1) {
             return null;
         }
