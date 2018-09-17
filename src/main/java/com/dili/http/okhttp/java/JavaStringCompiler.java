@@ -5,6 +5,7 @@ import com.dili.ss.util.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.system.ApplicationHome;
+import org.springframework.util.ResourceUtils;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
@@ -12,6 +13,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -66,12 +68,7 @@ public class JavaStringCompiler {
 //			List<String> opts = Arrays.asList("-Xlint:unchecked", "-d", path);
 //			opts.add("-target");
 //			opts.add("1.8");
-            boolean isJar = false;
-            try {
-                isJar = isJarRun();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
+            boolean isJar = isJarRun();
             if( isJar && !isRun){
                 String jarDirPath = new ApplicationHome(getClass()).getDir().getAbsolutePath();
                 String jarPath = new ApplicationHome(getClass()).getSource().getAbsolutePath();
@@ -88,14 +85,22 @@ public class JavaStringCompiler {
 		}
     }
 
-    private boolean isJarRun() throws URISyntaxException {
-        ProtectionDomain protectionDomain = getClass().getProtectionDomain();
-        CodeSource codeSource = protectionDomain.getCodeSource();
-        URI location = (codeSource == null ? null : codeSource.getLocation().toURI());
-        String path = (location == null ? null : location.getSchemeSpecificPart());
-        File root = new File(path);
-        return root.isDirectory() ? false : true;
-    }
+    private boolean isJarRun() {
+//        ProtectionDomain protectionDomain = getClass().getProtectionDomain();
+//        CodeSource codeSource = protectionDomain.getCodeSource();
+//        URI location = (codeSource == null ? null : codeSource.getLocation().toURI());
+//        String path = (location == null ? null : location.getSchemeSpecificPart());
+//        File root = new File(path);
+//        return root.isDirectory() ? false : true;
+		try {
+			File file = new File(ResourceUtils.getURL("classpath:").getPath());
+			return file.getAbsolutePath().endsWith("\\BOOT-INF\\classes!") ? true : false;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			//取不到路径默认为包模式
+			return true;
+		}
+	}
 
     private static String buildClassPath(String libRelativePath){
         String jarDirPath = new ApplicationHome(JavaStringCompiler.class).getDir().getAbsolutePath();
