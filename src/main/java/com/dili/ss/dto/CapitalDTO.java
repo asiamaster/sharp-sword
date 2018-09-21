@@ -5,7 +5,7 @@ package com.dili.ss.dto;
  * @author wangmi
  * Created by asiamaster on 2017/8/1 0001.
  */
-public class CapitalDTOData extends DTO{
+public class CapitalDTO extends DTO{
 	private static final long serialVersionUID = -688089562635699991L;
 
 	/**
