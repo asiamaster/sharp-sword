@@ -1,22 +1,20 @@
 package com.dili.ss.metadata.provider;
 
-import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.base.BaseServiceImpl;
-import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.metadata.*;
 import com.dili.ss.service.CommonService;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.POJOUtils;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 批量提供者适配器
@@ -109,7 +107,16 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                     for(Object obj : relationDatas){
                         try {
                             Map map = BeanConver.transformObjectToMap(obj);
-                            id2RelTable.put(map.get(getRelationTablePkField(metaMap)).toString(), map);
+                            //这里有可能关联表的字段为空
+                            Object relationTablePkFieldValue = map.get(getRelationTablePkField(metaMap));
+                            if(relationTablePkFieldValue != null) {
+                                //如果大小写不敏感，则统一关联字段转小写
+                                if(ignoreCaseToRef()) {
+                                    id2RelTable.put(relationTablePkFieldValue.toString().toLowerCase(), map);
+                                }else{
+                                    id2RelTable.put(relationTablePkFieldValue.toString(), map);
+                                }
+                            }
                         } catch (Exception e) {
                             log.error("批量提供者转换(getFkList方法的结果)失败:"+e.getLocalizedMessage());
                             break;
@@ -121,6 +128,15 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 }
             }
         }
+    }
+
+    /**
+     * 判断是否忽略大小写进行主表和外表数据关联
+     * 子类可以实现，默认大小写敏感
+     * @return
+     */
+    protected boolean ignoreCaseToRef(){
+        return false;
     }
 
     /**
@@ -139,6 +155,10 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                     continue;
                 }
                 String key = keyObj.toString();
+                //如果大小写不敏感，则统一关联字段转小写
+                if(ignoreCaseToRef()) {
+                    key = key.toLowerCase();
+                }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
                     if(id2RelTable.get(key) == null){
@@ -159,6 +179,10 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 }
                 //记录要转义的字段，避免被覆盖
                 String key = keyObj.toString();
+                //如果大小写不敏感，则统一关联字段转小写
+                if(ignoreCaseToRef()) {
+                    key = key.toLowerCase();
+                }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
                     if(id2RelTable.get(key) == null){
@@ -172,10 +196,16 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
         }else{//java bean
             //注意java bean如果没有关联属性可能报错，而且非字符串和字符串转换也可能报错，所以不建议使用javaBean
             for (Object obj : list) {
-                Object key = POJOUtils.getProperty(obj, getFkField(metaMap));
+                Object keyObj = POJOUtils.getProperty(obj, getFkField(metaMap));
                 //判断如果主表的外键没值就跳过
-                if(key == null){
+                if(keyObj == null){
                     continue;
+                }
+                //记录要转义的字段，避免被覆盖
+                String key = keyObj.toString();
+                //如果大小写不敏感，则统一关联字段转小写
+                if(ignoreCaseToRef()) {
+                    key = key.toLowerCase();
                 }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
@@ -183,7 +213,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                         continue;
                     }
                     //java bean无法记录原始值，而且设置转义值也可能因为类型转换报错
-                    POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key.toString()).get(entry.getValue()));
+                    POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                 }
             }
         }
@@ -191,13 +221,15 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
 
     /**
      * 获取关联表数据
+     * @param relationIds 根据主DTO的外键字典(FkField)中的值列表
+     * @param metaMap meta信息
      * @return 可能返回DTO, Map或JavaBean的列表
      */
     protected abstract List getFkList(List<String> relationIds, Map metaMap);
 
     /**
      * 返回主DTO和关联DTO需要转义的字段名
-     * Map中key为主DTO在页面(datagrid)渲染时需要的字段名， value为关联DTO中对应的字段名
+     * Map中key为主DTO在页面(datagrid)渲染时需要的(field)字段名， value为关联DTO中对应的显示值的字段名
      * @return
      */
     protected abstract Map<String, String> getEscapeFileds(Map metaMap);

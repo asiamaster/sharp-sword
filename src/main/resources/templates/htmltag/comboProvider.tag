@@ -23,7 +23,7 @@
     //注意，这里只能取到value属性中的值，而无法取到combobox的当前值，因为还没有渲染，渲染以后应该使用getValue方法取值
     _comboProviderParamObj_${_id}.value = $("#${_id}").val();
     $("#${_id}").combobox({
-        url:"${contextPath}/provider/getLookupList"
+        url:"${contextPath}/provider/getLookupList.action"
         ,method:"POST"
         ,valueField:"value"
         ,textField:"text"

@@ -76,7 +76,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         try {
             return super.getBodyContent().toString();
         } catch (BeetlException ex) {
-            ex.pushResource(this.ctx.getResourceId());
+            ex.pushResource(this.ctx.getResource());
             throw ex;
         }
     }
@@ -90,7 +90,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
             ctx.byteWriter = writer;
             return tempWriter.getTempConent();
         } catch (BeetlException ex) {
-            ex.pushResource(this.ctx.getResourceId());
+            ex.pushResource(this.ctx.getResource());
             throw ex;
         }
     }

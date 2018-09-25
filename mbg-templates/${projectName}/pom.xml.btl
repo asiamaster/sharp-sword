@@ -22,8 +22,6 @@
         <targetResourcesProject>\${basedir}/src/main/resources</targetResourcesProject>
         <targetXMLPackage>mapper</targetXMLPackage>
         <!--  依赖版本  -->
-        <spring.version>4.2.8.RELEASE</spring.version>
-        <mybatis.version>3.3.0</mybatis.version>
         <mybatis-spring.version>1.2.3</mybatis-spring.version>
         <springloaded.version>1.2.6.RELEASE</springloaded.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,6 +29,7 @@
         <mapper.version>3.3.9</mapper.version>
         <mysql.version>5.1.38</mysql.version>
         <aspectj.version>1.8.10</aspectj.version>
+        <sharp-sword.version>2.0.12-SNAPSHOT</sharp-sword.version>
     </properties>
 
     <!--地利-->
@@ -81,7 +80,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.7.0</version>
                 <!-- 编译JDK版本 -->
                 <configuration>
                     <source>1.8</source>
@@ -134,7 +133,7 @@
                     <dependency>
                         <groupId>com.dili</groupId>
                         <artifactId>sharp-sword</artifactId>
-                        <version>1.5.4-SNAPSHOT</version>
+                        <version>\${sharp-sword.version}</version>
                         <!--<scope>system</scope>-->
                         <!--<systemPath>\${\project.basedir}/lib/sharp-sword-1.5.4-SNAPSHOT.jar</systemPath>-->
                     </dependency>
@@ -154,7 +153,7 @@
 		<dependency>
 			<groupId>com.dili</groupId>
 			<artifactId>sharp-sword</artifactId>
-			<version>1.5.4-SNAPSHOT</version>
+			<version>\${sharp-sword.version}</version>
 		</dependency>
         <dependency>
             <groupId>org.mybatis.generator</groupId>
@@ -162,29 +161,8 @@
             <version>1.3.5</version>
         </dependency>
 
-        <!-- 参数校验包 -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>5.2.4.Final</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml</groupId>
-                    <artifactId>classmate</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.5</version>
-        </dependency>
         <!--swagger -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.4.0</version>
-        </dependency>
+
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
@@ -193,7 +171,7 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>1.5.3</version>
+            <version>1.5.16</version>
         </dependency>
         <!-- okhttp -->
         <dependency>
@@ -218,37 +196,6 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
-        <!-- druid -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.0.27</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-typehandlers-jsr310 -->
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-typehandlers-jsr310</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <!-- jedis -->
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
-        </dependency>
-        <!-- beetl -->
-        <dependency>
-            <groupId>com.ibeetl</groupId>
-            <artifactId>beetl</artifactId>
-            <version>2.7.12</version>
-        </dependency>
-
-        <!-- fastjson -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.23</version>
-        </dependency>
         <!-- if you enable json support in spring mvc. -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -256,49 +203,14 @@
             <version>1.9.13</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>2.2.1</version>
-        </dependency>
-
 
         <!-- ===============  spring boot starters  =============== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <!--<version>\${boot.version}</version>-->
             <scope>test</scope>
         </dependency>
-        <!--mybatis-->
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <!--pagehelper-->
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <version>1.1.1</version>
-        </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.github.pagehelper</groupId>-->
-            <!--<artifactId>pagehelper</artifactId>-->
-            <!--<version>5.0.0</version>-->
-        <!--</dependency>-->
-        <!--mapper-->
-        <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>mapper-spring-boot-starter</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <!-- mongo -->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-data-mongodb</artifactId>-->
-        <!--</dependency>-->
         <!-- redis -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -313,29 +225,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <!-- starter-tomcat -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <!--<scope>provided</scope>-->
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-freemarker</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.jasypt/jasypt-spring31 -->
-        <dependency>
-            <groupId>org.jasypt</groupId>
-            <artifactId>jasypt-spring31</artifactId>
-            <version>1.9.2</version>
         </dependency>
 
         <!-- starter-security -->
@@ -406,15 +295,7 @@
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.4.3.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- Spring Boot 1.4.x and Spring Framework 4.2.x support -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Camden.RELEASE</version>
+                <version>2.0.0.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

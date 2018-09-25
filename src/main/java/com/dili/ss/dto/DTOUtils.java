@@ -6,6 +6,7 @@ import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.MetadataUtils;
 import com.dili.ss.metadata.ObjectMeta;
 import com.dili.ss.util.BeanConver;
+import com.dili.ss.util.CloneUtils;
 import com.dili.ss.util.POJOUtils;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -82,6 +83,22 @@ public class DTOUtils {
 	}
 
 	/**
+	 * 深克隆
+	 * @param obj
+	 * @param proxyClazz
+	 * @param <T>
+	 * @return
+	 */
+	public static <T extends IDTO> T clone(T obj, Class<T> proxyClazz){
+		assert (obj != null);
+		DTO dto = go(obj);
+		if(dto == null){
+			return null;
+		}
+		return DTOUtils.proxy(CloneUtils.clone(dto), proxyClazz);
+	}
+
+	/**
 	 * 取DTO的实际类<br>
 	 * <li>是代理对象时,则返回其代理接口</li>
 	 * <li>是实际的DTO子类的实例时,则返回子类的类名</li>
@@ -93,10 +110,11 @@ public class DTOUtils {
 		assert (dto != null);
 		if (Proxy.isProxyClass(dto.getClass())) {
 			InvocationHandler handler = Proxy.getInvocationHandler(dto);
-			if (handler instanceof DTOHandler)
+			if (handler instanceof DTOHandler) {
 				return ((DTOHandler<?>) handler).getProxyClazz();
-			else
+			} else {
 				throw new InternalException("当前代理对象不是DTOHandler能处理的对象!");
+			}
 		} else {
 			return dto.getClass();
 		}

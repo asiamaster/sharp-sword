@@ -31,39 +31,44 @@ public class QuartzRecycleJob implements ApplicationListener<ContextRefreshedEve
 		if (contextRefreshedEvent.getApplicationContext().getParent() == null) {
 			List<ScheduleJob> scheduleJobs = scheduleJobService.list(null);
 			for (ScheduleJob job : scheduleJobs) {
+				//启动时把所有非正常调度任务都改为正常
+				if(!job.getJobStatus().equals(QuartzConstants.JobStatus.NORMAL.getCode())) {
+					job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
+				}
+				scheduleJobService.updateSelective(job);
 				scheduleJobService.addJob(job, true);
 			}
 		}
 	}
 
 	public void scan(ScheduleMessage scheduleMessage) {
-		try {
-			List<ScheduleJob> schedulingJobs = scheduleJobService.getAllJob();
-			for(ScheduleJob scheduleJob : schedulingJobs){
-				//过滤掉自己
-				if(scheduleJob.getJobName().equals("quartzRecycleJob") && scheduleJob.getJobGroup().equals("system")){
-					continue;
-				}
-				//无，完成和错误状态的都删除
-				if(scheduleJob.getJobStatus().equals(QuartzConstants.JobStatus.NONE) ||
-						scheduleJob.getJobStatus().equals(QuartzConstants.JobStatus.COMPLETE) ||
-						scheduleJob.getJobStatus().equals(QuartzConstants.JobStatus.ERROR) ){
-					scheduleJobService.delete(scheduleJob.getId(), true);
-				}else{//正常，阻塞和暂停状态只更新数据库状态，不调度
-					scheduleJobService.updateSelective(scheduleJob);
-				}
-			}
-			//删除没在调度器中的数据
-			List<ScheduleJob> dbScheduleJobs = scheduleJobService.list(null);
-			for(ScheduleJob scheduleJob : dbScheduleJobs){
-				if(!containsScheduleJob(schedulingJobs, scheduleJob)){
-					scheduleJobService.delete(scheduleJob.getId(), false);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error("QuartzRecycleJob异常:"+e.getMessage());
-		}
+//		try {
+//			List<ScheduleJob> schedulingJobs = scheduleJobService.getAllJob();
+//			for(ScheduleJob scheduleJob : schedulingJobs){
+//				//过滤掉自己
+//				if(scheduleJob.getJobName().equals("quartzRecycleJob") && scheduleJob.getJobGroup().equals("system")){
+//					continue;
+//				}
+//				//无，完成和错误状态的都删除
+//				if(scheduleJob.getJobStatus().equals(QuartzConstants.JobStatus.NONE) ||
+//						scheduleJob.getJobStatus().equals(QuartzConstants.JobStatus.COMPLETE) ||
+//						scheduleJob.getJobStatus().equals(QuartzConstants.JobStatus.ERROR) ){
+//					scheduleJobService.delete(scheduleJob.getId(), true);
+//				}else{//正常，阻塞和暂停状态只更新数据库状态，不调度
+//					scheduleJobService.updateSelective(scheduleJob);
+//				}
+//			}
+//			//删除没在调度器中的数据
+//			List<ScheduleJob> dbScheduleJobs = scheduleJobService.list(null);
+//			for(ScheduleJob scheduleJob : dbScheduleJobs){
+//				if(!containsScheduleJob(schedulingJobs, scheduleJob)){
+//					scheduleJobService.delete(scheduleJob.getId(), false);
+//				}
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			log.error("QuartzRecycleJob异常:"+e.getMessage());
+//		}
 	}
 
 	private boolean containsScheduleJob(List<ScheduleJob> scheduleJobs, ScheduleJob scheduleJob){

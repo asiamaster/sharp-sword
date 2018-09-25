@@ -87,10 +87,11 @@ function datetimeFormatter (value) {
  * 绑定实体的metadata信息，用于提供者转换
  * @param gridId    datagrid Id
  * @param isClearQueryParams    是否清空datagrid中原有的queryParams, 默认为false,不清空
+ * @param isTreegrid 是否树表，默认false
  * @returns {queryParams|{provider}|*|string|{}}
  */
-function bindMetadata(gridId, isClearQueryParams){
-    var opts=$("#"+gridId).datagrid("options");
+function bindMetadata(gridId, isClearQueryParams, isTreegrid){
+    var opts = isTreegrid == null ? $("#"+gridId).datagrid("options") : $("#"+gridId).treegrid("options");
     //赋默认值
     isClearQueryParams = isClearQueryParams || false;
     var params = isClearQueryParams ? {} : opts.queryParams || {};
@@ -98,7 +99,7 @@ function bindMetadata(gridId, isClearQueryParams){
     var lastColumns = opts.columns[opts.columns.length-1];
     params["metadata"] = {};
     //提供者的默认排序索引
-    var index = 1;
+    var index = 10;
     for(var column in lastColumns){
         var _provider = lastColumns[column]["_provider"];
         var _data = lastColumns[column]["_data"];
@@ -134,7 +135,7 @@ function bindMetadata(gridId, isClearQueryParams){
             fieldMetadata["_relationTable"] = lastColumns[column]["_relationTable"];
             fieldMetadata["_fkField"] = lastColumns[column]["_fkField"];
             params["metadata"][field] = JSON.stringify(fieldMetadata);
-            index++;
+            index+=10;
         }
     }
     return params;
@@ -152,6 +153,33 @@ function bindGridMeta2Form(gridId, formId, containsNull){
     if(!formId || formId == null || formId === "") return param;
     var formData = $("#"+formId).serializeObject(containsNull);
     return $.extend({}, param, formData);
+}
+
+/**
+ * 为表单绑定树型表格的metadata，保持原有的meta信息
+ * 返回绑定好的对象
+ * @param gridId
+ * @param formId
+ * @returns {*}
+ */
+function bindTreegridMeta2Form(gridId, formId, containsNull){
+    var param = bindMetadata(gridId, true, true);
+    if(!formId || formId == null || formId === "") return param;
+    var formData = $("#"+formId).serializeObject(containsNull);
+    return $.extend({}, param, formData);
+}
+
+/**
+ * 为一个JSON对象绑定树型表格的metadata，保持原有的meta信息
+ * 返回绑定好的对象
+ * @param gridId
+ * @param formId
+ * @returns {*}
+ */
+function bindTreegridMeta2Data(gridId, json){
+    var param = bindMetadata(gridId, true, true);
+    if(!json || json == null || json === "" || !isJson(json)) return param;
+    return $.extend({}, param, json);
 }
 
 /**
@@ -185,6 +213,7 @@ function convertTree(rows){
                 id:row.id,
                 text:row.text,
                 state:row["state"],
+                checked: row["checked"],
                 attributes:row["attributes"]
             });
         }
@@ -204,6 +233,7 @@ function convertTree(rows){
                     id:row.id,
                     text:row.text,
                     state:row["state"],
+                    checked: row["checked"],
                     attributes:row["attributes"]
                 };
                 if (node.children){
@@ -222,16 +252,22 @@ var treeLoadFilter = function(data,parent){
     var idField = $(this).tree("options")["_idField"];
     var textField = $(this).tree("options")["_textField"];
     var parentIdField = $(this).tree("options")["_parentIdField"];
+    var jsonData = $.isArray(data) ? data : data.rows;
+    //如果没数据或者已经有children属性，则不进行转换，主要用于拖动有子节点的场景
+    //这里不能返回jsonData，jsonData可能为null导致报错，只能返回data
+    if(null == jsonData || (jsonData.length <=0 || jsonData[0].hasOwnProperty("children"))){
+        return data;
+    }
     if(idField && idField != null && idField != ""){
-        modifyJsonKey(data,idField,"id");
+        modifyJsonKey(jsonData,idField,"id");
     }
     if(textField && textField != null && textField != ""){
-        modifyJsonKey(data,textField,"text");
+        modifyJsonKey(jsonData,textField,"text");
     }
     if(parentIdField && parentIdField != null && parentIdField != ""){
-        modifyJsonKey(data,parentIdField,"parentId");
+        modifyJsonKey(jsonData,parentIdField,"parentId");
     }
-    return convertTree(data);
+    return convertTree(jsonData);
 }
 
 //树表加载过滤器
@@ -275,12 +311,19 @@ function findParentIdFromId(rows, parentId, idField){
 
 //修改json对象或数组中的key
 function modifyJsonKey(json,oldkey,newkey){
+    if(oldkey == newkey){
+        return;
+    }
     if(json instanceof Array){
         for(var i in json){
             var obj = json[i];
             modifyJsonKey(json[i],oldkey,newkey);
         }
     }else{
+        //没有指定的字段名则不进行key转换，这里主要用于节点拖动时，数据已经转换成标准的id,text和parentId了
+        if(!json.hasOwnProperty(oldkey)){
+            return;
+        }
         var val = json[oldkey];
         delete json[oldkey];
         json[newkey]=val;
@@ -341,32 +384,33 @@ $(function() {
 
     //文本框添加清空按钮
     $.extend($.fn.textbox.methods, {
-        addClearBtn: function(jq, iconCls){
-            return jq.each(function(){
-                var t = $(this);
+        addClearBtn: function (jq, iconCls) {
+            return jq.each(function () {
+                var t = jq;
                 var opts = t.textbox('options');
-                opts.icons = opts.icons || [];
-                if(!_containsIconCls(opts.icons, iconCls)){
+                //使用深复制，解决有多个textbox时，调用一次addClearBtn可能或为其它文本框添加cleaBtn的问题
+                opts.icons = opts.icons ? opts.icons.slice() : [];
+                if (!_containsIconCls(opts.icons, iconCls)) {
                     opts.icons.unshift({
                         iconCls: iconCls,
-                        handler: function(e){
+                        handler: function (e) {
                             //针对textbox with button清除不掉，这里强制清除
                             $(e.data.target).textbox('initValue', "");
                             $(e.data.target).textbox('clear').textbox('textbox').focus();
-                            $(this).css('visibility','hidden');
+                            $(this).css('visibility', 'hidden');
                         }
                     });
                 }
                 t.textbox();
-                if (!t.textbox('getText') || t.textbox('getText') == ""){
-                    t.textbox('getIcon',0).css('visibility','hidden');
+                if (!t.textbox('getText') || t.textbox('getText') == "") {
+                    t.textbox('getIcon', 0).css('visibility', 'hidden');
                 }
-                t.textbox('textbox').bind('keyup', function(){
-                    var icon = t.textbox('getIcon',0);
-                    if ($(this).val()){
-                        icon.css('visibility','visible');
+                t.textbox('textbox').bind('keyup', function () {
+                    var icon = t.textbox('getIcon', 0);
+                    if ($(this).val()) {
+                        icon.css('visibility', 'visible');
                     } else {
-                        icon.css('visibility','hidden');
+                        icon.css('visibility', 'hidden');
                     }
                 });
             });
@@ -536,12 +580,14 @@ function _doComboboxEnter(target){
 //combobox的onLoadSuccess事件，加载成功后默认选中第一项或第二项(第一项是请选择且value为null)
 function onComboLoadSuccessSelectOne() {
     var data = $(this).combobox("getData");
+    var opts = $(this).combobox("options");
+    var valueField = opts.valueField;
     if(data == null || data.length<=0) return;
-    if(data[0]["value"] == null || data[0]["value"] === ""){
+    if(data[0][valueField] == null || data[0][valueField] === ""){
         if(data == null || data.length<=1) return;
-        $(this).combobox("select", data[1]["value"]);
+        $(this).combobox("select", data[1][valueField]);
     }else{
-        $(this).combobox("select", data[0]["value"]);
+        $(this).combobox("select", data[0][valueField]);
     }
 }
 
@@ -564,3 +610,87 @@ function clearEasyuiForm(formId){
         .removeAttr('checked')
         .removeAttr('selected');
 }
+//数据表格的页脚视图
+var footerView = $.extend({}, $.fn.datagrid.defaults.view, {
+    renderFooter: function(target, container, frozen){
+        var opts = $.data(target, 'datagrid').options;
+        var rows = $.data(target, 'datagrid').footer || [];
+        var fields = $(target).datagrid('getColumnFields', frozen);
+        var table = ['<table class="datagrid-ftable" cellspacing="0" cellpadding="0" border="0"><tbody>'];
+
+        for(var i=0; i<rows.length; i++){
+            var styleValue = opts.rowStyler ? opts.rowStyler.call(target, i, rows[i]) : '';
+            var style = styleValue ? 'style="' + styleValue + '"' : '';
+            table.push('<tr class="datagrid-row" datagrid-row-index="' + i + '"' + style + '>');
+            table.push(this.renderRow.call(this, target, fields, frozen, i, rows[i]));
+            table.push('</tr>');
+        }
+
+        table.push('</tbody></table>');
+        $(container).html(table.join(''));
+    }
+});
+//格式化数字，去掉最后的0
+function cutZeroFormatter(value) {
+    if(value == null || value == ""){
+        return null;
+    }
+    //如果有多个小数点，返回0
+    if(value.lastIndexOf(".") != value.indexOf(".")){
+        return 0;
+    }
+    //去掉开头的0
+    if(!value.startWith("0.")){
+        while (value.startWith("0")){
+            value = value.substring(1, value.length);
+        }
+    }
+    //如果有小数点，去掉末尾的0
+    if(value.lastIndexOf(".") != -1){
+        for(var i = value.length; i > 0; i--){
+            if(value.lastIndexOf("0") == i-1){
+                value = value.substring(0, i-1);
+            }else{
+                break;
+            }
+        }
+    }
+    //获取精度，easyui默认值为0
+    var precision = $(this).numberbox("options").precision;
+    var indexOfDot = value.indexOf(".");
+    //根据精度，截断后面的位数
+    if( value.lastIndexOf(".") != -1 &&  value.length - indexOfDot - 1 > precision){
+        value = value.substring(0, indexOfDot+precision+1);
+    }
+    //如果value是以.结尾，则去掉最后的.
+    if(value.lastIndexOf(".") != -1 && value.lastIndexOf(".") == value.length-1){
+        value = value.substring(0, value.length-1);
+    }
+    return value;
+}
+$(function () {
+    //日期和时间控件添加清空
+    var d_buttons = $.extend([], $.fn.datebox.defaults.buttons);
+    d_buttons.splice(1, 0, {
+        text: '清空',
+        handler: function (target) {
+            $(target).datebox('setValue', '');
+        }
+    });
+    $('.easyui-datebox').datebox({
+        buttons: d_buttons,
+        editable: false
+    });
+
+    var dt_buttons = $.extend([], $.fn.datetimebox.defaults.buttons);
+    dt_buttons.splice(2, 0, {
+        text: '清空',
+        handler: function (target) {
+            $(target).datetimebox('setValue', '');
+        }
+    });
+    $('.easyui-datetimebox').datetimebox({
+        buttons: dt_buttons,
+        editable: false
+    });
+});

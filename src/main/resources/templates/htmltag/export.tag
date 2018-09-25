@@ -34,7 +34,7 @@
         var flag = false;
         $.ajax({
             type: "POST",
-            url: "${contextPath}/export/isFinished?token="+token,
+            url: "${contextPath}/export/isFinished.action?token="+token,
             processData:true,
             dataType: "json",
             async : false,
@@ -43,14 +43,15 @@
                     flag = true;
                 }
             },
-            error: function(){
-                $.messager.alert('错误','远程访问失败',"error");
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+                $.messager.alert('导出错误','远程访问失败:'+XMLHttpRequest.status+XMLHttpRequest.statusText+","+textStatus,"error");
+                flag = true;
             }
         });
         return flag;
     }
     //导出excel
-    function doExport(gridId, isTreegrid){
+    function doExport(gridId, isTreegrid, exportUrl){
         var opts;
         if(isTreegrid){
             opts=$("#"+gridId).treegrid("options");
@@ -62,7 +63,7 @@
             return;
         var param = {};
         param.columns = JSON.stringify(opts.columns);
-        var _gridExportQueryParams = bindMetadata(gridId);
+        var _gridExportQueryParams = bindMetadata(gridId, false, isTreegrid);
         _gridExportQueryParams["sort"] = opts.sortName;
         _gridExportQueryParams["order"] = opts.sortOrder;
         param.queryParams = JSON.stringify(_gridExportQueryParams);
@@ -88,15 +89,21 @@
 //            interval : 300
 //        });
         load();
+        if(!exportUrl){
+            exportUrl = "${contextPath}/export/serverExport.action";
+        }
         $('#_exportForm').form("load", param);
         $('#_exportForm').form("submit",{
-            url:"${contextPath}/export/serverExport",
+            url: exportUrl,
             onSubmit: function(formParam) {
                 //定时查看是否导出完成
                 timeoutId = window.setTimeout(checkFinished, 1);
             },
             success: function(data){
 //                $.messager.progress('close');	// 如果提交成功则隐藏进度条
+                if(data != null && data != ''){
+                    $.messager.alert('导出错误', data, "error");
+                }
                 disLoad();
             }
         });
@@ -130,8 +137,11 @@
                 //定时查看是否导出完成
                 timeoutId = window.setTimeout(checkFinished, 1);
             },
-            success: function(){
+            success: function(data){
 //                $.messager.progress('close');	// 如果提交成功则隐藏进度条
+                if(data != null && data != ''){
+                    $.messager.alert('导出错误', data, "error");
+                }
                 disLoad();
             }
         });

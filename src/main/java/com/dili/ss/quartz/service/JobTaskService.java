@@ -352,6 +352,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
 //            SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
 //            trigger = simpleTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
             trigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(scheduleBuilder).forJob(scheduleJob.getJobName(), scheduleJob.getJobGroup()).build();
+            trigger.getJobDataMap().put(QuartzConstants.jobDataMapScheduleJobKey, scheduleJob);
         } else {
             // Trigger已存在，那么更新相应的定时设置
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression());
@@ -359,6 +360,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
 //            // 按新的cronExpression表达式重新构建trigger
 //            trigger = cronTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).forJob(scheduleJob.getJobName(), scheduleJob.getJobGroup()).build();
             trigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(scheduleBuilder).forJob(scheduleJob.getJobName(), scheduleJob.getJobGroup()).build();
+            trigger.getJobDataMap().put(QuartzConstants.jobDataMapScheduleJobKey, scheduleJob);
         }
         scheduler.rescheduleJob(triggerKey, trigger);
     }

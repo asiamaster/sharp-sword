@@ -1,5 +1,6 @@
 package com.dili.ss.datasource.aop;
 
+import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.dili.ss.constant.SsConstants;
 import com.dili.ss.datasource.*;
 import com.dili.ss.datasource.selector.RoundRobinSelector;
@@ -13,9 +14,9 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.boot.bind.RelaxedDataBinder;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -27,6 +28,11 @@ import org.springframework.core.type.AnnotationMetadata;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+
+//import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+//import org.springframework.boot.bind.RelaxedDataBinder;
+//import org.springframework.boot.bind.RelaxedPropertyResolver;
 
 /**
  * 动态数据源注册<br/>
@@ -39,8 +45,6 @@ public class DynamicRoutingDataSourceRegister implements ImportBeanDefinitionReg
 	private static final Logger logger = LoggerFactory.getLogger(DynamicRoutingDataSourceRegister.class);
 
 	private ConversionService conversionService = new DefaultConversionService();
-	//记录spring.datasource.*除type,driver-class-name,url, username和password外的通用属性，用于DataSource属性绑定
-	private PropertyValues dataSourcePropertyValues;
 
 	// 如配置文件中未指定数据源类型，使用该默认值
 //	org.apache.tomcat.jdbc.pool.DataSource
@@ -100,21 +104,20 @@ public class DynamicRoutingDataSourceRegister implements ImportBeanDefinitionReg
 	 */
 	private void initDefaultDataSource(Environment env) {
 		// 读取主数据源
-		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env, "spring.datasource.");
+//		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env, "spring.datasource.");
 		Map<String, Object> dsMap = new HashMap<>();
 		//初始化数据源切换模式，默认为1(多数据源)
-		DataSourceManager.switchMode = SwitchMode.getSwitchModeByCode(propertyResolver.getProperty("switch-mode", "1"));
+		DataSourceManager.switchMode = SwitchMode.getSwitchModeByCode(env.getProperty("spring.datasource.switch-mode", "1"));
 		if(SwitchMode.MASTER_SLAVE.equals(DataSourceManager.switchMode)) {
 			//负载均衡模式，默认为轮询
-			DataSourceManager.selectorMode = SelectorMode.getSelectorModeByCode(propertyResolver.getProperty("selector-mode", "1"));
+			DataSourceManager.selectorMode = SelectorMode.getSelectorModeByCode(env.getProperty("spring.datasource.selector-mode", "1"));
 		}
-		dsMap.put("type", propertyResolver.getProperty("type"));
-		dsMap.put("driver-class-name", propertyResolver.getProperty("driver-class-name"));
-		dsMap.put("url", propertyResolver.getProperty("url"));
-		dsMap.put("username", propertyResolver.getProperty("username"));
-		dsMap.put("password", propertyResolver.getProperty("password"));
-		defaultDataSource = buildDataSource(dsMap);
-		dataBinder(defaultDataSource, env);
+		dsMap.put("type", env.getProperty("spring.datasource.type"));
+		dsMap.put("driver-class-name", env.getProperty("spring.datasource.driver-class-name"));
+		dsMap.put("url", env.getProperty("spring.datasource.url"));
+		dsMap.put("username", env.getProperty("spring.datasource.username"));
+		dsMap.put("password", env.getProperty("spring.datasource.password"));
+		defaultDataSource = buildDataSource(dsMap, env);
 	}
 
 	/**
@@ -122,13 +125,16 @@ public class DynamicRoutingDataSourceRegister implements ImportBeanDefinitionReg
 	 */
 	private void initCustomDataSources(Environment env) {
 		// 读取配置文件获取更多数据源，也可以通过defaultDataSource读取数据库获取更多数据源
-		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env, "spring.datasource.");
-		String dsPrefixs = propertyResolver.getProperty("names");
+//		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env, "spring.datasource.");
+		String dsPrefixs = env.getProperty("spring.datasource.names");
 		for (String dsPrefix : dsPrefixs.split(",")) {// 多个数据源
-			Map<String, Object> dsMap = propertyResolver.getSubProperties(dsPrefix + ".");
-			DataSource ds = buildDataSource(dsMap);
+			Map<String, Object> dsMap = new HashMap<>();
+			dsMap.put("driver-class-name", env.getProperty("spring.datasource."+dsPrefix+".driver-class-name"));
+			dsMap.put("url", env.getProperty("spring.datasource."+dsPrefix+".url"));
+			dsMap.put("username", env.getProperty("spring.datasource."+dsPrefix+".username"));
+			dsMap.put("password", env.getProperty("spring.datasource."+dsPrefix+".password"));
+			DataSource ds = buildDataSource(dsMap, env);
 			customDataSources.put(dsPrefix, ds);
-			dataBinder(ds, env);
 			//主从数据源需要初始化DataSourceManager的数据
 			if(SwitchMode.MASTER_SLAVE.equals(DataSourceManager.switchMode)){
 				DataSourceManager.slaves.add(dsPrefix);
@@ -142,14 +148,18 @@ public class DynamicRoutingDataSourceRegister implements ImportBeanDefinitionReg
 	/**
 	 * 创建DataSource
 	 *
-	 * @param dsMap(type, driverClassName, url, username, password)
+	 * @param dsMap(type, driverClassName, url, username, password) 数据源的单独配置
+	 * @param env	统一配置从环境中取
 	 * @return
 	 */
-	private DataSource buildDataSource(Map<String, Object> dsMap) {
+	private DataSource buildDataSource(Map<String, Object> dsMap, Environment env) {
 		try {
 			Object type = dsMap.get("type");
 			if (type == null) {
 				type = DATASOURCE_TYPE_DEFAULT;// 默认DataSource
+			}
+			if(!type.equals(DATASOURCE_TYPE_DEFAULT)){
+				throw new RuntimeException("暂不支持非DruidDataSource数据源!");
 			}
 			Class<? extends DataSource> dataSourceType;
 			dataSourceType = (Class<? extends DataSource>) Class.forName((String) type);
@@ -157,10 +167,17 @@ public class DynamicRoutingDataSourceRegister implements ImportBeanDefinitionReg
 			String url = dsMap.get("url").toString();
 			String username = decrypt(dsMap.get("username").toString());
 			String password = decrypt(dsMap.get("password").toString());
-			DataSourceBuilder factory = DataSourceBuilder.create().driverClassName(driverClassName).url(url)
-					.username(username).password(password).type(dataSourceType);
-			return factory.build();
+//			DataSourceBuilder factory = DataSourceBuilder.create().driverClassName(driverClassName).url(url)
+//					.username(username).password(password).type(dataSourceType);
+//			DataSource dataSource =  factory.build();
+//			dataBinder(dataSource, env);
+			Binder binder = Binder.get(env);
+			Properties datasourceProp = binder.bind("spring.datasource", Bindable.of(Properties.class)).get();
+			datasourceProp.putAll(dsMap);
+			return DruidDataSourceFactory.createDataSource(datasourceProp);
 		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -188,27 +205,50 @@ public class DynamicRoutingDataSourceRegister implements ImportBeanDefinitionReg
 	 * 为DataSource绑定更多数据
 	 *
 	 * @param dataSource
-	 * @param env
+	 * @param env 统一配置从环境中取
 	 */
 	private void dataBinder(DataSource dataSource, Environment env){
-		RelaxedDataBinder dataBinder = new RelaxedDataBinder(dataSource);
-		//dataBinder.setValidator(new LocalValidatorFactory().run(this.applicationContext));
-		dataBinder.setConversionService(conversionService);
-		dataBinder.setIgnoreNestedProperties(false);//false
-		dataBinder.setIgnoreInvalidFields(false);//false
-		dataBinder.setIgnoreUnknownFields(true);//true
-		if(dataSourcePropertyValues == null){
-			Map<String, Object> rpr = new RelaxedPropertyResolver(env, "spring.datasource").getSubProperties(".");
-			Map<String, Object> values = new HashMap<>(rpr);
-			// 排除已经设置的属性
-			values.remove("type");
-			values.remove("driver-class-name");
-			values.remove("url");
-			values.remove("username");
-			values.remove("password");
-			dataSourcePropertyValues = new MutablePropertyValues(values);
-		}
-		dataBinder.bind(dataSourcePropertyValues);
+		//记录spring.datasource.*除type,driver-class-name,url, username和password外的通用属性，用于DataSource属性绑定
+//		PropertyValues dataSourcePropertyValues;
+
+//		RelaxedDataBinder dataBinder = new RelaxedDataBinder(dataSource);
+//		//dataBinder.setValidator(new LocalValidatorFactory().run(this.applicationContext));
+//		dataBinder.setConversionService(conversionService);
+//		dataBinder.setIgnoreNestedProperties(false);//false
+//		dataBinder.setIgnoreInvalidFields(false);//false
+//		dataBinder.setIgnoreUnknownFields(true);//true
+//		Map<String, Object> rpr = new RelaxedPropertyResolver(env, "spring.datasource").getSubProperties(".");
+//		Map<String, Object> values = new HashMap<>(rpr);
+//		// 排除已经设置的属性
+//		values.remove("type");
+//		values.remove("driver-class-name");
+//		values.remove("url");
+//		values.remove("username");
+//		values.remove("password");
+//			dataSourcePropertyValues = new MutablePropertyValues(values);
+//		dataBinder.bind(dataSourcePropertyValues);
+
+//		Binder binder = Binder.get(env);
+//		Properties datasourceProp = binder.bind("spring.datasource", Bindable.of(Properties.class)).get();
+//		// 排除已经设置的属性
+//		datasourceProp.remove("type");
+//		datasourceProp.remove("driver-class-name");
+//		datasourceProp.remove("url");
+//		datasourceProp.remove("username");
+//		datasourceProp.remove("password");
+//		try {
+//			DruidDataSourceFactory.createDataSource(datasourceProp);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		Class<? extends DataSource> dsClazz = dataSource.getClass();
+
+
+
+
 	}
+
+
+
 
 }

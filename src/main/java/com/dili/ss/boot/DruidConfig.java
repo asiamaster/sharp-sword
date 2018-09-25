@@ -10,12 +10,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 /**
+ * 针对druid监控的数据源配置
  * Created by asiam on 2017/2/24 0024.
  */
 @Configuration
-@ConditionalOnExpression("'${druidFilter.enable}'=='true'")
+@ConditionalOnExpression("'${druid-filter.enable}'=='true'")
 public class DruidConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DruidConfig.class);
@@ -57,8 +59,8 @@ public class DruidConfig {
     private int removeAbandonedTimeout;
     @Value("${spring.datasource.logAbandoned:false}")
     private boolean logAbandoned;
-//    @Value("${spring.datasource.filters}")
-//    private String filters;
+    @Value("${spring.datasource.filters}")
+    private String filters;
     @Value("${spring.datasource.poolPreparedStatements:true}")
     private boolean poolPreparedStatements;
     @Value("${spring.datasource.maxPoolPreparedStatementPerConnectionSize:10}")
@@ -89,11 +91,11 @@ public class DruidConfig {
         datasource.setRemoveAbandonedTimeout(removeAbandonedTimeout);
         datasource.setPoolPreparedStatements(poolPreparedStatements);
         datasource.setMaxPoolPreparedStatementPerConnectionSize(maxPoolPreparedStatementPerConnectionSize);
-//        try {
-//            datasource.setFilters(filters);
-//        } catch (SQLException e) {
-//            LOGGER.error("druid configuration initialization filter", e);
-//        }
+        try {
+            datasource.setFilters(filters);
+        } catch (SQLException e) {
+            LOGGER.error("druid configuration initialization filter", e);
+        }
         return datasource;
     }
 

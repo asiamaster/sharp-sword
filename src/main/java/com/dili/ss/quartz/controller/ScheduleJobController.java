@@ -54,7 +54,7 @@ public class ScheduleJobController {
     @ApiImplicitParams({
 		@ApiImplicitParam(name="ScheduleJob", paramType="form", value = "ScheduleJob的form信息", required = false, dataType = "string")
 	})
-    @RequestMapping(value="/list", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value="/list.action", method = {RequestMethod.GET, RequestMethod.POST})
     public @ResponseBody List<ScheduleJob> list(ScheduleJob scheduleJob) {
         return scheduleJobService.list(scheduleJob);
     }
@@ -63,7 +63,7 @@ public class ScheduleJobController {
     @ApiImplicitParams({
 		@ApiImplicitParam(name="ScheduleJob", paramType="form", value = "ScheduleJob的form信息", required = false, dataType = "string")
 	})
-    @RequestMapping(value="/listPage", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value="/listPage.action", method = {RequestMethod.GET, RequestMethod.POST})
     public @ResponseBody String listPage(ScheduleJob scheduleJob) throws Exception {
         return scheduleJobService.listEasyuiPageByExample(scheduleJob, true).toString();
     }
@@ -72,7 +72,7 @@ public class ScheduleJobController {
     @ApiImplicitParams({
 		@ApiImplicitParam(name="ScheduleJob", paramType="form", value = "ScheduleJob的form信息", required = true, dataType = "string")
 	})
-    @RequestMapping(value="/insert", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value="/insert.action", method = {RequestMethod.GET, RequestMethod.POST})
     public @ResponseBody
     BaseOutput insert(ScheduleJob scheduleJob) {
         scheduleJobService.insertSelective(scheduleJob, true);
@@ -83,7 +83,7 @@ public class ScheduleJobController {
     @ApiImplicitParams({
 		@ApiImplicitParam(name="ScheduleJob", paramType="form", value = "ScheduleJob的form信息", required = true, dataType = "string")
 	})
-    @RequestMapping(value="/update", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value="/update.action", method = {RequestMethod.GET, RequestMethod.POST})
     public @ResponseBody
     BaseOutput update(ScheduleJob scheduleJob) {
         scheduleJobService.updateSelective(scheduleJob, true);
@@ -94,7 +94,7 @@ public class ScheduleJobController {
     @ApiImplicitParams({
 		@ApiImplicitParam(name="id", paramType="form", value = "ScheduleJob的主键", required = true, dataType = "long")
 	})
-    @RequestMapping(value="/delete", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value="/delete.action", method = {RequestMethod.GET, RequestMethod.POST})
     public @ResponseBody
     BaseOutput delete(Long id) {
         scheduleJobService.delete(id, true);
@@ -105,7 +105,7 @@ public class ScheduleJobController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name="scheduleJob", paramType="form", value = "ScheduleJob的主键", required = true)
 	})
-	@RequestMapping(value="/pause", method = {RequestMethod.GET, RequestMethod.POST})
+	@RequestMapping(value="/pause.action", method = {RequestMethod.GET, RequestMethod.POST})
 	public @ResponseBody
 	BaseOutput pause(ScheduleJob scheduleJob) {
 		scheduleJobService.pauseJob(scheduleJob);
@@ -116,7 +116,7 @@ public class ScheduleJobController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name="scheduleJob", paramType="form", value = "ScheduleJob的主键", required = true)
 	})
-	@RequestMapping(value="/resume", method = {RequestMethod.GET, RequestMethod.POST})
+	@RequestMapping(value="/resume.action", method = {RequestMethod.GET, RequestMethod.POST})
 	public @ResponseBody
 	BaseOutput resume(ScheduleJob scheduleJob) {
 		scheduleJobService.resumeJob(scheduleJob);

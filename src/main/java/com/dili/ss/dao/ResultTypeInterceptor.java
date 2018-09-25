@@ -1,5 +1,7 @@
 package com.dili.ss.dao;
 
+import com.dili.ss.dto.DTOUtils;
+import com.dili.ss.dto.IDTO;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -112,7 +114,10 @@ public class ResultTypeInterceptor implements Interceptor {
 			} else {
 				return null;
 			}
-		} else {
+		} else if(DTOUtils.isDTOProxy(parameterObject)){
+			Object result = ((IDTO)parameterObject).aget(resultType);
+			return objectToClass(result);
+		}else {
 			//mapper框架不处理
 			if(resultType.equals("resultType")){
 				return null;

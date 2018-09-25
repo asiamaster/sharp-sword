@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Component
 @ConditionalOnExpression("'${CSRFInterceptor.enable}'=='true'")
-@ConfigurationProperties(prefix="web.CSRFInterceptor")
+@ConfigurationProperties(prefix="web.CSRFInterceptor", ignoreInvalidFields=true)
 public class CSRFInterceptorProperties {
 
 	//初始化以避免空

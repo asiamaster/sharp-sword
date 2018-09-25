@@ -34,9 +34,10 @@ public class ExportController {
     ExportUtils exportUtils;
 
 
-    @RequestMapping("/isFinished")
+    @RequestMapping("/isFinished.action")
     public @ResponseBody String isFinished(HttpServletRequest request, HttpServletResponse response, @RequestParam("token") String token) throws InterruptedException {
-        while(!SsConstants.EXPORT_FLAG.containsKey(token)){
+        //每秒去判断是否导出完成
+        while(!SsConstants.EXPORT_FLAG.containsKey(token) || SsConstants.EXPORT_FLAG.get(token).equals(0L)){
             Thread.sleep(1000L);
         }
         log.info("export token["+token+"] finished at:"+ DateUtils.dateFormat(SsConstants.EXPORT_FLAG.get(token)));
@@ -52,7 +53,7 @@ public class ExportController {
      * @param queryParams
      * @param title
      */
-    @RequestMapping("/serverExport")
+    @RequestMapping("/serverExport.action")
     public @ResponseBody String serverExport(HttpServletRequest request, HttpServletResponse response,
                                              @RequestParam("columns") String columns,
                                              @RequestParam("queryParams") String queryParams,
@@ -68,6 +69,7 @@ public class ExportController {
                 SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
                 return "服务器忙，请稍候再试";
             }
+            SsConstants.EXPORT_FLAG.put(token, 0L);
             exportUtils.export(request, response, buildExportParam(columns, queryParams, title, url));
             SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
         } catch (Exception e) {

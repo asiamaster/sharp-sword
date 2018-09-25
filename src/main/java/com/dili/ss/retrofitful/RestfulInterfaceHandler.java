@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.http.okhttp.OkHttpUtils;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.dto.DTOUtils;
+import com.dili.ss.dto.IDTO;
 import com.dili.ss.retrofitful.annotation.*;
 import com.dili.ss.util.SystemConfigUtils;
 import okhttp3.MediaType;
@@ -186,8 +188,9 @@ public class RestfulInterfaceHandler<T> implements InvocationHandler, Serializab
             okHttpClient = new OkHttpClient.Builder()
                     .retryOnConnectionFailure(false)
 //                .addInterceptor(new LoggerInterceptor("TAG"))
-                    .connectTimeout(10000L, TimeUnit.MILLISECONDS)
-                    .readTimeout(10000L, TimeUnit.MILLISECONDS)
+                    .connectTimeout(60L, TimeUnit.SECONDS)
+                    .readTimeout(60L, TimeUnit.SECONDS)
+                    .writeTimeout(60L, TimeUnit.SECONDS)
                     //其他配置
                     .build();
             okHttpUtils = OkHttpUtils.initClient(okHttpClient);
@@ -212,20 +215,41 @@ public class RestfulInterfaceHandler<T> implements InvocationHandler, Serializab
                 headersMap.put("Content-Type", "application/json;charset=utf-8");
 
                 if("POST".equalsIgnoreCase(httpMethod)){
-                    String json = paramObj instanceof String ? (String)paramObj : JSON.toJSONString(paramObj);
+                    String json = null;
+                    //如果是DTO对象，还需要设置metadata
+                    if(paramObj == null){
+                        json = "";
+                    }else if(DTOUtils.isDTOProxy(paramObj)){
+                        JSONObject paramJo = new JSONObject();
+                        Map<String, Object> metadata = ((IDTO)paramObj).mget();
+                        for(Map.Entry<String, Object> entry : metadata.entrySet()){
+                            paramJo.put("metadata["+entry.getKey()+"]", entry.getValue());
+                        }
+                        paramJo.putAll(DTOUtils.go(paramObj));
+                        json = JSON.toJSONString(paramJo);
+                    }else {
+                        json = paramObj instanceof String ? (String) paramObj : JSON.toJSONString(paramObj);
+                    }
+
 //                    logger.info("RestfulInterfaceHandler.DelegateService.execute, url:"+url+", 返回类型type:+"+type+",json:" + json);
-                    resp = okHttpUtils
+                    resp = OkHttpUtils
                             .postString().headers(headersMap)
                             .url(url).content(json)
                             .mediaType(MediaType.parse("application/json; charset=utf-8"))
                             .build()
+                            .connTimeOut(60000L)
+                            .readTimeOut(120000L)
+                            .writeTimeOut(60000L)
                             .execute();
 //                    httpResponse = HttpRequester.sendPost(Constants.FUNDS_BASE_URL + url, null, JSON.toJSONString(paramObj));
                 }else{
-                    resp = okHttpUtils
+                    resp = OkHttpUtils
                             .get()
                             .url(url).params((Map)JSON.toJSON(paramObj))
                             .build()
+                            .connTimeOut(60000L)
+                            .readTimeOut(120000L)
+                            .writeTimeOut(60000L)
                             .execute();
 //                    httpResponse = HttpRequester.sendGet(Constants.FUNDS_BASE_URL + url, null);
                 }

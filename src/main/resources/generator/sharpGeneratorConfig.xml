@@ -97,7 +97,7 @@
         <!--<sqlMapGenerator targetPackage="mapper"  targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources"/>-->
         <!--<javaClientGenerator targetPackage="com.dili.ss" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java" type="XMLMAPPER" />-->
 
-        <table tableName="project" >
+        <table tableName="order" >
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
         <!--<table domainObjectName="ScheduleJob" tableName="mbg_provider">-->

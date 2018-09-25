@@ -129,7 +129,7 @@ public class MenubuttonTag extends Tag {
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("<div id=\""+divId+"\" class=\"easyui-panel\" align=\""+panelAlign+"\" style=\"padding-left:10px;\">"+ LINE_SEPARATOR);
+		stringBuilder.append("<div id=\""+divId+"\" class=\"easyui-panel\" align=\""+panelAlign+"\" style=\"padding:1px;\">"+ LINE_SEPARATOR);
 		for(Object root : rootList) {
 			//校验text和id必须有
 			if(getData(root, textField, isMap) == null || getData(root, idField, isMap) == null) {

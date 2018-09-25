@@ -23,13 +23,6 @@ public class ResultCode {
      */
     public static final String PARAMS_ERROR="1000";
 
-    /**1004:输入参数错误，SKU对应的商品不在售 <br/>
-     *  <li>前端是否可直接显示后台返回的message:是</li>
-     *  <li>是否有出现错误的数据返回给前端：有</li>
-     *  <li>返回错误数据：不在售商品的SKU</li>
-     */
-    public static final String PRODUCT_NOT_SALE="1004";
-
 
     /**2000：权限错误(未登录，数据权限不满足，功能权限不满足等错误)<br/>
      *  <li>前端是否可直接显示后台返回的message:是</li>

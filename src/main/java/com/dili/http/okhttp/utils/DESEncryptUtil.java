@@ -201,7 +201,7 @@ public class DESEncryptUtil {
 	 * 测试函数
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main1(String[] args) {
 
 		String key = "i am key,let me encrypt you! 1234haha";//1co35SwcG+o=
 		//String key1 = "i am key,let me encrypt you! 1234haha";
