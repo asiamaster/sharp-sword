@@ -24,5 +24,4 @@ public class RestfulUtil {
                 new Class<?>[] { clazz }, new RestfulInterfaceHandler<T>(clazz));
     }
 
-
 }
