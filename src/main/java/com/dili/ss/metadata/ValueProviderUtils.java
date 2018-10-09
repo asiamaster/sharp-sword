@@ -9,6 +9,7 @@ import com.dili.ss.dto.IDTO;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.SpringUtil;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,22 @@ public class ValueProviderUtils {
 	 * @throws Exception
 	 */
 	public static <T extends BaseDomain> List<Map> buildDataByProvider(Map medadata, List list, ObjectMeta objectMeta) throws Exception {
-		if (medadata == null || medadata.isEmpty()) {
+		if(medadata == null){
+			medadata = Maps.newHashMap();
+		}
+		if(objectMeta != null) {
+			for (FieldMeta fieldMeta : objectMeta) {
+				if (StringUtils.isNotBlank(fieldMeta.getProvider())) {
+					JSONObject meta = new JSONObject();
+					meta.put("field", fieldMeta.getName());
+					meta.put("index", fieldMeta.getIndex());
+					meta.put("provider", fieldMeta.getProvider());
+					meta.put("queryParams", fieldMeta.getParams());
+					medadata.put(fieldMeta.getName(), meta);
+				}
+			}
+		}
+		if (medadata.isEmpty()) {
 			return list;
 		}
 		List<Map> results = new ArrayList<>(list.size());

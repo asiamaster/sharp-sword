@@ -229,22 +229,24 @@ public class DateUtils {
      */
     public static String formatDate2DateTimeStart(String dateStr) {
         Calendar calendar = format(dateStr, "yyyy-MM-dd");
-        calendar.set(11, 0);
-        calendar.set(12, 0);
-        calendar.set(13, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         return format(calendar.getTime());
     }
 
     /**
-     * 获取dataStr(格式为yyyy-MM-dd)的最晚时间23:59:59
+     * 获取dataStr(格式为yyyy-MM-dd)的最晚时间23:59:59.999
      * @param dateStr
      * @return
      */
     public static String formatDate2DateTimeEnd(String dateStr) {
         Calendar calendar = format(dateStr, "yyyy-MM-dd");
-        calendar.set(11, 23);
-        calendar.set(12, 59);
-        calendar.set(13, 59);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
         return format(calendar.getTime());
     }
 
@@ -259,9 +261,10 @@ public class DateUtils {
         } else {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
-            calendar.set(11, 0);
-            calendar.set(12, 0);
-            calendar.set(13, 0);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
             return calendar.getTime();
         }
     }
@@ -277,9 +280,10 @@ public class DateUtils {
         } else {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
-            calendar.set(11, 23);
-            calendar.set(12, 59);
-            calendar.set(13, 59);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            calendar.set(Calendar.MILLISECOND, 999);
             return calendar.getTime();
         }
     }

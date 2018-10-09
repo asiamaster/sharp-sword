@@ -104,7 +104,10 @@ var MyECharts = {
         },
         //处理分组数据，数据格式：group：XXX，name：XXX，value：XXX用于折线图、柱形图（分组，堆积）
         //参数：数据、展示类型
-        FormatGroupData: function (data, type, nameField, valueField, groupField) {
+        FormatGroupData: function (data, type, nameField, valueField, groupField, smooth) {
+            if(smooth == null){
+                smooth = true;
+            }
             nameField = nameField ||"name";
             valueField = valueField ||"value";
             groupField = groupField ||"group";
@@ -122,7 +125,7 @@ var MyECharts = {
             for (var i = 0; i < groups.length; i++) {
                 var temp_series = {};
                 var temp_data = new Array();
-                temp_series = { name: groups[i], type: type, data: temp_data, smooth:true };
+                temp_series = { name: groups[i], type: type, data: temp_data, smooth:smooth };
                 for (var k = 0; k < names.length; k++){
                     //判断datas中是否包含name
                     var containsName = false;
@@ -151,10 +154,13 @@ var MyECharts = {
             var option = {
                 title: {
                     text: title || '',
-                    subtext: subtext || ''
+                    subtext: subtext || '',
+                    x:'center'
                 },
                 legend: {
-                    data:datas.legend
+                    data:datas.legend,
+                    x:'left',
+                    orient: 'vertical'
                 },
                 tooltip: {
                     trigger: 'axis'
@@ -165,7 +171,7 @@ var MyECharts = {
                     feature : {
                         mark : {show: true},
                         dataView : {show: true, readOnly: false},
-                        magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                        magicType : {show: true, type: ['line']},
                         restore : {show: true},
                         saveAsImage : {show: true}
                     }
@@ -187,15 +193,18 @@ var MyECharts = {
             return option;
         },
         //折线图
-        Line: function (title, subtext, data, nameField, valueField, groupField, opts) {
-            var datas = MyECharts.ChartDataFormat.FormatGroupData(data, 'line', nameField, valueField, groupField);
+        Line: function (title, subtext, data, nameField, valueField, groupField, opts, smooth) {
+            var datas = MyECharts.ChartDataFormat.FormatGroupData(data, 'line', nameField, valueField, groupField, smooth);
             var option = {
                 title: {
                     text: title || '',
-                    subtext: subtext || ''
+                    subtext: subtext || '',
+                    x:'center'
                 },
                 legend: {
-                    data:datas.legend
+                    data:datas.legend,
+                    x:'left',
+                    orient: 'vertical'
                 },
                 tooltip: {
                     show: true
@@ -205,7 +214,7 @@ var MyECharts = {
                     feature : {
                         mark : {show: true},
                         dataView : {show: true, readOnly: false},
-                        magicType : {show: true, type: ['line', 'bar']},
+                        magicType : {show: true, type: [ 'bar']},
                         restore : {show: true},
                         saveAsImage : {show: true}
                     }
@@ -259,7 +268,7 @@ var MyECharts = {
                     {
                         name: title,
                         type: 'pie',
-                        radius: '55%',
+                        radius: '75%',
                         center: ['50%', '60%'],
                         data: datas.data,
                         itemStyle: {
@@ -379,3 +388,53 @@ var MyECharts = {
         return myChart;
     }
 };
+
+/**
+ * 查询图表
+ * @param chartObj echart对象
+ * @param type 图表类型，三种:Pie  Line  Bar 默认为Pie
+ * @param url   restful url
+ * @param queryParams   查询参数 json
+ * @param nameField
+ * @param valueField
+ * @param groupField
+ */
+function queryChart(chartObj, type, url, queryParams, nameField, valueField, groupField) {
+    var options = chartObj.getOption();
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: queryParams,
+        dataType: "json",
+        success: function(data){
+            //判断如果是BaseOutput，就再取data
+            if(data.code != null && data.result != null){
+                if(data.code != "200"){
+                    alert(data.result);
+                    return;
+                }
+                data = data.data;
+            }
+            if(data == null || data == ""){
+                data = [];
+                chartObj.clear();
+            }
+            if(type == null){
+                type = "Pie";
+            }
+            var opt;
+            if(type == "Pie"){
+                opt = MyECharts.ChartOptionTemplates.Pie(options.title[0].text, options.title[0].subtext, data, nameField, valueField);
+            } else if (type=="Line"){
+                opt = MyECharts.ChartOptionTemplates.Line(options.title[0].text, options.title[0].subtext, data, nameField, valueField, groupField);
+            } else if (type=="Bar"){
+                opt = MyECharts.ChartOptionTemplates.Bar(options.title[0].text, options.title[0].subtext, data, nameField, valueField, groupField);
+            } else{
+                opt = {};
+            }
+            chartObj.setOption($.extend(false, options, opt));
+        },error: function () {
+            alert('远程访问失败'+textStatus);
+        }
+    });
+}

@@ -75,7 +75,7 @@ public @interface EditMode {
 	 *
 	 * @return
 	 */
-	String provider() default "emptyValueProvider";
+	String provider() default "";
 
 	/**
 	 * 显示文本的字段名
