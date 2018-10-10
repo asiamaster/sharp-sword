@@ -400,7 +400,6 @@ var MyECharts = {
  * @param groupField
  */
 function queryChart(chartObj, type, url, queryParams, nameField, valueField, groupField) {
-    var options = chartObj.getOption();
     $.ajax({
         type: "POST",
         url: url,
@@ -417,11 +416,21 @@ function queryChart(chartObj, type, url, queryParams, nameField, valueField, gro
             }
             if(data == null || data == ""){
                 data = [];
-                chartObj.clear();
+                // chartObj.clear();
             }
             if(type == null){
                 type = "Pie";
             }
+            var options = chartObj.getOption();
+            //清空数据,保留画布配置
+            if(options["legend"]){
+                options["legend"]["data"]=[];
+            }
+            if(options["xAxis"] != null){
+                options["xAxis"][0]["data"]=[];
+            }
+            options["series"]=[];
+
             var opt;
             if(type == "Pie"){
                 opt = MyECharts.ChartOptionTemplates.Pie(options.title[0].text, options.title[0].subtext, data, nameField, valueField);
@@ -432,7 +441,7 @@ function queryChart(chartObj, type, url, queryParams, nameField, valueField, gro
             } else{
                 opt = {};
             }
-            chartObj.setOption($.extend(false, options, opt));
+            chartObj.setOption($.extend(false, options, opt), true);
         },error: function () {
             alert('远程访问失败'+textStatus);
         }
