@@ -14,4 +14,5 @@ public interface BaseDeleteMapper<T> extends
         DeleteMapper<T>,
         DeleteByPrimaryKeyMapper<T> {
 
+
 }

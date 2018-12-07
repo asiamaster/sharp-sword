@@ -209,7 +209,7 @@ public class MyControllerPlugin extends PluginAdapter {
         sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = false, dataType = \"string\")"+LINE_SEPARATOR);
         sb.append("\t})");
         listMethod.addAnnotation(sb.toString());
-        listMethod.addAnnotation("@RequestMapping(value=\"/list\", method = {RequestMethod.GET, RequestMethod.POST})");
+        listMethod.addAnnotation("@RequestMapping(value=\"/list.action\", method = {RequestMethod.GET, RequestMethod.POST})");
         clazz.addMethod(listMethod);
     }
 
@@ -238,7 +238,7 @@ public class MyControllerPlugin extends PluginAdapter {
         sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = false, dataType = \"string\")"+LINE_SEPARATOR);
         sb.append("\t})");
         listPageMethod.addAnnotation(sb.toString());
-        listPageMethod.addAnnotation("@RequestMapping(value=\"/listPage\", method = {RequestMethod.GET, RequestMethod.POST})");
+        listPageMethod.addAnnotation("@RequestMapping(value=\"/listPage.action\", method = {RequestMethod.GET, RequestMethod.POST})");
         clazz.addMethod(listPageMethod);
     }
 
@@ -266,7 +266,7 @@ public class MyControllerPlugin extends PluginAdapter {
         sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = true, dataType = \"string\")"+LINE_SEPARATOR);
         sb.append("\t})");
         listMethod.addAnnotation(sb.toString());
-        listMethod.addAnnotation("@RequestMapping(value=\"/insert\", method = {RequestMethod.GET, RequestMethod.POST})");
+        listMethod.addAnnotation("@RequestMapping(value=\"/insert.action\", method = {RequestMethod.GET, RequestMethod.POST})");
         clazz.addMethod(listMethod);
     }
 
@@ -294,7 +294,7 @@ public class MyControllerPlugin extends PluginAdapter {
         sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = true, dataType = \"string\")"+LINE_SEPARATOR);
         sb.append("\t})");
         listMethod.addAnnotation(sb.toString());
-        listMethod.addAnnotation("@RequestMapping(value=\"/update\", method = {RequestMethod.GET, RequestMethod.POST})");
+        listMethod.addAnnotation("@RequestMapping(value=\"/update.action\", method = {RequestMethod.GET, RequestMethod.POST})");
         clazz.addMethod(listMethod);
     }
 
@@ -319,7 +319,7 @@ public class MyControllerPlugin extends PluginAdapter {
         sb.append("\t\t@ApiImplicitParam(name=\"id\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的主键\", required = true, dataType = \"long\")"+LINE_SEPARATOR);
         sb.append("\t})");
         listMethod.addAnnotation(sb.toString());
-        listMethod.addAnnotation("@RequestMapping(value=\"/delete\", method = {RequestMethod.GET, RequestMethod.POST})");
+        listMethod.addAnnotation("@RequestMapping(value=\"/delete.action\", method = {RequestMethod.GET, RequestMethod.POST})");
         clazz.addMethod(listMethod);
     }
 

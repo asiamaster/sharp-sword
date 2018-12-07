@@ -16,10 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * DTOData的工具类
@@ -112,6 +118,10 @@ public class DTOUtils {
 			InvocationHandler handler = Proxy.getInvocationHandler(dto);
 			if (handler instanceof DTOHandler) {
 				return ((DTOHandler<?>) handler).getProxyClazz();
+			}//这里单独处理fastjson的JSONObject，解决本框架retrofitful远程调用嵌套DTO问题
+//			else if(handler instanceof JSONObject){
+			else if(handler.getClass().getName().equals("com.alibaba.fastjson.JSONObject")){
+				return IDTO.class;
 			} else {
 				throw new InternalException("当前代理对象不是DTOHandler能处理的对象!");
 			}

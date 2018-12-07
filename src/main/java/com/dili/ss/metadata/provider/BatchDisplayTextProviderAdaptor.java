@@ -165,7 +165,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                         continue;
                     }
                     //记录原始值
-                    dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX+entry.getKey(), key);
+                    dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX+entry.getKey(), keyObj);
                     dto.aset(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                 }
             }
@@ -189,7 +189,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                         continue;
                     }
                     //记录原始值
-                    map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX+entry.getKey(), key);
+                    map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX+entry.getKey(), keyObj);
                     map.put(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                 }
             }

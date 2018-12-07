@@ -12,4 +12,25 @@ public class GeneratorTest {
 	public void generateDefault() throws Exception {
 		ProjectGenerator.generate("E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources/generator/sharpGeneratorConfig.xml");
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

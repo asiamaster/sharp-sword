@@ -375,6 +375,7 @@ var MyECharts = {
                     }
                 ]
             };
+            // 深浅拷贝对应的参数就是[deep]，是可选的，为true或false。默认情况是false（浅拷贝），并且false是不能够显示的写出来的。如果想写，只能写true（深拷贝）
             $.extend(true, option, opts);
             return option;
         }
@@ -398,8 +399,9 @@ var MyECharts = {
  * @param nameField
  * @param valueField
  * @param groupField
+ * @param opts
  */
-function queryChart(chartObj, type, url, queryParams, nameField, valueField, groupField) {
+function queryChart(chartObj, type, url, queryParams, nameField, valueField, groupField, opts) {
     $.ajax({
         type: "POST",
         url: url,
@@ -421,29 +423,29 @@ function queryChart(chartObj, type, url, queryParams, nameField, valueField, gro
             if(type == null){
                 type = "Pie";
             }
-            var options = chartObj.getOption();
+            var oriOpts = chartObj.getOption();
             //清空数据,保留画布配置
-            if(options["legend"]){
-                options["legend"]["data"]=[];
+            if(oriOpts["legend"]){
+                oriOpts["legend"]["data"]=[];
             }
-            if(options["xAxis"] != null){
-                options["xAxis"][0]["data"]=[];
+            if(oriOpts["xAxis"] != null){
+                oriOpts["xAxis"][0]["data"]=[];
             }
-            options["series"]=[];
+            oriOpts["series"]=[];
 
             var opt;
             if(type == "Pie"){
-                opt = MyECharts.ChartOptionTemplates.Pie(options.title[0].text, options.title[0].subtext, data, nameField, valueField);
+                opt = MyECharts.ChartOptionTemplates.Pie(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, $.extend(true, oriOpts, opts));
             } else if (type=="Line"){
-                opt = MyECharts.ChartOptionTemplates.Line(options.title[0].text, options.title[0].subtext, data, nameField, valueField, groupField);
+                opt = MyECharts.ChartOptionTemplates.Line(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, groupField, $.extend(true, oriOpts, opts));
             } else if (type=="Bar"){
-                opt = MyECharts.ChartOptionTemplates.Bar(options.title[0].text, options.title[0].subtext, data, nameField, valueField, groupField);
+                opt = MyECharts.ChartOptionTemplates.Bar(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, groupField, $.extend(true, oriOpts, opts));
             } else{
                 opt = {};
             }
-            chartObj.setOption($.extend(false, options, opt), true);
+            chartObj.setOption(opt, true);
         },error: function () {
-            alert('远程访问失败'+textStatus);
+            alert('远程访问失败');
         }
     });
 }

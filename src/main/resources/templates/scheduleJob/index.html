@@ -23,12 +23,12 @@
                             <td style="padding:5px;">
                                 <input name="jobStatus" id="jobStatus" style="width:100%;" panelWidth="auto" data-options="editable:false,labelAlign:'right'"
                                        panelHeight="auto" label="任务状态:"/>
-                                <#comboProvider _id="jobStatus" _provider='jobStatusProvider'/>
+                                <#comboProvider _id="jobStatus" _provider='jobStatusProvider' _queryParams='{emptyText:"-- 全部 --"}'/>
                             </td>
                             <td style="padding:5px;">
                                 <input name="isConcurrent" id="isConcurrent" style="width:100%;" panelWidth="auto" data-options="labelAlign:'right',editable:false"
                                        panelHeight="auto" label="同步/异步:"/>
-                                <#comboProvider _id="isConcurrent" _provider='isConcurrentProvider'/>
+                                <#comboProvider _id="isConcurrent" _provider='isConcurrentProvider' _queryParams='{emptyText:"-- 全部 --"}'/>
                             </td>
                             <td>
                                 <a href="#" class="easyui-linkbutton" iconCls="icon-search" id="queryBtn"

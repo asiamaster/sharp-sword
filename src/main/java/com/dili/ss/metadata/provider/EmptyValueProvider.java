@@ -17,7 +17,8 @@ public class EmptyValueProvider implements ValueProvider {
 		return "";
 	}
 
-	public List<ValuePair<?>> getLookupList(Object val, Map metadata, FieldMeta fieldMeta) {
+	@Override
+    public List<ValuePair<?>> getLookupList(Object val, Map metadata, FieldMeta fieldMeta) {
 		return null;
 	}
 }

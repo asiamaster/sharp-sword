@@ -22,7 +22,6 @@ public class JobStatusProvider implements ValueProvider {
     static {
         buffer = new ArrayList<ValuePair<?>>();
         QuartzConstants.JobStatus[] jobStatuses = QuartzConstants.JobStatus.values();
-        buffer.add(new ValuePairImpl(EMPTY_ITEM_TEXT, null));
         for(QuartzConstants.JobStatus jobStatus : jobStatuses){
             buffer.add(new ValuePairImpl(jobStatus.getDesc(), jobStatus.getCode()));
         }

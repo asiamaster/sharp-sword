@@ -14,7 +14,7 @@
                     //总列数
                     var COLUMN_COUNT = 5;
                     //获取一个非主键的第一个字段作为表格排序列和表单的focus字段
-                    var firstField = null;
+                    var firstField = table.allColumns[0];
                     for(var i=0; i<table.allColumns.~size;i++){//for start
                         var field = table.allColumns[i];
                         //主键直接跳过
@@ -314,9 +314,9 @@
             var _url = null;
             //没有id就新增
             if(_formData.id == null || _formData.id==""){
-                _url = "\${contextPath}/${classNameFirstLower}/insert";
+                _url = "\${contextPath}/${classNameFirstLower}/insert.action";
             }else{//有id就修改
-                _url = "\${contextPath}/${classNameFirstLower}/update";
+                _url = "\${contextPath}/${classNameFirstLower}/update.action";
             }
             $.ajax({
                 type: "POST",
@@ -350,7 +350,7 @@
                 if (r){
                     $.ajax({
                         type: "POST",
-                        url: "\${contextPath}/${classNameFirstLower}/delete",
+                        url: "\${contextPath}/${classNameFirstLower}/delete.action",
                         data: {id:selected.id},
                         processData:true,
                         dataType: "json",
@@ -375,7 +375,7 @@
         function queryGrid() {
             var opts = $("#grid").datagrid("options");
             if (null == opts.url || "" == opts.url) {
-                opts.url = "\${contextPath}/${classNameFirstLower}/listPage";
+                opts.url = "\${contextPath}/${classNameFirstLower}/listPage.action";
             }
             if(!$('#form').form("validate")){
                 return;

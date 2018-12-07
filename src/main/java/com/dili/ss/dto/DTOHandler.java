@@ -5,6 +5,9 @@ package com.dili.ss.dto;
  */
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.glossary.RelationOperator;
+import com.dili.ss.quartz.domain.ScheduleJob;
 import com.dili.ss.util.POJOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -13,6 +16,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -66,20 +70,24 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 				assert (args != null);
 				assert (args.length > 0);
 				delegate.put(field, args[0]);
-				// 取值情况
+			// 取值情况
 			} else {
-				// 如果包括这个字段，则空就是空
+				//getter方法返回类型
 				Class<?> returnType = method.getReturnType();
+				//代理对象的key中包含getter方法的属性名称，需要设置(转换)当前代理对象中该值的类型
 				if (delegate.containsKey(field)) {
 					retval = delegate.get(field);
-					// 如果是基本类型
+					//先判断可以提前返回的条件(不需要转换类型)
+					// 必须先判断是基本类型(基本类型的返回值不允许为空)
 					if (returnType.isPrimitive()) {
 						// 如果当前没有值,则取出初始值
 						if (retval == null) {
 							return POJOUtils.getPrimitiveDefault(returnType);
-							// 如果返回值却不是该类型,则需要对基进行转换
+							// 如果有返回值却不是该类型,则需要进行转换
 						} else if (!returnType.equals(retval.getClass())) {
 							return POJOUtils.getPrimitiveValue(returnType, retval);
+						} else{
+							return retval;
 						}
 					} // 如果是空就不处理
 					else if (retval == null){
@@ -87,61 +95,29 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 					} //如果是String型,直接toString()
 					else if(String.class.equals(returnType)){
 						return retval.toString();
-					}
-					//这里有可能不是String类型，但是通过aset方法传入一个空串，以下的类型都不接受空串，所以返回null
-					if(StringUtils.isBlank(retval.toString())){
+					}//如果返回类型和取值对象的类型相同，则直接返回取值对象
+					else if(returnType.isAssignableFrom(DTOUtils.getDTOClass(retval))){
+						return retval;
+					}//这里有可能不是String类型，但是通过aset方法传入一个空串，以下的类型都不接受空串，所以返回null
+					else if(StringUtils.isBlank(retval.toString())){
 						return null;
 					}
-					//如果返回类型和取值对象的类型相同，则直接返回取值对象
-					if(returnType.getClass().isAssignableFrom(DTOUtils.getDTOClass(retval))){
-						return retval;
+					//再判断需要转换类型的字段
+					//通过转换工厂减少if else， 提高效率
+					Object convertedValue = ReturnTypeHandlerFactory.convertValue(returnType, retval);
+					if(convertedValue != null){
+						delegate.put(field, convertedValue);
+						return convertedValue;
 					}
-					// 如果返回值要求是枚举，但是结果却是字符串是需在此进行转换
-					if (returnType.isEnum() && retval instanceof String) {
+					//如果返回值是代理IDTO对象且返回类型是IDTO对象的子类，需要根据返回值转为相应的DTO
+					//这里主要处理fastjson的远程调用转换问题
+					if(IDTO.class.isAssignableFrom(DTOUtils.getDTOClass(retval)) && IDTO.class.isAssignableFrom(returnType)){
+						JSONObject jo = ((JSONObject) Proxy.getInvocationHandler(retval));
+						retval = DTOUtils.as(new DTO(jo), (Class<IDTO>)returnType);
+					}
+					//如果返回值要求是枚举，但是结果却是字符串是需在此进行转换
+					else if (returnType.isEnum() && retval instanceof String) {
 						retval = Enum.valueOf((Class<? extends Enum>) returnType, (String) retval);
-					} // 如果是日期型
-					else if (Date.class.isAssignableFrom(returnType)) {
-						// 如果当前字段的值不是日期型, 转换返回值，并且将新的返回值填入委托对象中
-						if(String.class.equals(retval.getClass())){
-							retval = StringUtils.isNumeric(retval.toString()) ? new Date(Long.parseLong(retval.toString())) : DateUtils.parseDate(retval.toString(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
-						} else if (Long.class.equals(retval.getClass())) {
-							retval = new Date((Long)retval);
-						}
-					}//如果是Integer型
-					else if(Integer.class.equals(returnType)){
-						retval = Integer.parseInt(retval.toString());
-					} //如果是Long型
-					else if(Long.class.equals(returnType)){
-						retval = Long.parseLong(retval.toString());
-					} //如果是Float型
-					else if(Float.class.equals(returnType)){
-						retval =  Float.parseFloat(retval.toString());
-					} //如果是Double型
-					else if(Double.class.equals(returnType)){
-						retval = Double.parseDouble(retval.toString());
-					} //如果是Boolean型
-					else if(Boolean.class.equals(returnType)){
-						retval = Boolean.parseBoolean(retval.toString());
-					}//如果是BigDecimal型
-					else if(BigDecimal.class.equals(returnType)){
-						retval = new BigDecimal(retval.toString());
-					}//如果是Clob型
-					else if(java.sql.Clob.class.equals(returnType)){
-						retval = getClobString((java.sql.Clob)retval);
-					}//如果是Instant型
-					else if (Instant.class.isAssignableFrom(returnType)){
-						if(String.class.equals(retval.getClass())){
-							retval = Instant.from(DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss").withZone(ZoneId.systemDefault()).parse((String)retval));
-						} else if(Long.class.equals(retval.getClass())){
-							retval = Instant.ofEpochMilli((Long) retval);
-						}
-					}//如果是LocalDateTime型
-					else if (LocalDateTime.class.isAssignableFrom(returnType)){
-						if(String.class.equals(retval.getClass())){
-							retval = LocalDateTime.parse((String)retval, DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss").withZone(ZoneId.systemDefault()));
-						}else if(Long.class.equals(retval.getClass())){
-							retval = LocalDateTime.ofInstant(Instant.ofEpochMilli((Long) retval), ZoneId.systemDefault());
-						}
 					}
 					delegate.put(field, retval);
 					// 否则需要返回缺省值
@@ -225,4 +201,50 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 	void setProxyClazz(Class<?> proxyClazz) {
 		this.proxyClazz = proxyClazz;
 	}
+
+//	public static void main(String[] args) {
+//		ScheduleJob scheduleJob = DTOUtils.newDTO(ScheduleJob.class);
+//		scheduleJob.setJobStatus(3);
+//		scheduleJob.setJobName("jobName");
+//		scheduleJob.setCreated(new Date());
+//		Test test = DTOUtils.newDTO(Test.class);
+//		test.aset("id", 1L);
+//		test.aset("created", new Date());
+//		test.aset("jobName", "jobName");
+//		test.aset("jobStatus", "");
+//		test.aset("time", LocalDateTime.now());
+//		test.aset("instant", Instant.now());
+//		test.aset("job", scheduleJob);
+//		test.aset("number", 6);
+//		test.aset("relationOperator", "Equal");
+//		System.out.println(test.getId());
+//		System.out.println(test.getCreated());
+//		System.out.println(test.getJobName());
+//		System.out.println(test.getJobStatus());
+//		System.out.println(test.getTime());
+//		System.out.println(test.getInstant());
+//		System.out.println(test.getJob());
+//		System.out.println(test.getNumber());
+//		System.out.println(test.getRelationOperator());
+//	}
+//
+//	interface Test extends ScheduleJob{
+//		LocalDateTime getTime();
+//		void setTime(LocalDateTime localDateTime);
+//
+//		Instant getInstant();
+//		void setInstant(Instant instant);
+//
+//		ScheduleJob getJob();
+//		void setJob(ScheduleJob scheduleJob);
+//
+//		BigDecimal getBig();
+//		void setBig(BigDecimal big);
+//
+//		int getNumber();
+//		void setNumber(int number);
+//
+//		RelationOperator getRelationOperator();
+//		void setRelationOperator(RelationOperator relationOperator);
+//	}
 }

@@ -41,7 +41,6 @@ public class SimpleValueProvider implements ValueProvider {
     protected static final String TEXTFIELD_KEY = "textField";
     protected static final String VALUE_KEY = "value";
     protected static final String ORDER_BY_CLAUSE_KEY = "orderByClause";
-    protected static final String QUERY_PARAMS_KEY = "queryParams";
 
     @Autowired
     protected CommonMapper commonMapper;
@@ -88,7 +87,6 @@ public class SimpleValueProvider implements ValueProvider {
     public List<ValuePair<?>> getLookupList(Object value, Map paramMap, FieldMeta fieldMeta){
         buildParam(paramMap);
         List<ValuePair<?>> data = commonMapper.selectValuePair(buildSql());
-        data.add(0, new ValuePairImpl(EMPTY_ITEM_TEXT, null));
         return data;
     }
 

@@ -12,6 +12,12 @@ import java.util.Map;
 public interface ValueProvider {
 
     String EMPTY_ITEM_TEXT = "-- 请选择 --";
+    //如果EMPTY_ITEM_TEXT不满足需要，可以添加自定义内容，方法为_queryParams="{emptyText:'全部'}"，需要子类实现
+    String EMPTY_ITEM_TEXT_KEY = "emptyText";
+    //下拉框就否必选， 如果必填_queryParams="{required:true}"，下拉框就没有空值内容
+    String REQUIRED_KEY = "required";
+    //查询参数key
+    String QUERY_PARAMS_KEY = "queryParams";
     //metaMap中的key，获取字段名, 该值暂时是由easyui_extend.js中的bindMetadata方法提供的，后期考虑改为后台设置
     String FIELD_KEY = "field";
     //metaMap中的key，获取当前行的JSON数据，可能是DTO或Domain

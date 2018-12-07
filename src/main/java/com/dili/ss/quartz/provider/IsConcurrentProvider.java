@@ -20,7 +20,6 @@ public class IsConcurrentProvider implements ValueProvider {
 
     static {
         buffer = new ArrayList<ValuePair<?>>();
-        buffer.add(new ValuePairImpl(EMPTY_ITEM_TEXT, null));
         buffer.add(new ValuePairImpl("同步", "0"));
         buffer.add(new ValuePairImpl("异步", "1"));
     }

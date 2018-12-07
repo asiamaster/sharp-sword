@@ -64,7 +64,8 @@ public class MyProviderPlugin extends PluginAdapter {
         return valid;
     }
 
-    public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
+    @Override
+	public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
         List<GeneratedJavaFile> mapperJavaFiles = new ArrayList<GeneratedJavaFile>();
         //如果配置了提供者生成表名(字段为id,provider_name,value,text,order_number)，则会根据表来生成全局缓存的提供者，便于使用provider的代码复用
         if(StringUtils.isNotBlank(tableName) && introspectedTable.getAliasedFullyQualifiedTableNameAtRuntime().equals(tableName.trim())){
@@ -155,7 +156,8 @@ public class MyProviderPlugin extends PluginAdapter {
 	    initializationBlock.addBodyLine("buffer = new ArrayList<ValuePair<?>>();");
 	    for(Object obj : data){
 		    JSONObject jo = (JSONObject)obj;
-		    initializationBlock.addBodyLine("buffer.add(new ValuePairImpl(\""+jo.get("text")+"\", \""+jo.get("value")+"\"));");
+		    String value = jo.get("value") == null ? "" : jo.get("value").toString();
+		    initializationBlock.addBodyLine("buffer.add(new ValuePairImpl(\""+jo.get("text")+"\", \""+value+"\"));");
 	    }
 	    clazz.addInitializationBlock(initializationBlock);
     }

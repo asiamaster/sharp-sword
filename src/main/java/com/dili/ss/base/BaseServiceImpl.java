@@ -1,7 +1,6 @@
 package com.dili.ss.base;
 
 
-import com.dili.ss.constant.SsConstants;
 import com.dili.ss.dao.ExampleExpand;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.BasePage;
@@ -13,7 +12,6 @@ import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.dto.IMybatisForceParams;
 import com.dili.ss.metadata.ValueProviderUtils;
-import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -23,17 +21,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.MapperException;
-import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.entity.Example;
-import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -488,7 +482,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
     //========================================= 私有方法分界线 =========================================
 
     /**
-     * 设置排序字段
+     * 设置IBaseDomain中的排序字段
      * @param domain
      * @param example
      */
@@ -669,18 +663,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
             Like like = method.getAnnotation(Like.class);
             Operator operator = method.getAnnotation(Operator.class);
             Class<?> fieldType = method.getReturnType();
-            Object value = null;
-            try {
-                method.setAccessible(true);
-                value = method.invoke(domain);
-                if(value instanceof Date){
-                    value = DateFormatUtils.format((Date)value, "yyyy-MM-dd HH:mm:ss");
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            Object value = getGetterValue(domain, method);
             //没值就不拼接sql
             if(value == null || "".equals(value)) {
                 continue;
@@ -696,8 +679,13 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                     case Like.BOTH:
                         criteria = criteria.andCondition(columnName + " like '%" + value + "%' ");
                         break;
-                    default :
-                        criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
+                    default : {
+                    	if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
+							criteria = criteria.andCondition(columnName + " = " + value + " ");
+						}else{
+							criteria = criteria.andCondition(columnName + " = '" + value + "' ");
+						}
+					}
                 }
             }else if(operator != null){
                 if(operator.value().equals(Operator.IN) || operator.value().equals(Operator.NOT_IN)){
@@ -705,7 +693,6 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                         continue;
                     }
                     StringBuilder sb = new StringBuilder();
-                    boolean isString = false;
                     if(Collection.class.isAssignableFrom(fieldType)){
                         for(Object o : (Collection)value){
 							if(o instanceof String){
@@ -730,75 +717,45 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                     criteria = criteria.andCondition(columnName + " " + operator.value() + " '" + value + "' ");
                 }
             }else{
-                criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
+				if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
+					criteria = criteria.andCondition(columnName + " = "+ value+" ");
+				}else{
+					criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
+				}
             }
         }
         //拼接自定义and conditon expr
         if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
             criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
         }
-        StringBuilder orderByClauseBuilder = new StringBuilder();
-        for(Method method : methods){
-            Transient transient1 = method.getAnnotation(Transient.class);
-            if(transient1 != null) {
-                continue;
-            }
-            OrderBy orderBy = method.getAnnotation(OrderBy.class);
-            if(orderBy == null) {
-                continue;
-            }
-            Column column = method.getAnnotation(Column.class);
-            String columnName = column == null ? POJOUtils.getBeanField(method) : column.name();
-            orderByClauseBuilder.append(","+columnName+" "+orderBy.value());
-        }
-        if(orderByClauseBuilder.length()>1) {
-            example.setOrderByClause(orderByClauseBuilder.substring(1));
-        }
+        //设置@OrderBy注解的排序(会被IBaseDomain中的排序字段覆盖)
+		buildOrderByClause(methods, example);
+//		设置IBaseDomain中的排序字段(会覆盖@OrderBy注解的排序)
         setOrderBy(domain, example);
     }
 
-    /**
-     * 判断是否为空值字段
-     * @param columnName
-     * @param nullValueField
-     * @return
-     */
-    private boolean isNullField(String columnName, Object nullValueField){
-        boolean isNullField = false;
-        if(nullValueField != null){
-            if(nullValueField instanceof String){
-                if(columnName.equals(nullValueField)){
-                    isNullField = true;
-                }
-            }else if(nullValueField instanceof List){
-                List<String> nullValueFields = (List)nullValueField;
-                for(String field : nullValueFields){
-                    if(columnName.equals(field)){
-                        isNullField = true;
-                        break;
-                    }
-                }
-            }
-        }
-        return isNullField;
-    }
-    /**
-     * 如果metadata中有空值字段名，则解析为field is null
-     */
-    private void parseNullField(T domain, Example.Criteria criteria){
-        //如果metadata中有空值字段名，则解析为field is null
-        Object nullValueField = DTOUtils.getDTOClass(domain).isInterface() ? domain.mget(IDTO.NULL_VALUE_FIELD) : domain.getMetadata(IDTO.NULL_VALUE_FIELD);
-        if(nullValueField != null){
-            if(nullValueField instanceof String){
-                criteria = criteria.andCondition(nullValueField + " is null ");
-            }else if(nullValueField instanceof List){
-                List<String> nullValueFields = (List)nullValueField;
-                for(String field : nullValueFields){
-                    criteria = criteria.andCondition(field + " is null ");
-                }
-            }
-        }
-    }
+	/**
+	 * 设置@OrderBy注解的排序
+	 */
+	private void buildOrderByClause(List<Method> methods, Example example){
+		StringBuilder orderByClauseBuilder = new StringBuilder();
+		for(Method method : methods){
+			Transient transient1 = method.getAnnotation(Transient.class);
+			if(transient1 != null) {
+				continue;
+			}
+			OrderBy orderBy = method.getAnnotation(OrderBy.class);
+			if(orderBy == null) {
+				continue;
+			}
+			Column column = method.getAnnotation(Column.class);
+			String columnName = column == null ? POJOUtils.getBeanField(method) : column.name();
+			orderByClauseBuilder.append(","+columnName+" "+orderBy.value());
+		}
+		if(orderByClauseBuilder.length()>1) {
+			example.setOrderByClause(orderByClauseBuilder.substring(1));
+		}
+	}
 
     /**
 	 * 获取子类和所有超类的属性<br/>
@@ -923,6 +880,72 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 			}
 		}
 		domain.aset(fieldName, params);
+	}
+
+
+	/**
+	 * 反射获取getter方法中的值
+	 * @param method
+	 * @param domain
+	 * @return
+	 */
+	private Object getGetterValue(T domain, Method method){
+		Object value = null;
+		try {
+			method.setAccessible(true);
+			value = method.invoke(domain);
+			if(value instanceof Date){
+				value = DateFormatUtils.format((Date)value, "yyyy-MM-dd HH:mm:ss");
+			}
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	/**
+	 * 判断是否为空值字段
+	 * @param columnName
+	 * @param nullValueField
+	 * @return
+	 */
+	private boolean isNullField(String columnName, Object nullValueField){
+		boolean isNullField = false;
+		if(nullValueField != null){
+			if(nullValueField instanceof String){
+				if(columnName.equals(nullValueField)){
+					isNullField = true;
+				}
+			}else if(nullValueField instanceof List){
+				List<String> nullValueFields = (List)nullValueField;
+				for(String field : nullValueFields){
+					if(columnName.equals(field)){
+						isNullField = true;
+						break;
+					}
+				}
+			}
+		}
+		return isNullField;
+	}
+	/**
+	 * 如果metadata中有空值字段名，则解析为field is null
+	 */
+	private void parseNullField(T domain, Example.Criteria criteria){
+		//如果metadata中有空值字段名，则解析为field is null
+		Object nullValueField = DTOUtils.getDTOClass(domain).isInterface() ? domain.mget(IDTO.NULL_VALUE_FIELD) : domain.getMetadata(IDTO.NULL_VALUE_FIELD);
+		if(nullValueField != null){
+			if(nullValueField instanceof String){
+				criteria = criteria.andCondition(nullValueField + " is null ");
+			}else if(nullValueField instanceof List){
+				List<String> nullValueFields = (List)nullValueField;
+				for(String field : nullValueFields){
+					criteria = criteria.andCondition(field + " is null ");
+				}
+			}
+		}
 	}
 
 }

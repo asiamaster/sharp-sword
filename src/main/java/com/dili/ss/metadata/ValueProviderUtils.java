@@ -1,5 +1,6 @@
 package com.dili.ss.metadata;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.BaseDomain;
@@ -8,6 +9,7 @@ import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.SpringUtil;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -102,14 +104,6 @@ public class ValueProviderUtils {
 		convertStringProvider(metadataCopy);
 		//将map.entrySet()转换成list，再进行排序
 		List<Map.Entry<String, Object>> metadataCopyList = new ArrayList<Map.Entry<String, Object>>(metadataCopy.entrySet());
-//		Collections.sort(metadataCopyList, new Comparator<Map.Entry<String, Long>>() {
-//			//降序排序
-//			@Override
-//			public int compare(Map.Entry<String, Long> o1, Map.Entry<String, Long> o2) {
-//
-//				return o2.getValue().compareTo(o1.getValue());
-//			}
-//		});
 		Collections.sort(metadataCopyList, (o1, o2) -> {
 			try {
 				JSONObject jsonValue1 = o1.getValue() instanceof JSONObject ? (JSONObject) o1.getValue() : JSONObject.parseObject(o1.getValue().toString());
@@ -276,7 +270,30 @@ public class ValueProviderUtils {
 	 */
 	public List<ValuePair<?>> getLookupList(String providerId, Object val, Map<String, Object> paramMap) {
 		ValueProvider providerObj = valueProviderMap.get(providerId);
-		return providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(val, paramMap, null);
+		Object queryParamsObj = paramMap.get(ValueProvider.QUERY_PARAMS_KEY);
+		String emptyText = ValueProvider.EMPTY_ITEM_TEXT;
+		List<ValuePair<?>> valuePairs =  providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(val, paramMap, null);
+        valuePairs = Lists.newArrayList(valuePairs);
+		if(queryParamsObj != null){
+			//获取查询参数
+			JSONObject queryParams = JSONObject.parseObject(queryParamsObj.toString());
+			//获取自定义空值显示内容
+			String customEmptyText = queryParams.getString(ValueProvider.EMPTY_ITEM_TEXT_KEY);
+			if(customEmptyText != null){
+				emptyText = customEmptyText;
+			}
+			//获取是否必填
+			Boolean required = queryParams.getBoolean(ValueProvider.REQUIRED_KEY);
+			//非必填才在首位添加空值内容
+			if(required == null || required.equals(false)){
+				if(providerObj != null) {
+					valuePairs.add(0, new ValuePairImpl<String>(emptyText, ""));
+				}
+			}
+		}else{
+            valuePairs.add(0, new ValuePairImpl<String>(emptyText, ""));
+        }
+		return valuePairs;
 	}
 
 	/**
