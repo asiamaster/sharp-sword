@@ -1,9 +1,5 @@
 package com.dili.ss.servlet;
 
-/**
- * Created by asiamaster on 2017/6/19 0019.
- */
-
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
