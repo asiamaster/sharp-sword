@@ -14,24 +14,25 @@ public class MoneyUtils {
     }
 
     public static String centToYuan(int cent) {
-        if(cent <= 0) {
-            return "0.00";
-        } else {
-            int yuan = cent / 100;
-            int mod = cent % 100;
-            int jiao = mod / 10;
-            int fen = mod % 10;
-            return yuan + "." + jiao + "" + fen;
+        int yuan = cent / 100;
+        int mod = Math.abs(cent % 100);
+        int jiao = mod / 10;
+        int fen = mod % 10;
+        if(cent < 0 && cent >-100){
+            return "-" + yuan + "." + jiao + "" + fen;
         }
+        return yuan + "." + jiao + "" + fen;
     }
 
     public static String centToYuan(Long cent) {
         if(cent != null){
-//        if(cent != null && cent.longValue() > 0L) {
             long yuan = cent.longValue() / 100L;
             long mod = Math.abs(cent.longValue() % 100L);
             long jiao = mod / 10L;
             long fen = mod % 10L;
+            if(cent < 0 && cent >-100){
+                return "-" + yuan + "." + jiao + "" + fen;
+            }
             return yuan + "." + jiao + "" + fen;
         } else {
             return "0.00";

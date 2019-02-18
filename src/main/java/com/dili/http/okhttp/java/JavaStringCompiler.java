@@ -48,6 +48,7 @@ public class JavaStringCompiler {
 	 * @throws IOException
 	 *             If compile error.
 	 */
+	@SuppressWarnings("all")
 	public Map<String, byte[]> compile(String fileName, String source) throws IOException {
 		try (MemoryJavaFileManager manager = new MemoryJavaFileManager(stdManager)) {
 			JavaFileObject javaFileObject = manager.makeStringSource(fileName, source);

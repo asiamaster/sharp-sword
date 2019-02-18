@@ -19,6 +19,7 @@ import org.springframework.core.io.support.ResourcePatternUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.Properties;
  */
 @Configuration
 @ConditionalOnExpression("'${beetl.enable}'=='true'")
+@SuppressWarnings("all")
 public class BeetlConfig  {
 
     @Autowired
@@ -69,7 +71,9 @@ public class BeetlConfig  {
         Properties p = new Properties();
         try {
             if(inputStream != null) {
-                p.load(inputStream);
+                //p.load(inputStream);//直接这么写，如果properties文件中有汉子，则汉字会乱码。因为未设置编码格式。
+//                p.load(new InputStreamReader(inputStream, "utf-8"));
+                p.load(new InputStreamReader(inputStream, "UTF-8"));
                 inputStream.close();
             }
         } catch (IOException e1) {

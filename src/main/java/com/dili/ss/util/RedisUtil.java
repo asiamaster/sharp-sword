@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtil {
     @SuppressWarnings("rawtypes")
     @Autowired
-    private RedisTemplate redisTemplate;
+    protected RedisTemplate redisTemplate;
 
     /**
      * 集合、列表、Set等对象自行取redisTemplate操作
@@ -48,8 +48,9 @@ public class RedisUtil {
      */
     public void removePattern(final String pattern) {
         Set<Serializable> keys = redisTemplate.keys(pattern);
-        if (keys.size() > 0)
+        if (keys.size() > 0) {
             redisTemplate.delete(keys);
+        }
     }
     /**
      * 删除对应的value
@@ -118,15 +119,14 @@ public class RedisUtil {
      * @return
      */
     public boolean set(final String key, Object value) {
-        boolean result = false;
         try {
             ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
             operations.set(key, value);
-            result = true;
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return result;
     }
 
     /**
@@ -151,16 +151,62 @@ public class RedisUtil {
      * @return
      */
     public boolean set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
-        boolean result = false;
         try {
             ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            operations.set(key, value);
-            redisTemplate.expire(key, expireTime, timeUnit);
-            result = true;
+            operations.set(key, value, expireTime, timeUnit);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return result;
+    }
+
+    /**
+     * 写入缓存
+     *
+     * @param key
+     * @param value
+     * @return 是否获取成功
+     */
+    public boolean setIfAbsent(final String key, Object value) {
+        try {
+            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            return operations.setIfAbsent(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 写入缓存
+     *
+     * @param key
+     * @param value
+     * @param expireTime 过期时间，单位秒
+     * @return 是否获取成功
+     */
+    public boolean setIfAbsent(final String key, Object value, Long expireTime) {
+        return setIfAbsent(key, value, expireTime, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 写入缓存
+     *
+     * @param key
+     * @param value
+     * @param expireTime
+     * @param timeUnit 过期时间单位枚举
+     * @return 是否获取成功
+     */
+    public boolean setIfAbsent(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
+        try {
+            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            return operations.setIfAbsent(key, value, expireTime, timeUnit);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**

@@ -668,6 +668,18 @@ function cutZeroFormatter(value) {
     }
     return value;
 }
+
+//日期格式正则校验
+$.extend($.fn.validatebox.defaults.rules, {
+    datetimeFmt: {
+        validator: function(value, param){
+            var reDateTime = /^(?:19|20)[0-9][0-9]-(?:(?:0[1-9])|(?:1[0-2]))-(?:(?:[0-2][1-9])|(?:[1-3][0-1])) (?:(?:[0-2][0-3])|(?:[0-1][0-9])):[0-5][0-9]:[0-5][0-9]$/;
+            return reDateTime.test(value);
+        },
+        message: '非法日期格式， 示例:2019-01-30 19:59:05'
+    }
+})
+
 $(function () {
     //日期和时间控件添加清空
     var d_buttons = $.extend([], $.fn.datebox.defaults.buttons);
@@ -690,7 +702,6 @@ $(function () {
         }
     });
     $('.easyui-datetimebox').datetimebox({
-        buttons: dt_buttons,
-        editable: false
+        buttons: dt_buttons
     });
 });

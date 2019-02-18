@@ -82,14 +82,14 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #key")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #key")})
 	public int delete(KEY key) {
 		return mapper.deleteByPrimaryKey(key);
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #key")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #key")})
 	public int delete(List<KEY> ids) {
 		Type t = getClass().getGenericSuperclass();
 		Class<T> entityClass = null;
@@ -104,14 +104,14 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
 	public int updateSelective(T condtion) {
 		return mapper.updateByPrimaryKeySelective(condtion);
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
 	public int updateSelectiveByExample(T domain, T condition) {
 		Class tClazz = getSuperClassGenricType(getClass(), 0);
 		if(null == condition) {
@@ -129,7 +129,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
 	public int updateExactByExample(T domain, T condition) {
 		Class tClazz = getSuperClassGenricType(getClass(), 0);
 		if(null == condition) {
@@ -147,7 +147,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
 	public int updateExactByExampleSimple(T domain, T condition) {
 		Class tClazz = getSuperClassGenricType(getClass(), 0);
 		if(null == condition) {
@@ -169,11 +169,14 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 	}
 
 	@Override
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
 	public int updateExact(T record){
 		return mapper.updateByPrimaryKeyExact(record);
 	}
 
     @Override
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.target+':id:' + #condtion.getId()")})
     public int updateExactSimple(T record){
         try {
             buildExactDomain(record, "setForceParams");
@@ -185,14 +188,14 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
 	public int update(T condtion) {
 		return mapper.updateByPrimaryKey(condtion);
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
+//	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #condtion.getId()")})
 	public int updateByExample(T domain, T condition) {
 		Class tClazz = getSuperClassGenricType(getClass(), 0);
 		if(null == condition) {
@@ -269,7 +272,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 	}
 
 	@Override
-	@Cacheable(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #key", unless = "#result==null")
+//	@Cacheable(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #key", unless = "#result==null")
 	public T get(KEY key) {
 		return mapper.selectByPrimaryKey(key);
 	}

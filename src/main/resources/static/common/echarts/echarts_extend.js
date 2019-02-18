@@ -91,6 +91,9 @@ var MyECharts = {
     //格式化数据
     ChartDataFormat: {
         FormatNOGroupData: function (data, nameField, valueField) {
+            if(data == null || data == "" || data.length == 0){
+                return {};
+            }
             nameField = nameField ||"name";
             valueField = valueField ||"value";
             var categories = [];
@@ -105,6 +108,9 @@ var MyECharts = {
         //处理分组数据，数据格式：group：XXX，name：XXX，value：XXX用于折线图、柱形图（分组，堆积）
         //参数：数据、展示类型
         FormatGroupData: function (data, type, nameField, valueField, groupField, smooth) {
+            if(data == null || data == "" || data.length == 0){
+                return {};
+            }
             if(smooth == null){
                 smooth = true;
             }
@@ -150,7 +156,6 @@ var MyECharts = {
         //柱状图
         Bar: function (title, subtext, data, nameField, valueField, groupField, opts) {
             var datas = MyECharts.ChartDataFormat.FormatGroupData(data, 'bar', nameField, valueField, groupField);
-//                alert(JSON.stringify(datas));
             var option = {
                 title: {
                     text: title || '',
@@ -424,26 +429,24 @@ function queryChart(chartObj, type, url, queryParams, nameField, valueField, gro
                 type = "Pie";
             }
             var oriOpts = chartObj.getOption();
-            //清空数据,保留画布配置
-            if(oriOpts["legend"]){
-                oriOpts["legend"]["data"]=[];
-            }
-            if(oriOpts["xAxis"] != null){
-                oriOpts["xAxis"][0]["data"]=[];
-            }
-            oriOpts["series"]=[];
-
-            var opt;
+            // //清空数据,保留画布配置
+            // if(oriOpts["legend"]){
+            //     oriOpts["legend"]["data"]=[];
+            // }
+            // if(oriOpts["xAxis"] != null){
+            //     oriOpts["xAxis"][0]["data"]=[];
+            // }
+            // oriOpts["series"]=[];
             if(type == "Pie"){
-                opt = MyECharts.ChartOptionTemplates.Pie(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, $.extend(true, oriOpts, opts));
+                opts = MyECharts.ChartOptionTemplates.Pie(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, opts);
             } else if (type=="Line"){
-                opt = MyECharts.ChartOptionTemplates.Line(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, groupField, $.extend(true, oriOpts, opts));
+                opts = MyECharts.ChartOptionTemplates.Line(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, groupField, opts);
             } else if (type=="Bar"){
-                opt = MyECharts.ChartOptionTemplates.Bar(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, groupField, $.extend(true, oriOpts, opts));
+                opts = MyECharts.ChartOptionTemplates.Bar(oriOpts.title[0].text, oriOpts.title[0].subtext, data, nameField, valueField, groupField, opts);
             } else{
-                opt = {};
+                opts = {};
             }
-            chartObj.setOption(opt, true);
+            chartObj.setOption(opts, true);
         },error: function () {
             alert('远程访问失败');
         }

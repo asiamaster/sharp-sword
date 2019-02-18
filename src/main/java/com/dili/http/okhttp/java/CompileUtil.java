@@ -19,6 +19,7 @@ public class CompileUtil {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings("all")
 	public static Class<?> compile(String classContent, String classFullname)  {
 //		System.out.println("========================================================");
 //		System.out.println("classFullname:"+classFullname);
