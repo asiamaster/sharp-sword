@@ -8,13 +8,18 @@ import com.dili.ss.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@ConditionalOnExpression("'${uid.enable}'=='true'")
 public class BizNumberHandler {
 
     @Autowired
@@ -23,6 +28,18 @@ public class BizNumberHandler {
     protected ConcurrentHashMap<String, SequenceNo> bizNumberMap = new ConcurrentHashMap<>();
     //获取失败后的重试次数
     protected static final int RETRY = 3;
+
+    /**
+     * 固定步长值，默认为50
+     */
+    @Value("${uid.fixedStep:50}")
+    private int fixedStep;
+
+    /**
+     * 范围步长值，默认为最大范围的20倍
+     */
+    @Value("${uid.rangeStep:20}")
+    private int rangeStep;
 
     /**
      * 根据业务类型获取业务号
@@ -74,12 +91,12 @@ public class BizNumberHandler {
         String[] ranges = range.split(",");
         if (idSequence == null) {
             idSequence = new SequenceNo();
-            //范围步长值取最大自增值的20倍
+            //范围步长值取最大自增值的rangeStep倍
             if (ranges.length == 2){
-                idSequence.setStep(Long.parseLong(ranges[1]) * 20);
+                idSequence.setStep(Long.parseLong(ranges[1]) * rangeStep);
             }else{
-                //固定步长值为固定值的50倍
-                idSequence.setStep(Long.parseLong(ranges[0]) * 50);
+                //固定步长值为固定值的fixedStep倍
+                idSequence.setStep(Long.parseLong(ranges[0]) * fixedStep);
             }
             bizNumberMap.putIfAbsent(type, idSequence);
             idSequence = bizNumberMap.get(type);
@@ -92,6 +109,7 @@ public class BizNumberHandler {
                 return -1L;
             }
         }
+
         int increment = ranges.length == 1 ? Integer.parseInt(ranges[0]) : rangeRandom(Integer.parseInt(ranges[0]), Integer.parseInt(ranges[1]));
         return increment == 1 ? idSequence.next() : idSequence.next(increment);
     }
@@ -106,7 +124,7 @@ public class BizNumberHandler {
      * @param length 编码位数(不包含日期位数)
      * @return
      */
-    //    @Transactional(propagation= Propagation.REQUIRES_NEW,rollbackFor=Exception.class)
+    @Transactional(propagation= Propagation.REQUIRES_NEW, rollbackFor=Exception.class)
     private SequenceNo getSeqNoByNewTransactional(SequenceNo idSequence, String type, Long startSeq, String dateFormat, int length){
         BizNumber bizNumber = this.getBizNumberByType(type);
         if(bizNumber == null){
