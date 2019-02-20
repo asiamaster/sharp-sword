@@ -1,8 +1,5 @@
 package com.dili.ss.uid.service.impl;
 
-import com.dili.ss.base.BaseServiceImpl;
-import com.dili.ss.uid.dao.BizNumberMapper;
-import com.dili.ss.uid.domain.BizNumber;
 import com.dili.ss.uid.domain.BizNumberRule;
 import com.dili.ss.uid.handler.BizNumberHandler;
 import com.dili.ss.uid.service.BizNumberService;

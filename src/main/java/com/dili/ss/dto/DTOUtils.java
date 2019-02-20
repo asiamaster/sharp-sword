@@ -8,7 +8,6 @@ import com.dili.ss.metadata.ObjectMeta;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.CloneUtils;
 import com.dili.ss.util.POJOUtils;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -270,7 +269,7 @@ public class DTOUtils {
 		if(source==null||proxyClz==null) return null;
 		T temp = DTOUtils.newDTO(proxyClz);
 		try {
-			BeanUtils.copyProperties(temp, source);
+			org.springframework.beans.BeanUtils.copyProperties(temp, source);
 		}catch(Exception e) {
 			e.printStackTrace(System.err);
 		}
