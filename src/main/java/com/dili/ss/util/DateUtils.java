@@ -3,6 +3,8 @@ package com.dili.ss.util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -35,9 +37,18 @@ public class DateUtils {
      * @return
      */
     public static String format(String format) {
-        return format(new Date(), format);
+        return format(LocalDateTime.now(), format);
     }
 
+    /**
+     * 日期格式化
+     * @param localDateTime
+     * @param format
+     * @return
+     */
+    public static String format(LocalDateTime localDateTime, String format) {
+        return DateTimeFormatter.ofPattern(format).format(localDateTime);
+    }
     /**
      * 日期格式化
      * @param date

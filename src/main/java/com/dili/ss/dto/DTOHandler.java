@@ -6,23 +6,14 @@ package com.dili.ss.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.glossary.RelationOperator;
-import com.dili.ss.quartz.domain.ScheduleJob;
 import com.dili.ss.util.POJOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -128,14 +119,14 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 			return retval;
 			// 否则直接调用这个方法
 		} else if ("aget".equals(method.getName())) {
-			return delegate.get(((String) args[0]));
+			return delegate.get(args[0]);
 		} else if ("aset".equals(method.getName())) {
 			return delegate.put(((String) args[0]), args[1]);
 		} else if ("mget".equals(method.getName())) {
 			if(args == null) {
 				return metadata;
 			}else {
-				return metadata.get(((String) args[0]));
+				return metadata.get(args[0]);
 			}
 		} else if ("mset".equals(method.getName())) {
 			if(args.length == 1 && args[0] instanceof Map){
