@@ -35,14 +35,13 @@ public class CharUtil {
 		}
 		return false;
 	}
-
+	private static final Pattern PATTERN = Pattern.compile("[\\u4E00-\\u9FBF]+");
 	// 只能判断部分CJK字符（CJK统一汉字）
 	public static boolean isChineseByREG(String str) {
 		if (str == null) {
 			return false;
 		}
-		Pattern pattern = Pattern.compile("[\\u4E00-\\u9FBF]+");
-		return pattern.matcher(str.trim()).find();
+		return PATTERN.matcher(str.trim()).find();
 	}
 
 	// 只能判断部分CJK字符（CJK统一汉字）
