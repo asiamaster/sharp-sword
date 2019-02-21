@@ -91,6 +91,7 @@ public class FrequentlyUsedAssociateProvider implements ApplicationListener<Cont
 	@Autowired
 	private CommonService commonService;
 
+	@Override
 	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
 		executor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(10000));
 		executor.allowCoreThreadTimeOut(true);
@@ -218,7 +219,7 @@ public class FrequentlyUsedAssociateProvider implements ApplicationListener<Cont
 
 	//从数据库或redis中初始化数据
 	private void initFromDb(LoadingCache<String, Integer> loadingCache, String key) {
-		if (persistenceType.equals("redis")) {
+		if ("redis".equals(persistenceType)) {
 			//没数据则直接返回
 			if(!getRedisUtil().getRedisTemplate().hasKey(key)) {
 				return;
@@ -250,7 +251,7 @@ public class FrequentlyUsedAssociateProvider implements ApplicationListener<Cont
 	private void persist(String key, String value, Integer hitTimes) {
 		LoadingCache<String, Integer> loadingCache = cacheMap.get(key);
 		executor.execute(() ->{
-			if (persistenceType.equals("redis")) {
+			if ("redis".equals(persistenceType)) {
 				//先清空,再重新持久化
 //				getRedisUtil().getRedisTemplate().delete(key);
 //				for (Map.Entry<String, Integer> entry : loadingCache.asMap().entrySet()) {

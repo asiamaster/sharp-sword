@@ -31,7 +31,7 @@ public class IsConcurrentProvider implements ValueProvider {
 
     @Override
     public String getDisplayText(Object obj, Map metaMap, FieldMeta fieldMeta) {
-        if(obj == null || obj.equals("")) return null;
+        if(obj == null || "".equals(obj)) return null;
         for(ValuePair<?> valuePair : buffer){
             if(obj.toString().equals(valuePair.getValue())){
                 return valuePair.getText();

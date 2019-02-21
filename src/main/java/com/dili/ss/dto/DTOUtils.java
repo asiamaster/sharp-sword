@@ -119,7 +119,7 @@ public class DTOUtils {
 				return ((DTOHandler<?>) handler).getProxyClazz();
 			}//这里单独处理fastjson的JSONObject，解决本框架retrofitful远程调用嵌套DTO问题
 //			else if(handler instanceof JSONObject){
-			else if(handler.getClass().getName().equals("com.alibaba.fastjson.JSONObject")){
+			else if("com.alibaba.fastjson.JSONObject".equals(handler.getClass().getName())){
 				return IDTO.class;
 			} else {
 				throw new InternalException("当前代理对象不是DTOHandler能处理的对象!");

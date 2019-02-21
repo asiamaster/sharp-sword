@@ -24,7 +24,7 @@ public class SimpleDataProvider implements ValueProvider {
 
     @Override
     public String getDisplayText(Object obj, Map metaMap, FieldMeta fieldMeta) {
-        if(obj == null || obj.equals("")) return "";
+        if(obj == null || "".equals(obj)) return "";
         JSONArray ja = (JSONArray)metaMap.get("data");
         if(ja == null || ja.isEmpty()) return "";
         for(Object o : ja){

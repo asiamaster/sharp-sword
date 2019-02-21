@@ -460,7 +460,7 @@ public class MenubuttonTag extends Tag {
 		List<Map> rootLists = Lists.newArrayList();
 		for(Map map : list){
 			Object parentId = getData(map, parentIdField, true);
-			if(parentId == null || parentId.equals("") || parentId.equals("-1")){
+			if(parentId == null || "".equals(parentId) || "-1".equals(parentId)){
 				rootLists.add(map);
 			}
 		}
@@ -477,7 +477,7 @@ public class MenubuttonTag extends Tag {
 		List rootLists = Lists.newArrayList();
 		for(Object bean : list){
 			Object parentId = getData(bean, parentIdField, false);
-			if(parentId == null || parentId.equals("") || parentId.equals("-1")){
+			if(parentId == null || "".equals(parentId) || "-1".equals(parentId)){
 				rootLists.add(bean);
 			}
 		}

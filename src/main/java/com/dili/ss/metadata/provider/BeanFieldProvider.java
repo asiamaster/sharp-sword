@@ -93,7 +93,7 @@ public class BeanFieldProvider implements ValueProvider {
 
     @Override
     public String getDisplayText(Object obj, Map metaMap, FieldMeta fieldMeta) {
-        if(obj == null || obj.equals("")) return "";
+        if(obj == null || "".equals(obj)) return "";
         return obj.toString();
     }
 }

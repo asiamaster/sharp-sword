@@ -396,7 +396,7 @@ public final class POJOUtils {
             return true;
         if (clazz.isPrimitive())
             return true;
-        return clazz.getPackage() == null ? false : clazz.getPackage().getName().equals("java.lang");
+        return clazz.getPackage() != null && "java.lang".equals(clazz.getPackage().getName());
     }
 
     // ===========================  下划线与驼峰的相互转换  ===========================

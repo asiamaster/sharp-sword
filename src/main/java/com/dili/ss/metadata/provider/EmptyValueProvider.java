@@ -13,6 +13,7 @@ import java.util.Map;
  */
 @Component
 public class EmptyValueProvider implements ValueProvider {
+	@Override
 	public String getDisplayText(Object val, Map metadata, FieldMeta fieldMeta) {
 		return "";
 	}

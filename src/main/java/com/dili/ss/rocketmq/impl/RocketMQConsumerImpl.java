@@ -79,6 +79,7 @@ public class RocketMQConsumerImpl
 		consumer = consumer;
 	}
 
+	@Override
 	public void startListener()
 			throws RocketMqException {
 		if (this.started.booleanValue()) {
@@ -109,6 +110,7 @@ public class RocketMQConsumerImpl
 		}
 	}
 
+	@Override
 	public void stopListener() throws RocketMqException {
 		if (log.isInfoEnabled()) {
 			log.info("开始停止MQ客户端!");
@@ -179,8 +181,10 @@ public class RocketMQConsumerImpl
 		consumer().registerMessageListener(createMesageListener());
 	}
 
+
 	protected MessageListener createMesageListener() {
 		return new MessageListenerConcurrently() {
+			@Override
 			public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
 				Boolean success = false;
 				MessageExt msg;
@@ -208,7 +212,7 @@ public class RocketMQConsumerImpl
 		if (StringUtils.isBlank(tags)) {
 			return Boolean.valueOf(true);
 		}
-		if (tags.equals("*")) {
+		if ("*".equals(tags)) {
 			return Boolean.valueOf(true);
 		}
 		List<String> selfTag = splitMsg(tags, "\\|\\|");

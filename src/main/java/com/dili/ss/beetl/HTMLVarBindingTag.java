@@ -23,20 +23,21 @@ public class HTMLVarBindingTag extends HTMLTagVarBindingWrapper
 
 	}
 
+	@Override
 	public Object[] bindVars(){
 		return null;
 	}
 
+	@Override
 	public void mapName2Index(LinkedHashMap<String, Integer> map)
 	{
 		((HTMLTag)tag).setBinds(map);
 	}
 
+	@Override
 	public void init(Context ctx, Object[] args, Statement st)
 	{
 		tag.init(ctx, args, st);
-		
-
 	}
 
 }

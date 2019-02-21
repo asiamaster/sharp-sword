@@ -6,7 +6,6 @@ import com.dili.ss.domain.BaseQuery;
 import com.dili.ss.dto.DTOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.beans.BeanCopier;
@@ -60,7 +59,7 @@ public class BeanConver {
     public static<T, K> K copyMap(Map map, Class<K> target){
         try {
             K result = (K)target.newInstance();
-            BeanUtils.copyProperties(result, map);
+            org.springframework.beans.BeanUtils.copyProperties(result, map);
             return result;
         } catch (Exception e) {
             LOG.error("实例转换出错");
@@ -94,7 +93,7 @@ public class BeanConver {
                 if(hasMethod(source.getClass(),"getPage" )) {
                     Method getPageIndex = source.getClass().getMethod("getPage");
                     Object pageIndex = getPageIndex.invoke(source);
-                    if (pageIndex != null && (pageIndex instanceof Integer || pageIndex.getClass().getName().equals("int"))) {
+                    if (pageIndex != null && (pageIndex instanceof Integer || "int".equals(pageIndex.getClass().getName()))) {
                         p.setPage((Integer) pageIndex);
                     }
                 }
@@ -102,7 +101,7 @@ public class BeanConver {
                 if(hasMethod(source.getClass(),"getRows" )) {
                     Method getPageSize = source.getClass().getMethod("getRows");
                     Object pageSize = getPageSize.invoke(source);
-                    if (pageSize != null && (pageSize instanceof Integer || pageSize.getClass().getName().equals("int"))) {
+                    if (pageSize != null && (pageSize instanceof Integer || "int".equals(pageSize.getClass().getName()))) {
                         p.setRows((Integer) pageSize);
                     } else {
                         p.setRows(BasePage.DEFAULT_PAGE_SIZE);
@@ -270,7 +269,7 @@ public class BeanConver {
         for (int i = 0; i < propertyDescriptors.length; i++) {
             PropertyDescriptor descriptor = propertyDescriptors[i];
             String propertyName = descriptor.getName();
-            if (!propertyName.equals("class")) {
+            if (!"class".equals(propertyName)) {
                 Method readMethod = descriptor.getReadMethod();
                 Object result = readMethod.invoke(bean, new Object[0]);
                 if (result != null) {

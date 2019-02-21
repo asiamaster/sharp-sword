@@ -117,7 +117,7 @@ public class SimpleValueProvider implements ValueProvider {
      */
     @Override
     public String getDisplayText(Object value, Map paramMap, FieldMeta fieldMeta){
-        if(value == null || value.equals("")){
+        if(value == null || "".equals(value)){
             return "";
         }
         paramMap.put(VALUE_KEY, value);

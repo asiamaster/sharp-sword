@@ -59,6 +59,7 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
         shellCallback = new DefaultShellCallback(overwrite);
     }
 
+    @Override
     public boolean validate(List<String> warnings) {
         boolean valid = true;
         if (!StringUtility.stringHasValue(this.properties.getProperty("targetDir"))) {
@@ -75,6 +76,7 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
     }
 
     //生成文件主方法
+    @Override
     public List<GeneratedXmlFile> contextGenerateAdditionalXmlFiles(IntrospectedTable introspectedTable) {
         //生成额外的文件
         generateFile(introspectedTable);

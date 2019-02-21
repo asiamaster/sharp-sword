@@ -39,6 +39,7 @@ public class MapWapper<K, V> {
         return innerMap.entrySet();
     }
 
+    @Override
     public boolean equals(Object o) {
         return innerMap.equals(o);
     }

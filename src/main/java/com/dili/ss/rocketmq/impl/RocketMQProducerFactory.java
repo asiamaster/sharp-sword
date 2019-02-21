@@ -19,11 +19,13 @@ public class RocketMQProducerFactory extends AbstractFactoryBean<RocketMQProduce
     this.producerConfig = producerConfig;
   }
 
+  @Override
   public Class<RocketMQProducer> getObjectType()
   {
     return RocketMQProducer.class;
   }
 
+  @Override
   protected RocketMQProducer createInstance() throws Exception
   {
     checkConfig();

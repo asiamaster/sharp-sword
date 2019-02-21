@@ -21,6 +21,7 @@ public class RocketMQLauncher
 	private RocketMQConsumer rocketMQConsumer;
 	private DefaultMQPushConsumer consumer;
 
+	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
 		if ((event instanceof ContextRefreshedEvent)) {
 			start((ContextRefreshedEvent) event);

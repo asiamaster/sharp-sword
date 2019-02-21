@@ -38,6 +38,7 @@ public class MyServicePlugin extends PluginAdapter {
         return valid;
     }
 
+    @Override
     public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
         String serviceSuperClass = properties.getProperty("serviceSuperClass");
         String serviceSuperInterface = properties.getProperty("serviceSuperInterface");

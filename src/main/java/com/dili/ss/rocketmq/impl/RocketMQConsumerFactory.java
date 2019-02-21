@@ -81,14 +81,17 @@ public class RocketMQConsumerFactory extends AbstractFactoryBean<RocketMQConsume
 		this.consummerConfig = consummerConfig;
 	}
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.context = applicationContext;
 	}
 
+	@Override
 	public Class<RocketMQConsumer> getObjectType() {
 		return RocketMQConsumer.class;
 	}
 
+	@Override
 	protected RocketMQConsumer createInstance() throws Exception {
 		return getInstance();
 	}

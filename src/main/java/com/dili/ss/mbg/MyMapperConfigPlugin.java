@@ -24,6 +24,7 @@ public class MyMapperConfigPlugin extends PluginAdapter {
     public MyMapperConfigPlugin() {
     }
 
+    @Override
     public boolean validate(List<String> warnings) {
         boolean valid = true;
         if(!StringUtility.stringHasValue(this.properties.getProperty("targetProject"))) {
@@ -39,6 +40,7 @@ public class MyMapperConfigPlugin extends PluginAdapter {
         return valid;
     }
 
+    @Override
     public List<GeneratedXmlFile> contextGenerateAdditionalXmlFiles(IntrospectedTable introspectedTable) {
         Document document = new Document("-//mybatis.org//DTD Config 3.0//EN", "http://mybatis.org/dtd/mybatis-3-config.dtd");
         XmlElement root = new XmlElement("configuration");

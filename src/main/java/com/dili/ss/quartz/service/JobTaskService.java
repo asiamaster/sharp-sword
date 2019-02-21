@@ -44,7 +44,7 @@ public class JobTaskService implements ApplicationListener<ContextRefreshedEvent
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         if(contextRefreshedEvent.getApplicationContext().getParent() == null
                 && SpringUtil.getApplicationContext().containsBean("schedulerFactoryBean")
-                && quartzEnabled.equals("true")) {
+                && "true".equals(quartzEnabled)) {
             schedulerFactoryBean = (SchedulerFactoryBean) SpringUtil.getBean(SchedulerFactoryBean.class);
         }
 //            //        Scheduler scheduler = schedulerFactoryBean.getScheduler();

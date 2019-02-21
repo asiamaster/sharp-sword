@@ -62,11 +62,11 @@ public class MyMapperPlugin extends PluginAdapter {
 		}
 		String caseSensitive = this.properties.getProperty("caseSensitive");
 		if (StringUtility.stringHasValue(caseSensitive)) {
-			this.caseSensitive = caseSensitive.equalsIgnoreCase("TRUE");
+			this.caseSensitive = "TRUE".equalsIgnoreCase(caseSensitive);
 		}
 		String isDTO = this.properties.getProperty("isDTO", "false");
 		if (StringUtility.stringHasValue(isDTO)) {
-			this.isDTO = isDTO.equalsIgnoreCase("TRUE");
+			this.isDTO = "TRUE".equalsIgnoreCase(isDTO);
 		}
 		String beginningDelimiter = this.properties.getProperty("beginningDelimiter");
 		if (StringUtility.stringHasValue(beginningDelimiter)) {
@@ -183,7 +183,7 @@ public class MyMapperPlugin extends PluginAdapter {
 			if (POJOUtils.isGetMethod(method.getName())) {
 				IntrospectedColumn introspectedColumn = introspectedTable.getColumn(POJOUtils.humpToLineFast(POJOUtils.getBeanField(method.getName())));
 				String fieldLabel = StringUtils.isBlank(introspectedColumn.getRemarks()) ? introspectedColumn.getJavaProperty() : BeetlTemplateUtil.getFieldName(introspectedColumn.getRemarks());
-				if (introspectedColumn.getJdbcTypeName().equals("VARCHAR")) {
+				if ("VARCHAR".equals(introspectedColumn.getJdbcTypeName())) {
 					method.addAnnotation("@FieldDef(label=\"" + fieldLabel + "\", maxLength = " + introspectedColumn.getLength() + ")");
 				} else {
 					method.addAnnotation("@FieldDef(label=\"" + fieldLabel + "\")");
@@ -193,11 +193,11 @@ public class MyMapperPlugin extends PluginAdapter {
 				if (jsonObject != null) {
 					method.addAnnotation("@EditMode(editor = FieldEditor.Combo, required = " + !introspectedColumn.isNullable() + ", params=\"" + jsonObject.toJSONString().replaceAll("\"", "\\\\\"") + "\")");
 				} else {
-					if (introspectedColumn.getJdbcTypeName().equals("TIMESTAMP")) {
+					if ("TIMESTAMP".equals(introspectedColumn.getJdbcTypeName())) {
 						method.addAnnotation("@EditMode(editor = FieldEditor.Datetime, required = " + !introspectedColumn.isNullable() + ")");
-					} else if (introspectedColumn.getJdbcTypeName().equals("DATE")) {
+					} else if ("DATE".equals(introspectedColumn.getJdbcTypeName())) {
 						method.addAnnotation("@EditMode(editor = FieldEditor.Date, required = " + !introspectedColumn.isNullable() + ")");
-					} else if (introspectedColumn.getJdbcTypeName().equals("INTEGER") || introspectedColumn.getJdbcTypeName().equals("BIGINT") || introspectedColumn.getJdbcTypeName().equals("BIT")) {
+					} else if ("INTEGER".equals(introspectedColumn.getJdbcTypeName()) || "BIGINT".equals(introspectedColumn.getJdbcTypeName()) || "BIT".equals(introspectedColumn.getJdbcTypeName())) {
 						method.addAnnotation("@EditMode(editor = FieldEditor.Number, required = " + !introspectedColumn.isNullable() + ")");
 					} else {
 						method.addAnnotation("@EditMode(editor = FieldEditor.Text, required = " + !introspectedColumn.isNullable() + ")");
@@ -346,7 +346,7 @@ public class MyMapperPlugin extends PluginAdapter {
 				//设置@Column
 				method.addAnnotation("@Column(name = \""+beginningDelimiter+introspectedColumn.getActualColumnName()+beginningDelimiter+"\")");
 				//设置@FieldDef
-				if (introspectedColumn.getJdbcTypeName().equals("VARCHAR")) {
+				if ("VARCHAR".equals(introspectedColumn.getJdbcTypeName())) {
 					method.addAnnotation("@FieldDef(label=\"" + fieldLabel + "\", maxLength = " + introspectedColumn.getLength() + ")");
 				} else {
 					method.addAnnotation("@FieldDef(label=\"" + fieldLabel + "\")");
@@ -357,11 +357,11 @@ public class MyMapperPlugin extends PluginAdapter {
 				if (jsonObject != null) {
 					method.addAnnotation("@EditMode(editor = FieldEditor.Combo, required = " + !introspectedColumn.isNullable() + ", params=\"" + jsonObject.toJSONString().replaceAll("\"", "\\\\\"") + "\")");
 				} else {
-					if (introspectedColumn.getJdbcTypeName().equals("TIMESTAMP")) {
+					if ("TIMESTAMP".equals(introspectedColumn.getJdbcTypeName())) {
 						method.addAnnotation("@EditMode(editor = FieldEditor.Datetime, required = " + !introspectedColumn.isNullable() + ")");
-					} else if (introspectedColumn.getJdbcTypeName().equals("DATE")) {
+					} else if ("DATE".equals(introspectedColumn.getJdbcTypeName())) {
 						method.addAnnotation("@EditMode(editor = FieldEditor.Date, required = " + !introspectedColumn.isNullable() + ")");
-					} else if (introspectedColumn.getJdbcTypeName().equals("INTEGER") || introspectedColumn.getJdbcTypeName().equals("BIGINT") || introspectedColumn.getJdbcTypeName().equals("BIT")) {
+					} else if ("INTEGER".equals(introspectedColumn.getJdbcTypeName()) || "BIGINT".equals(introspectedColumn.getJdbcTypeName()) || "BIT".equals(introspectedColumn.getJdbcTypeName())) {
 						method.addAnnotation("@EditMode(editor = FieldEditor.Number, required = " + !introspectedColumn.isNullable() + ")");
 					} else {
 						method.addAnnotation("@EditMode(editor = FieldEditor.Text, required = " + !introspectedColumn.isNullable() + ")");
@@ -541,7 +541,7 @@ public class MyMapperPlugin extends PluginAdapter {
 		List<Attribute> attrs = element.getAttributes();
 		for (int i = 0; i < attrs.size(); i++) {
 			Attribute attr = attrs.get(i);
-			if (attr.getName().equals("id")) {
+			if ("id".equals(attr.getName())) {
 				attrs.remove(i);
 				break;
 			}

@@ -53,6 +53,7 @@ public class MyControllerPlugin extends PluginAdapter {
         return valid;
     }
 
+    @Override
     public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
         String controllerSuperClass = properties.getProperty("controllerSuperClass");
         String controllerSuperInterface = properties.getProperty("controllerSuperInterface");

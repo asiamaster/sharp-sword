@@ -185,7 +185,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
                         Field pathField = ClasspathResource.class.getDeclaredField("path");
                         pathField.setAccessible(true);
                         String templatePath = (String) pathField.get((ClasspathResource) ctx.getResource());
-                        resourceRoot = resourceRoot != null && resourceRoot.equals("/") ? "" : resourceRoot;
+                        resourceRoot = resourceRoot != null && "/".equals(resourceRoot) ? "" : resourceRoot;
                         Integer indexOfLength = 11 + resourceRoot.length();
                         t.binding("templatePath", templatePath.substring(templatePath.indexOf("/templates/" + resourceRoot) + indexOfLength, templatePath.lastIndexOf(".")));
                     }

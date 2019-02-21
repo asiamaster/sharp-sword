@@ -119,7 +119,7 @@ public class ResultTypeInterceptor implements Interceptor {
 			return objectToClass(result);
 		}else {
 			//mapper框架不处理
-			if(resultType.equals("resultType")){
+			if("resultType".equals(resultType)){
 				return null;
 			}
 			MetaObject metaObject = SystemMetaObject.forObject(parameterObject);

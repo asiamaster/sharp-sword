@@ -97,7 +97,7 @@ public class ReflectionUtils {
         for (Class<?> superClass = clazz; superClass != Object.class && superClass != null; superClass = superClass.getSuperclass()) {
             Field[] declaredFields = superClass.getDeclaredFields();
             for(Field field : declaredFields){
-                if(field.getName().equals("serialVersionUID")){
+                if("serialVersionUID".equals(field.getName())){
                     continue;
                 }
                 //是否排除static字段

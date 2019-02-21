@@ -33,19 +33,19 @@ public class ValuePairImpl<T> implements ValuePair<T> {
 		this.text = name;
 		this.value = value;
 	}
-
+	@Override
 	public String getText() {
 		return text;
 	}
-
+	@Override
 	public T getValue() {
 		return value;
 	}
-
+	@Override
 	public void setText(String name) {
 		this.text = name;
 	}
-
+	@Override
 	public void setValue(T value) {
 		this.value = value;
 	}

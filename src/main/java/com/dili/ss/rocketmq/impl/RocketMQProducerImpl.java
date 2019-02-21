@@ -75,7 +75,7 @@ public class RocketMQProducerImpl
 		}
 		return producer;
 	}
-
+	@Override
 	public void sendMsg(Message msg) throws RocketMqException {
 		try {
 			DefaultMQProducer defaultMQProducer = producer();
@@ -87,10 +87,11 @@ public class RocketMQProducerImpl
 			throw new RocketMqException("操作MQ出错!");
 		}
 	}
-
+	@Override
 	public void sendOrderMsg(Message msg, Number order) throws RocketMqException {
 		try {
 			producer().send(msg, new MessageQueueSelector() {
+						@Override
 						public MessageQueue select(List<MessageQueue> mqs, Message msg, Object arg) {
 							Number id = (Number) arg;
 							int index = (int) (id.longValue() % mqs.size());
@@ -103,7 +104,7 @@ public class RocketMQProducerImpl
 			throw new RocketMqException("操作MQ出错！");
 		}
 	}
-
+	@Override
 	public SendResult sendOrderMsg(Message msg, String order) throws RocketMqException {
 		try {
 			return producer().send(msg, new SelectMessageQueueByHash(), order);
@@ -112,7 +113,7 @@ public class RocketMQProducerImpl
 		}
 		throw new RocketMqException("操作MQ出错！");
 	}
-
+	@Override
 	public void shutdown() throws RocketMqException {
 		producer().shutdown();
 	}

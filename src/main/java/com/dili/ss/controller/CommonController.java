@@ -91,7 +91,7 @@ public class CommonController {
         String sqlStart = stringBuilder.toString();
         //声明最终执行的sql变量
         String sql = null;
-        if(conditionItems.getConditionRelationField().equals("none")){
+        if("none".equals(conditionItems.getConditionRelationField())){
             sql = sqlStart;
         }else {
             stringBuilder = new StringBuilder();

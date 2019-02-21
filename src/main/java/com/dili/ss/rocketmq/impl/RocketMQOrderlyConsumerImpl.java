@@ -21,8 +21,10 @@ public class RocketMQOrderlyConsumerImpl extends RocketMQConsumerImpl {
 		super(mqListeners);
 	}
 
-	protected MessageListener createMesageListener() {
+	@Override
+    protected MessageListener createMesageListener() {
 		return new MessageListenerOrderly() {
+			@Override
 			public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext paramConsumeOrderlyContext) {
 				Boolean success = false;
 				MessageExt msg;

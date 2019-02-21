@@ -79,7 +79,7 @@ public class BeetlConfig  {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        p.put("contextPath",contextPath.equals("${server.servlet.context-path}")?"":contextPath);
+        p.put("contextPath", "${server.servlet.context-path}".equals(contextPath) ?"":contextPath);
         beetlGroupUtilConfiguration.setSharedVars((Map)p);
         beetlGroupUtilConfiguration.setVirtualAttributeEvals(virtualAttributeEval);
         beetlGroupUtilConfiguration.setFunctions(functions);

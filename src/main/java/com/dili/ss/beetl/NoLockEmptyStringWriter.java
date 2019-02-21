@@ -25,6 +25,7 @@ public class NoLockEmptyStringWriter extends Writer
 		
 	}
 
+	@Override
 	public void write(String str) throws IOException
 	{
 		
@@ -43,6 +44,7 @@ public class NoLockEmptyStringWriter extends Writer
 
 	}
 
+	@Override
 	public String toString()
 	{
 		return "";
