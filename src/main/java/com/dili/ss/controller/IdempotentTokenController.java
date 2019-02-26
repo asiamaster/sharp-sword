@@ -4,6 +4,7 @@ import com.dili.ss.service.IdempotentTokenService;
 import com.dili.ss.servlet.dto.TokenPair;
 import com.dili.ss.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/idempotentToken")
+@ConditionalOnExpression("'${idempotent.enable}'=='true'")
 public class IdempotentTokenController {
 //    private static final Logger logger = LoggerFactory.getLogger(TokenController.class);
     @Autowired
