@@ -4,11 +4,13 @@ import com.dili.ss.service.IdempotentTokenService;
 import com.dili.ss.servlet.dto.TokenPair;
 import com.dili.ss.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@ConditionalOnExpression("'${idempotent.enable}'=='true'")
 public class IdempotentTokenServiceImpl implements IdempotentTokenService {
 
     @Autowired
