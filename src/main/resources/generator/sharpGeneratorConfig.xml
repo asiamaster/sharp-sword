@@ -91,13 +91,13 @@
         <javaModelGenerator targetPackage="com.dili.${appName}.domain" targetProject="d:/tpl"/>
         <!--<javaModelGenerator targetPackage="com.dili.ss.domain.mbg" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"/>-->
 
-        <!--<sqlMapGenerator targetPackage="mapper"  targetProject="d:/tpl"/>-->
-        <!--<javaClientGenerator targetPackage="com.dili.${appName}.dao" targetProject="d:/tpl" type="XMLMAPPER" />-->
+        <sqlMapGenerator targetPackage="mapper"  targetProject="d:/tpl"/>
+        <javaClientGenerator targetPackage="com.dili.${appName}.dao" targetProject="d:/tpl" type="XMLMAPPER" />
 
         <!--<sqlMapGenerator targetPackage="mapper"  targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources"/>-->
         <!--<javaClientGenerator targetPackage="com.dili.ss" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java" type="XMLMAPPER" />-->
 
-        <table tableName="order" >
+        <table tableName="orders" >
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
         <!--<table domainObjectName="ScheduleJob" tableName="mbg_provider">-->

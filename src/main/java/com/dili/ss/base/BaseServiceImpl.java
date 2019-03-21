@@ -495,6 +495,14 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
             StringBuilder orderByClauseBuilder = new StringBuilder();
             String[] sortFields = domain.getSort().split(",");
             String[] orderByTypes = domain.getOrder().split(",");
+            //如果orderByTypes(asc或desc)只定义了一个，则所有都按第一个来处理
+            if(sortFields.length > 1 && orderByTypes.length == 1){
+				String orderByType = orderByTypes[0];
+				orderByTypes = new String[sortFields.length];
+            	for(int i=0; i<sortFields.length; i++){
+					orderByTypes[i] = orderByType;
+				}
+			}
             //sortFields和orderTypes的对应顺序一致
             for(int i=0; i < sortFields.length; i++) {
                 String sortField = sortFields[i].trim();
