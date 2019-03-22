@@ -13,12 +13,33 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * activiti图片生成器
  * 解决中文显示问题
  */
 public class ImageGenerator {
+
+    static CustomProcessDiagramGenerator diagramGenerator = new CustomProcessDiagramGeneratorImpl();
+
+    /**
+     * 生成高亮的流程图
+     * @param bpmnModel
+     * @param imageType
+     * @param highLightedActivities
+     * @param highLightedFlows
+     * @param activityFontName
+     * @param labelFontName
+     * @param annotationFontName
+     * @param customClassLoader
+     * @param scaleFactor
+     * @param colors
+     * @return
+     */
+    public static InputStream generateDiagram(BpmnModel bpmnModel, String imageType, java.util.List<String> highLightedActivities, List<String> highLightedFlows, String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor, Color[] colors){
+        return diagramGenerator.generateDiagram(bpmnModel, imageType, highLightedActivities, highLightedFlows, activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor, colors);
+    }
 
     /**
      * 生成没有高亮的流程图
@@ -31,7 +52,6 @@ public class ImageGenerator {
      * @throws IOException
      */
     public static byte[] generateDiagram(BpmnModel bpmnModel, String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader) throws IOException {
-        CustomProcessDiagramGenerator diagramGenerator = new CustomProcessDiagramGeneratorImpl();
         InputStream is = diagramGenerator.generateDiagram(bpmnModel, "png",
                 null, null, ActivitiConstants.FONT_NAME,ActivitiConstants.FONT_NAME,ActivitiConstants.FONT_NAME,
                 customClassLoader,1.0, new Color[]{Color.BLACK, Color.BLACK});
@@ -39,15 +59,11 @@ public class ImageGenerator {
     }
 
     public static BufferedImage createImage(BpmnModel bpmnModel) {
-        CustomProcessDiagramGenerator diagramGenerator = new CustomProcessDiagramGeneratorImpl();
-        BufferedImage diagramImage = diagramGenerator.generatePngImage(bpmnModel, 1.0D);
-        return diagramImage;
+        return diagramGenerator.generatePngImage(bpmnModel, 1.0D);
     }
 
     public static BufferedImage createImage(BpmnModel bpmnModel, double scaleFactor) {
-        CustomProcessDiagramGenerator diagramGenerator = new CustomProcessDiagramGeneratorImpl();
-        BufferedImage diagramImage = diagramGenerator.generatePngImage(bpmnModel, scaleFactor);
-        return diagramImage;
+        return diagramGenerator.generatePngImage(bpmnModel, scaleFactor);
     }
 
     public static byte[] createByteArrayForImage(BufferedImage image, String imageType) {

@@ -63,9 +63,6 @@ public class ActivitiServiceImpl implements ActivitiService {
     @Autowired
     private SpringProcessEngineConfiguration springProcessEngineConfiguration;
 
-    @Autowired
-    CustomProcessDiagramGenerator customProcessDiagramGenerator;
-
     private final Logger log = LoggerFactory.getLogger(ActivitiServiceImpl.class);
     //高亮线
     private final Color LINE_COLOR = new Color(30, 160, 30);
@@ -397,7 +394,7 @@ public class ActivitiServiceImpl implements ActivitiService {
 //                "宋体",
 //                "宋体",
 //                springProcessEngineConfiguration.getClassLoader(),1.0);
-        InputStream is = customProcessDiagramGenerator.generateDiagram(bpmnModel, "png",
+        InputStream is = ImageGenerator.generateDiagram(bpmnModel, "png",
                 null, null, ActivitiConstants.FONT_NAME,ActivitiConstants.FONT_NAME,ActivitiConstants.FONT_NAME,
                 springProcessEngineConfiguration.getClassLoader(),1.0, new Color[]{LINE_COLOR, ACTIVITY_COLOR});
         OutputStream outputStream = response.getOutputStream();
@@ -487,7 +484,7 @@ public class ActivitiServiceImpl implements ActivitiService {
 //                        springProcessEngineConfiguration.getClassLoader(),
 //                                1.0);
 
-                imageStream = customProcessDiagramGenerator.generateDiagram(bpmnModel, "png",
+                imageStream = ImageGenerator.generateDiagram(bpmnModel, "png",
                         activeActivityIds, highLightedFlows, ActivitiConstants.FONT_NAME,ActivitiConstants.FONT_NAME,ActivitiConstants.FONT_NAME,
                         //Color数据第一个是线的颜色，第二个是活动的颜色
                         springProcessEngineConfiguration.getClassLoader(),1.0, new Color[]{LINE_COLOR, ACTIVITY_COLOR});
