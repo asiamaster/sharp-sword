@@ -1,7 +1,6 @@
 package com.dili.ss.activiti.util;
 
 import com.dili.ss.activiti.component.CustomProcessDiagramGenerator;
-import com.dili.ss.activiti.component.impl.CustomProcessDiagramGeneratorImpl;
 import com.dili.ss.activiti.consts.ActivitiConstants;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.image.exception.ActivitiImageException;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 public class ImageGenerator {
 
-    static CustomProcessDiagramGenerator diagramGenerator = new CustomProcessDiagramGeneratorImpl();
+    public static CustomProcessDiagramGenerator diagramGenerator;
 
     /**
      * 生成高亮的流程图
