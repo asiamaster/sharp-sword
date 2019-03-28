@@ -25,7 +25,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mapper.version>3.3.9</mapper.version>
         <mysql.version>5.1.38</mysql.version>
-        <sharp-sword.version>2.2.0-SNAPSHOT</sharp-sword.version>
     </properties>
 
     <!-- 父工程定义 -->
@@ -290,7 +289,16 @@
             <version>\${springloaded.version}</version>
         </dependency>
         <!-- 内部包  -->
-
+        <dependency>
+            <groupId>com.dili</groupId>
+            <artifactId>commons</artifactId>
+            <version>1.0.7-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dili</groupId>
+            <artifactId>uap-sdk</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
