@@ -23,8 +23,12 @@ public class RestfulUtil {
             throw new RuntimeException("@Restful注解的baseUrl或value必填");
         }
         try {
+            Object interfaceHandler = B.b.g("interfaceHandler");
+            if(interfaceHandler == null){
+                return null;
+            }
             return (T) Proxy.newProxyInstance(clazz.getClassLoader(),
-                    new Class<?>[] { clazz }, (InvocationHandler)((Class)B.b.g("interfaceHandler")).getConstructor(Class.class).newInstance(clazz));
+                    new Class<?>[] { clazz }, (InvocationHandler)((Class)interfaceHandler).getConstructor(Class.class).newInstance(clazz));
         } catch (Exception e) {
             return null;
         }
