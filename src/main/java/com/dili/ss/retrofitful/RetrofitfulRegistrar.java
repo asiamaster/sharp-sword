@@ -1,5 +1,6 @@
 package com.dili.ss.retrofitful;
 
+import com.dili.ss.boot.InitConfig;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.retrofitful.annotation.Restful;
 import com.dili.ss.retrofitful.annotation.RestfulScan;
@@ -41,6 +42,7 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
+        InitConfig.init();
         Set<String> basePackages = getBasePackages(annotationMetadata);
         for (String basePackage : basePackages) {
             Resource rootResource = getRootResource(basePackage);

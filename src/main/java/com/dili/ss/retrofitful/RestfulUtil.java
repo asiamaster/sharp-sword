@@ -27,7 +27,6 @@ public class RestfulUtil {
             return (T) Proxy.newProxyInstance(clazz.getClassLoader(),
                     new Class<?>[] { clazz }, (InvocationHandler)((Class)B.b.g("interfaceHandler")).getConstructor(Class.class).newInstance(clazz));
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
 

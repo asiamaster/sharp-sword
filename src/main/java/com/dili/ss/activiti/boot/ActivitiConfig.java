@@ -38,6 +38,7 @@ public class ActivitiConfig implements ProcessEngineConfigurationConfigurer {
             springProcessEngineConfiguration.setProcessDiagramGenerator(processDiagramGenerator);
             ImageGenerator.diagramGenerator = (CustomProcessDiagramGenerator) processDiagramGenerator;
         } catch (Exception e) {
+            return;
         }
         springProcessEngineConfiguration.setHistory(HistoryLevel.NONE.getKey());
         List<ActivitiEventListener> activitiEventListener=new ArrayList<ActivitiEventListener>();
