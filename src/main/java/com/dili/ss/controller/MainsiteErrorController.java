@@ -58,6 +58,17 @@ public class MainsiteErrorController implements ErrorController {
 //	页面错误
 	@RequestMapping(produces = "text/html")
 	public String handleError(HttpServletRequest request, HttpServletResponse response){
+		//获取statusCode:401,404,500
+//		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code")
+//		if(statusCode == 401){
+//			return "/401"
+//		}else if(statusCode == 404){
+//			return "/404"
+//		}else if(statusCode == 403){
+//			return "/403"
+//		}else{
+//			return "/500"
+//		}
 		return SystemConfigUtils.getProperty("error.page.404", "error/404");
 	}
 

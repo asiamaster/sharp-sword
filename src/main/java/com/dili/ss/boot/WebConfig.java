@@ -167,6 +167,7 @@ public class WebConfig implements WebMvcConfigurer {
 	 *
 	 */
 	@Bean
+	@ConditionalOnExpression("'${exceptionResolver.enable}'=='true'")
 	public SimpleMappingExceptionResolver simpleMappingExceptionResolver(){
 		SimpleMappingExceptionResolver simpleMappingExceptionResolver = new SimpleMappingExceptionResolver();
 //		定义默认的异常处理页面

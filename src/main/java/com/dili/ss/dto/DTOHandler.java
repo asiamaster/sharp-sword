@@ -6,6 +6,7 @@ package com.dili.ss.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.metadata.annotation.FieldDef;
 import com.dili.ss.util.POJOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,6 +17,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * DTO层的代理处理器
@@ -60,11 +62,22 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 			if (POJOUtils.isSetMethod(method)) {
 				assert (args != null);
 				assert (args.length > 0);
-				delegate.put(field, args[0]);
+				FieldDef fieldDef = method.getAnnotation(FieldDef.class);
+				if(fieldDef == null || fieldDef.handler() == Function.class){
+					delegate.put(field, args[0]);
+				}else{
+					delegate.put(field, fieldDef.handler().newInstance().apply(args[0]));
+				}
+
 			// 取值情况
 			} else {
 				//getter方法返回类型
 				Class<?> returnType = method.getReturnType();
+				FieldDef fieldDef = method.getAnnotation(FieldDef.class);
+				//如果FieldDef注解不为空，并且有实现类
+				if(fieldDef != null && !fieldDef.handler().getClass().isInterface()) {
+					return fieldDef.handler().newInstance().apply(delegate.get(field));
+				}
 				//代理对象的key中包含getter方法的属性名称，需要设置(转换)当前代理对象中该值的类型
 				if (delegate.containsKey(field)) {
 					retval = delegate.get(field);

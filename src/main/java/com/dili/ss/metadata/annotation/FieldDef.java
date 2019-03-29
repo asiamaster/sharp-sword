@@ -1,6 +1,7 @@
 package com.dili.ss.metadata.annotation;
 
 import java.lang.annotation.*;
+import java.util.function.Function;
 
 /**
  * DTO字段定义
@@ -34,5 +35,10 @@ public @interface FieldDef {
 	 */
 	String defValue() default "";
 
+	/**
+	 * 值处理者
+	 * @return
+	 */
+	Class<? extends Function> handler() default Function.class;
 
 }

@@ -1,7 +1,6 @@
 package com.dili.ss.activiti.service.impl;
 
 import com.dili.ss.activiti.component.CustomBpmnJsonConverter;
-import com.dili.ss.activiti.component.CustomProcessDiagramGenerator;
 import com.dili.ss.activiti.consts.ActivitiConstants;
 import com.dili.ss.activiti.dto.ActModelVO;
 import com.dili.ss.activiti.service.ActivitiService;
@@ -29,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +48,7 @@ import java.util.List;
  * @since 1.0
  */
 @Service
+@ConditionalOnExpression("'${activiti.enable}'=='true'")
 public class ActivitiServiceImpl implements ActivitiService {
 
     @Autowired

@@ -10,6 +10,7 @@ import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Resource;
@@ -22,6 +23,7 @@ import java.util.List;
  * @since 1.0
  */
 @Configuration
+@ConditionalOnExpression("'${activiti.enable}'=='true'")
 public class ActivitiConfig implements ProcessEngineConfigurationConfigurer {
 
     @Resource
