@@ -4,8 +4,8 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.dili</groupId>
-	<artifactId>dili-${projectName}</artifactId>
-	<name>dili-${projectName}</name>
+	<artifactId>${projectName}-parent</artifactId>
+	<name>${projectName}-parent</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<!--<version>1.0.0.RELEASE</version>-->
 	<description>父项目</description>

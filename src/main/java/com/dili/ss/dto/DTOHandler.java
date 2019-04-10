@@ -75,7 +75,7 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 				Class<?> returnType = method.getReturnType();
 				FieldDef fieldDef = method.getAnnotation(FieldDef.class);
 				//如果FieldDef注解不为空，并且有实现类
-				if(fieldDef != null && !fieldDef.handler().getClass().isInterface()) {
+				if(fieldDef != null && !fieldDef.handler().isInterface()) {
 					return fieldDef.handler().newInstance().apply(delegate.get(field));
 				}
 				//代理对象的key中包含getter方法的属性名称，需要设置(转换)当前代理对象中该值的类型

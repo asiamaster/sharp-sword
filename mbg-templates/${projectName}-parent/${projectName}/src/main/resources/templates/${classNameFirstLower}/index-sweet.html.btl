@@ -330,7 +330,7 @@
                 swal('警告','请选中一条数据', 'warning');
                 return;
             }
-            <#swalConfirm swalTitle="您确认想要删除记录吗？">
+            ${"<#"}swalConfirm swalTitle="您确认想要删除记录吗？">
                     $.ajax({
                         type: "POST",
                         url: "\${contextPath}/${classNameFirstLower}/delete.action",
@@ -350,8 +350,7 @@
                             swal('错误', '远程访问失败', 'error');
                         }
                     });
-            </#swalConfirm>
-
+            ${"</#"}swalConfirm>
         }
         //表格查询
         function queryGrid() {

@@ -145,7 +145,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
      * @param id2RelTable
      */
     private void setDtoData(List list, Map<String, Map> id2RelTable, Map metaMap){
-        if(list.get(0) instanceof IDTO) {
+        if(list.get(0) instanceof IDTO && list.get(0).getClass().isInterface()) {
             for (Object obj : list) {
                 IDTO dto = (IDTO) obj;
                 //记录要转义的字段，避免被覆盖

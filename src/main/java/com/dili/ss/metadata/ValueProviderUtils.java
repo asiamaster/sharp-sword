@@ -1,6 +1,5 @@
 package com.dili.ss.metadata;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.BaseDomain;
@@ -96,7 +95,6 @@ public class ValueProviderUtils {
 		if (medadata.isEmpty()) {
 			return list;
 		}
-		List<Map> results = new ArrayList<>(list.size());
 		//复制一个出来，避免修改，这里用putAll进行简单的深拷贝就行了，因为只是删除元素进行性能优化
 		Map metadataCopy = new HashMap(medadata.size());
 		metadataCopy.putAll(medadata);
@@ -117,8 +115,11 @@ public class ValueProviderUtils {
 				return 0;
 			}
 		});
-		//仅用于下面while循环中缓存下提供者bean
-		Map<String, BatchValueProvider> bvpBuffer = new HashMap<>();
+		//返回提供者转义后的列表
+		List<Map> results = new ArrayList<>(list.size());
+		for (Object t : list) {
+			results.add(BeanConver.transformObjectToMap(t));
+		}
 		Iterator<Map.Entry<String, Object>> it = metadataCopyList.iterator();
 		while(it.hasNext()){
 			Map.Entry<String, Object> entry = it.next();
@@ -136,81 +137,43 @@ public class ValueProviderUtils {
 				jsonValue.put(ValueProvider.FIELD_KEY, key) ;
 			}
 			String providerBeanId = jsonValue.get("provider").toString();
-			if (bvpBuffer.containsKey(providerBeanId)) {
-				batchValueProvider = bvpBuffer.get(providerBeanId);
-			} else {
-				Object bean = SpringUtil.getBean(providerBeanId);
-				if (bean instanceof BatchValueProvider) {
-					batchValueProvider = (BatchValueProvider) bean;
-					bvpBuffer.put(providerBeanId, batchValueProvider);
-					it.remove();
-				} else {
-					continue;
-				}
-			}
-			//批量设置列表
-			try {
-				batchValueProvider.setDisplayList(list, jsonValue, objectMeta);
-			}catch (Exception e){
-				e.printStackTrace();
-				LOGGER.error("提供者报错:"+batchValueProvider.getClass().getName());
-			}
-
-		}
-		//仅用于下面for循环中缓存下提供者bean
-		Map<String, ValueProvider> vpBuffer = new HashMap<>();
-		for (Object t : list) {
-			Map dataMap = BeanConver.transformObjectToMap(t);
-			metadataCopyList.forEach((entry) -> {
-				ValueProvider valueProvider = null;
-				//key是字段field
-				String key = entry.getKey();
-				//value是provider相关的json对象
-				JSONObject jsonValue = null;
-				try{
-					jsonValue = entry.getValue() instanceof String ? JSONObject.parseObject((String)entry.getValue()) : (JSONObject)JSONObject.toJSON(entry.getValue());
-				} catch (JSONException e) {
-//					e.printStackTrace();
-					return;
-				}
-				String providerBeanId = jsonValue.get(ValueProvider.PROVIDER_KEY).toString();
-				jsonValue.put(ValueProvider.FIELD_KEY, key);
-				String field = key;
-//				jsonValue.remove("provider");
-				jsonValue.put(ValueProvider.ROW_DATA_KEY, t);
-				if (vpBuffer.containsKey(providerBeanId)) {
-					valueProvider = vpBuffer.get(providerBeanId);
-				} else {
-					Object bean = SpringUtil.getBean(providerBeanId);
-					if (bean instanceof ValueProvider) {
-						valueProvider = (ValueProvider) bean;
-						vpBuffer.put(providerBeanId, valueProvider);
-					} else {
-						return;
-					}
-				}
-				FieldMeta fieldMeta = objectMeta == null ? null : objectMeta.getFieldMetaById(field);
+			Object bean = SpringUtil.getBean(providerBeanId);
+			if (bean instanceof BatchValueProvider) {
+				batchValueProvider = (BatchValueProvider) bean;
+				//批量设置列表
 				try {
-					String text = valueProvider.getDisplayText(dataMap.get(field), jsonValue, fieldMeta);
-					//保留原值，用于在修改时提取表单加载，但是需要过滤掉日期类型，
-					// 因为前台无法转换Long类型的日期格式,并且也没法判断是日期格式
-					// 配合批量提供者处理，如果转换后的显示值返回null，则不保留原值
-					if (text != null &&  !(dataMap.get(field) instanceof Date)) {
-						dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(field));
-					}
-					//批量提供者只put转换后不为null的值
-					if(text != null && valueProvider instanceof BatchValueProvider) {
-						dataMap.put(field, text);
-						//普通值提供者put所有转化后的值(无论是否为空)
-					}else if(!(valueProvider instanceof BatchValueProvider)){
-						dataMap.put(field, text);
-					}
+					batchValueProvider.setDisplayList(results, jsonValue, objectMeta);
 				}catch (Exception e){
 					e.printStackTrace();
-					LOGGER.error("提供者报错:"+valueProvider.getClass().getName());
+					LOGGER.error("批量提供者报错:"+batchValueProvider.getClass().getName());
 				}
-			});
-			results.add(dataMap);
+			} else {//普通值提供者
+				for (Map dataMap : results) {
+					String field = key;
+					jsonValue.put(ValueProvider.ROW_DATA_KEY, dataMap);
+					ValueProvider valueProvider = (ValueProvider) bean;
+					FieldMeta fieldMeta = objectMeta == null ? null : objectMeta.getFieldMetaById(field);
+					try {
+						String text = valueProvider.getDisplayText(dataMap.get(field), jsonValue, fieldMeta);
+						//保留原值，用于在修改时提取表单加载，但是需要过滤掉日期类型，
+						// 因为前台无法转换Long类型的日期格式,并且也没法判断是日期格式
+						// 配合批量提供者处理，如果转换后的显示值返回null，则不保留原值
+						if (text != null &&  !(dataMap.get(field) instanceof Date)) {
+							dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(field));
+						}
+						//批量提供者只put转换后不为null的值
+						if(text != null && valueProvider instanceof BatchValueProvider) {
+							dataMap.put(field, text);
+							//普通值提供者put所有转化后的值(无论是否为空)
+						}else if(!(valueProvider instanceof BatchValueProvider)){
+							dataMap.put(field, text);
+						}
+					}catch (Exception e){
+						e.printStackTrace();
+						LOGGER.error("提供者报错:"+valueProvider.getClass().getName());
+					}
+				}//end of for
+			}// end of else
 		}
 		return results;
 	}
