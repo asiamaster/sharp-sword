@@ -111,7 +111,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                             Object relationTablePkFieldValue = map.get(getRelationTablePkField(metaMap));
                             if(relationTablePkFieldValue != null) {
                                 //如果大小写不敏感，则统一关联字段转小写
-                                if(ignoreCaseToRef()) {
+                                if(ignoreCaseToRef(metaMap)) {
                                     id2RelTable.put(relationTablePkFieldValue.toString().toLowerCase(), map);
                                 }else{
                                     id2RelTable.put(relationTablePkFieldValue.toString(), map);
@@ -135,14 +135,14 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
      * 子类可以实现，默认大小写敏感
      * @return
      */
-    protected boolean ignoreCaseToRef(){
+    protected boolean ignoreCaseToRef(Map metaMap){
         return false;
     }
 
     /**
      * 设置转义值，支持dto,map和javaBean
      * @param list
-     * @param id2RelTable
+     * @param id2RelTable key为id，value为关联DTO
      */
     private void setDtoData(List list, Map<String, Map> id2RelTable, Map metaMap){
         if(list.get(0) instanceof IDTO && list.get(0).getClass().isInterface()) {
@@ -156,7 +156,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 }
                 String key = keyObj.toString();
                 //如果大小写不敏感，则统一关联字段转小写
-                if(ignoreCaseToRef()) {
+                if(ignoreCaseToRef(metaMap)) {
                     key = key.toLowerCase();
                 }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
@@ -180,7 +180,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 //记录要转义的字段，避免被覆盖
                 String key = keyObj.toString();
                 //如果大小写不敏感，则统一关联字段转小写
-                if(ignoreCaseToRef()) {
+                if(ignoreCaseToRef(metaMap)) {
                     key = key.toLowerCase();
                 }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
@@ -204,7 +204,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 //记录要转义的字段，避免被覆盖
                 String key = keyObj.toString();
                 //如果大小写不敏感，则统一关联字段转小写
-                if(ignoreCaseToRef()) {
+                if(ignoreCaseToRef(metaMap)) {
                     key = key.toLowerCase();
                 }
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
@@ -228,17 +228,33 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
     protected abstract List getFkList(List<String> relationIds, Map metaMap);
 
     /**
-     * 返回主DTO和关联DTO需要转义的字段名
+     * 返回主DTO和关联DTO需要转义的字段名，可同时转义多个字段
      * Map中key为主DTO在页面(datagrid)渲染时需要的(field)字段名， value为关联DTO中对应的显示值的字段名
      * @return
      */
-    protected abstract Map<String, String> getEscapeFileds(Map metaMap);
-//    {
+    //    {
 //        Map<String, String> excapeFields = new HashMap<>();
 //        excapeFields.put("customerName", "name");
 //        excapeFields.put("customerPhone", "phone");
 //        return excapeFields;
 //    }
+    protected Map<String, String> getEscapeFileds(Map metaMap){
+        if(metaMap.get(ESCAPE_FILEDS_KEY) instanceof Map){
+            return (Map)metaMap.get(ESCAPE_FILEDS_KEY);
+        }else {
+            Map<String, String> map = new HashMap<>();
+            map.put(metaMap.get(FIELD_KEY).toString(), getEscapeFiled(metaMap));
+            return map;
+        }
+    }
+
+    /**
+     * 返回主DTO和关联DTO需要转义的字段名
+     * @param metaMap
+     * @return
+     */
+    protected String getEscapeFiled(Map metaMap){return null;};
+
 
     /**
      * 主DTO与关联DTO的关联(java bean)属性(外键)

@@ -28,6 +28,15 @@
         ,valueField:"value"
         ,textField:"text"
         ,queryParams:_comboProviderParamObj_${_id}
+        <% if(has(_value)){ %>
+        ,onLoadSuccess: function () {
+            $(this).combobox('select', '${_value}');
+        }
+        <% }else if(has(_selectOne) && _selectOne == "true"){ %>
+        ,onLoadSuccess: function () {
+            onComboLoadSuccessSelectOne();
+        }
+        <% } %>
     })
     <% } %>
 </script>
