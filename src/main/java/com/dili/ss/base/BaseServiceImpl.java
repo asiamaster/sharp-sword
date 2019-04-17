@@ -5,6 +5,7 @@ import com.dili.ss.dao.ExampleExpand;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.BasePage;
 import com.dili.ss.domain.EasyuiPageOutput;
+import com.dili.ss.domain.annotation.FindInSet;
 import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
 import com.dili.ss.dto.DTOUtils;
@@ -544,6 +545,7 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
             }
             Like like = field.getAnnotation(Like.class);
             Operator operator = field.getAnnotation(Operator.class);
+			FindInSet findInSet = field.getAnnotation(FindInSet.class);
             Class<?> fieldType = field.getType();
             Object value = null;
             try {
@@ -598,7 +600,13 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                 }else {
                     criteria = criteria.andCondition(columnName + " " + operator.value() + " '" + value + "' ");
                 }
-            }else{
+            }else if(findInSet != null){
+				if(Number.class.isAssignableFrom(value.getClass())){
+					criteria = criteria.andCondition("find_in_set (" + value + ", "+columnName+")");
+				}else{
+					criteria = criteria.andCondition("find_in_set ('" + value + "', "+columnName+")");
+				}
+			}else{
                 criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
             }
         }
@@ -662,7 +670,8 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                 continue;
             }
             Column column = method.getAnnotation(Column.class);
-            String columnName = column == null ? POJOUtils.getBeanField(method) : column.name();
+            //数据库列名
+            String columnName = column == null ? POJOUtils.humpToLineFast(POJOUtils.getBeanField(method)) : column.name();
 //			跳过空值字段
             if(isNullField(columnName, domain.getMetadata(IDTO.NULL_VALUE_FIELD))){
                 continue;
@@ -672,7 +681,8 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                 continue;
             }
             Like like = method.getAnnotation(Like.class);
-            Operator operator = method.getAnnotation(Operator.class);
+			Operator operator = method.getAnnotation(Operator.class);
+			FindInSet findInSet = method.getAnnotation(FindInSet.class);
             Class<?> fieldType = method.getReturnType();
             Object value = getGetterValue(domain, method);
             //没值就不拼接sql
@@ -727,7 +737,13 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
                 }else {
                     criteria = criteria.andCondition(columnName + " " + operator.value() + " '" + value + "' ");
                 }
-            }else{
+            }else if(findInSet != null){
+				if(Number.class.isAssignableFrom(value.getClass())){
+					criteria = criteria.andCondition("find_in_set (" + value + ", "+columnName+")");
+				}else{
+					criteria = criteria.andCondition("find_in_set ('" + value + "', "+columnName+")");
+				}
+			}else{
 				if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
 					criteria = criteria.andCondition(columnName + " = "+ value+" ");
 				}else{
