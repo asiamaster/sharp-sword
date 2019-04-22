@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dili</groupId>
-    <version>2.4.2-SNAPSHOT</version>
+    <version>2.5.0-SNAPSHOT</version>
     <artifactId>sharp-sword</artifactId>
     <description>利刃</description>
     <packaging>jar</packaging>
@@ -539,51 +539,6 @@
             <version>1.1.2</version>
         </dependency>
 
-        <!-- activiti -->
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-spring-boot-starter-basic</artifactId>
-            <version>5.22.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-spring-boot-starter-jpa</artifactId>
-            <version>5.22.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-modeler</artifactId>
-            <version>5.22.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.activiti</groupId>
-                    <artifactId>activiti-bpmn-model</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.security</groupId>
-                    <artifactId>spring-security-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.security</groupId>
-                    <artifactId>spring-security-crypto</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.security</groupId>
-                    <artifactId>spring-security-config</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>provided</scope>
-        </dependency>
-        <!-- 自动创建流程图布局 -->
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-bpmn-layout</artifactId>
-            <version>5.22.0</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -668,6 +623,14 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
             <version>1.4.7</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
 
