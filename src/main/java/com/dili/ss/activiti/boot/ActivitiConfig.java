@@ -10,7 +10,9 @@ import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Resource;
@@ -28,6 +30,8 @@ public class ActivitiConfig implements ProcessEngineConfigurationConfigurer {
 
     @Resource
     private GlobalActivitiEventListener globalActivitiEventListener;
+    @Resource
+    private ProcessDiagramGenerator processDiagramGenerator;
     @Override
     public void configure(SpringProcessEngineConfiguration springProcessEngineConfiguration) {
         springProcessEngineConfiguration.setActivityFontName(ActivitiConstants.FONT_NAME);
@@ -35,7 +39,6 @@ public class ActivitiConfig implements ProcessEngineConfigurationConfigurer {
         springProcessEngineConfiguration.setLabelFontName(ActivitiConstants.FONT_NAME);
         springProcessEngineConfiguration.setIdGenerator(new IdGen());
         try {
-            ProcessDiagramGenerator processDiagramGenerator = (ProcessDiagramGenerator) ((Class<ProcessDiagramGenerator>)B.b.g("customProcessDiagramGenerator")).newInstance();
             springProcessEngineConfiguration.setProcessDiagramGenerator(processDiagramGenerator);
             ImageGenerator.diagramGenerator = (CustomProcessDiagramGenerator) processDiagramGenerator;
         } catch (Exception e) {

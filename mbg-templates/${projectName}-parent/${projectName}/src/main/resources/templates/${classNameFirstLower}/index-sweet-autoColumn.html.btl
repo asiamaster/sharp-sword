@@ -108,6 +108,7 @@
                 <thead>
                     <tr>
                     <%
+                    if(table.allColumns.~size > 1){
                     //宽度百分比需要减去主键列
                     var widthPercent = 101 / (table.allColumns.~size - 1);
                     for(var i=0; i<table.allColumns.~size;i++){//for start
@@ -149,7 +150,8 @@
                             ${fieldName}
                         </th>
                     <%
-                    }//for end%>
+                    }//for end
+                    }%> // if end
                     </tr>
                 </thead>
             </table>

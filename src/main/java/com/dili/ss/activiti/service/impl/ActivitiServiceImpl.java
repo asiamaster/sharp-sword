@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Activiti通用服务
  * @author asiamaster
  * @date 2019-2-27 10:02:54
  * @since 1.0
@@ -388,13 +389,6 @@ public class ActivitiServiceImpl implements ActivitiService {
      */
     @Override
     public void showImageByBpmnModel(BpmnModel bpmnModel, HttpServletResponse response) throws Exception{
-//        InputStream is = springProcessEngineConfiguration.getProcessDiagramGenerator().generateDiagram(
-//                bpmnModel,
-//                "png",
-//                "宋体",
-//                "宋体",
-//                "宋体",
-//                springProcessEngineConfiguration.getClassLoader(),1.0);
         InputStream is = ImageGenerator.generateDiagram(bpmnModel, "png",
                 null, null, ActivitiConstants.FONT_NAME,ActivitiConstants.FONT_NAME,ActivitiConstants.FONT_NAME,
                 springProcessEngineConfiguration.getClassLoader(),1.0, new Color[]{LINE_COLOR, ACTIVITY_COLOR});

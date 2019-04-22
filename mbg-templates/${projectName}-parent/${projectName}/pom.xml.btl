@@ -186,17 +186,6 @@
             <artifactId>okio</artifactId>
             <version>1.11.0</version>
         </dependency>
-        <!-- mariadb -->
-        <!--<dependency>-->
-            <!--<groupId>org.mariadb.jdbc</groupId>-->
-            <!--<artifactId>mariadb-java-client</artifactId>-->
-            <!--<version>1.1.7</version>-->
-        <!--</dependency>-->
-        <!-- mysql -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
 
         <!-- if you enable json support in spring mvc. -->
         <dependency>

@@ -2,12 +2,14 @@ package com.dili.ss.activiti.listener;
 
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.stereotype.Component;
 
 /**
  * 全局事件监听
  */
-//@Component
-//@ConditionalOnExpression("'${activiti.enable}'=='true'")
+@Component
+@ConditionalOnExpression("'${activiti.enable}'=='true'")
 public class GlobalActivitiEventListener implements ActivitiEventListener {
     @Override
     public void onEvent(ActivitiEvent event) {

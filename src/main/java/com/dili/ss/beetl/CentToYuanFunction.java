@@ -23,7 +23,6 @@ public class CentToYuanFunction implements Function {
             }
             catch (Exception e)
             {
-//                throw new RuntimeException(e);
                 return "分转元失败,参数:"+o;
             }
         }
