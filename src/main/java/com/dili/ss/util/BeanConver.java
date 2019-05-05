@@ -255,14 +255,13 @@ public class BeanConver {
      * @return
      * @throws Exception
      */
-    public static Map<String, Object> transformObjectToMap(Object bean) throws Exception {
+    public static Map<String, Object> transformObjectToMap(Object bean, Class<?> type) throws Exception {
         if(bean instanceof Map){
             return (Map) bean;
         }
         if(DTOUtils.isDTOProxy(bean)){
             return DTOUtils.go(bean);
         }
-        Class<?> type = bean.getClass();
         Map<String, Object> returnMap = new HashMap<String, Object>();
         BeanInfo beanInfo = Introspector.getBeanInfo(type);
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
@@ -278,6 +277,17 @@ public class BeanConver {
             }
         }
         return returnMap;
+    }
+
+    /**
+     * 把javaBean或dto对象转换为Map键值对
+     *
+     * @param bean or dto
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> transformObjectToMap(Object bean) throws Exception {
+        return transformObjectToMap(bean, bean.getClass());
     }
 
 
