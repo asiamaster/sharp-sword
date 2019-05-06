@@ -90,6 +90,23 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
+	public int deleteByExample(T t) {
+		Class tClazz = getSuperClassGenricType(getClass(), 0);
+		if(null == t) {
+			t = getDefaultBean (tClazz);
+		}
+		Example example = new Example(tClazz);
+		//接口只取getter方法
+		if(tClazz.isInterface()) {
+			buildExampleByGetterMethods(t, example);
+		}else {//类取属性
+			buildExampleByFields(t, example);
+		}
+		return mapper.deleteByExample(example);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
 //	@Caching(evict = {@CacheEvict(value = "rc", key = "#root.getTarget().redisKey()+':id:' + #key")})
 	public int delete(List<KEY> ids) {
 		Type t = getClass().getGenericSuperclass();

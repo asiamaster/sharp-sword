@@ -45,6 +45,13 @@ public interface BaseService<T,KEY extends Serializable> {
 	int delete(KEY key);
 
 	/**
+	 * 根据条件删除对象
+	 * @param t 条件对象
+	 * @return 影响条数
+	 */
+	int deleteByExample(T t);
+
+	/**
 	 * 批量删除对象,主键集合
 	 * @param keys 主键数组
 	 * @return 影响条数
