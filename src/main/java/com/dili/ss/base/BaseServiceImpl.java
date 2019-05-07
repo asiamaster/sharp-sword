@@ -12,6 +12,7 @@ import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.dto.IMybatisForceParams;
+import com.dili.ss.exception.ParamErrorException;
 import com.dili.ss.metadata.ValueProviderUtils;
 import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
@@ -23,9 +24,6 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -37,6 +35,7 @@ import javax.persistence.Transient;
 import java.io.Serializable;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -577,6 +576,10 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
             if(value == null) {
                 continue;
             }
+			//防注入
+			if(value instanceof String && !checkXss((String)value)){
+				throw new ParamErrorException("SQL注入拦截:"+value);
+			}
             if(like != null) {
                 switch(like.value()){
                     case Like.LEFT:
@@ -651,6 +654,25 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
         setOrderBy(domain, example);
     }
 
+	private static final String sqlReg = "(?:')|(?:--)|(/\\*(?:.|[\\n\\r])*?\\*/)|"+ "(\\b(select|update|and|or|delete|insert|trancate|char|into|substr|ascii|declare|exec|count|master|into|drop|execute)\\b)";
+	private static Pattern sqlPattern = Pattern.compile(sqlReg, Pattern.CASE_INSENSITIVE);
+	/**
+	 * 检测SQL注入
+	 *
+	 * @param value
+	 * @return
+	 */
+	private boolean checkXss(String value) {
+		if (value == null || "".equals(value)) {
+			return true;
+		}
+		if (sqlPattern.matcher(value).find()) {
+			LOGGER.error("SQL注入拦截:" + value);
+			return false;
+		}
+		return true;
+	}
+
     /**
      * 判断该方法是否要排除，用于buildExampleByGetterMethods
      * 排除非getter，getPage(),getRows(),getMetadata()和getMetadata(String key)等IBaseDomain或BaseDomain上定义的基础方法
@@ -706,6 +728,10 @@ public abstract class BaseServiceImpl<T extends IBaseDomain, KEY extends Seriali
             if(value == null || "".equals(value)) {
                 continue;
             }
+			//防注入
+			if(value instanceof String && !checkXss((String)value)){
+				throw new ParamErrorException("SQL注入拦截:"+value);
+			}
             if(like != null) {
                 switch(like.value()){
                     case Like.LEFT:

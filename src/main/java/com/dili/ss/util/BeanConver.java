@@ -252,10 +252,12 @@ public class BeanConver {
      * 把javaBean或dto对象转换为Map键值对
      *
      * @param bean or dto
+     * @param type 转换的类型
+     * @param recursive 向上递归
      * @return
      * @throws Exception
      */
-    public static Map<String, Object> transformObjectToMap(Object bean, Class<?> type) throws Exception {
+    public static Map<String, Object> transformObjectToMap(Object bean, Class<?> type, boolean recursive) throws Exception {
         if(bean instanceof Map){
             return (Map) bean;
         }
@@ -263,6 +265,16 @@ public class BeanConver {
             return DTOUtils.go(bean);
         }
         Map<String, Object> returnMap = new HashMap<String, Object>();
+        if(recursive){
+            if(type.getSuperclass() != null){
+                returnMap.putAll(transformObjectToMap(bean, type, true));
+            }
+            if(type.getInterfaces() != null && type.getInterfaces().length > 0){
+                for(Class<?> intf : type.getInterfaces()){
+                    returnMap.putAll(transformObjectToMap(bean, intf, true));
+                }
+            }
+        }
         BeanInfo beanInfo = Introspector.getBeanInfo(type);
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
         for (int i = 0; i < propertyDescriptors.length; i++) {
@@ -277,6 +289,18 @@ public class BeanConver {
             }
         }
         return returnMap;
+    }
+
+    /**
+     * 把javaBean或dto对象转换为Map键值对
+     *
+     * @param bean or dto
+     * @param type 转换的类型
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> transformObjectToMap(Object bean, Class<?> type) throws Exception {
+        return transformObjectToMap(bean, type, false);
     }
 
     /**
